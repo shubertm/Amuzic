@@ -13,3 +13,4 @@ local.properties
 *.tab
 *.tab.values.at
 misc.xml
+/.idea/
