@@ -1,7 +1,7 @@
 *.iml
 .gradle
-/local.properties
 .idea
+/local.properties
 .DS_Store
 /build
 /captures
@@ -13,4 +13,3 @@ local.properties
 *.tab
 *.tab.values.at
 misc.xml
-/.idea/
