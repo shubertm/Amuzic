@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Amuzic</string>
+    <string name="app_name_debug">Amuzic [Debug]</string>
+    <string name="all_songs">All songs</string>
+    <string name="artists">Artists</string>
+    <string name="albums">Albums</string>
+    <string name="folders">Folders</string>
+    <string name="confirm_exit">Tap back again to exit</string>
+</resources>
