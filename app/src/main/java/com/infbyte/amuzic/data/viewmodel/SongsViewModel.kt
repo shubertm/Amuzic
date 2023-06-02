@@ -1,5 +1,6 @@
 package com.infbyte.amuzic.data.viewmodel
 
+import android.media.AudioManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +12,7 @@ import com.infbyte.amuzic.data.model.Folder
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.data.model.SongsRepo
 import com.infbyte.amuzic.playback.PlaybackListener
+import com.infbyte.amuzic.playback.PlaybackManager
 import com.infbyte.amuzic.playback.PlaybackModes.REPEAT_ALL
 import com.infbyte.amuzic.ui.screens.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,14 +23,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SongsViewModel @Inject constructor() : ViewModel() {
+
     @Inject lateinit var songsRepo: SongsRepo
 
     @Inject lateinit var player: PlaybackListener
+
+    private lateinit var playbackManager: PlaybackManager
 
     private val _isLoadingSongs = mutableStateOf(false)
     val isLoadingSongs: State<Boolean> = _isLoadingSongs
     private val _isLoaded = mutableStateOf(false)
     val isLoaded: State<Boolean> = _isLoaded
+
+    private var hasAudioFocus = false
+    val audioFocusChangeListener =
+        AudioManager.OnAudioFocusChangeListener { focusChange ->
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    hasAudioFocus = true
+                }
+
+                AudioManager.AUDIOFOCUS_LOSS -> {
+                    onPauseSong()
+                }
+            }
+        }
 
     var confirmExit = false
         private set
@@ -75,6 +94,10 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     val mode = mutableStateOf(REPEAT_ALL)
     val progress = mutableStateOf(0f)
     val isPlaying = mutableStateOf(false)
+
+    fun setPlaybackManager(pManager: PlaybackManager) {
+        playbackManager = pManager
+    }
 
     fun confirmExit() {
         viewModelScope.launch {
@@ -316,13 +339,20 @@ class SongsViewModel @Inject constructor() : ViewModel() {
         player.progress().toFloat() / player.duration().toFloat()
 
     private fun onPlaySong() {
-        player.playSong()
-        isPlaying.value = player.isActive()
-        startProgressMonitor()
+        playbackManager.requestAudioFocus { isGranted ->
+            hasAudioFocus = isGranted
+            if (hasAudioFocus) {
+                player.playSong()
+                isPlaying.value = player.isActive()
+                startProgressMonitor()
+            }
+        }
     }
 
     private fun onPauseSong() {
         player.pauseSong()
+        playbackManager.abandonAudioFocus()
+        hasAudioFocus = false
         isPlaying.value = player.isActive()
     }
 
