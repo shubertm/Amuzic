@@ -1,7 +1,8 @@
 <h1 align="center">Amuzic</h1>
 <p align="center">
-<a href="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml" 
-src="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml/badge.svg"></a>
+<a href="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml"> 
+<img src="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml/badge.svg">
+</a>
 </p>
 
 ## Overview
