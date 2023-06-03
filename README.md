@@ -1,12 +1,13 @@
 <h1 align="center">Amuzic</h1>
 <p align="center">
-<a href="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml">
-<a href="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml/badge.svg"></a>
-</a>
+<a href="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml" 
+src="https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml/badge.svg"></a>
 </p>
 
-## App Overview
+## Overview
+<p align="center">
 <img src="https://github.com/ShubertMunthali/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png" width="60" height="60"/>
+</p>
 
 ## Tools
 ### Language
