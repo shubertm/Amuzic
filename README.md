@@ -2,7 +2,7 @@
 [![Github Actions](https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml/badge.svg)](https://github.com/ShubertMunthali/Amuzic/actions/workflows/build.yml)
 
 ## App Overview
-![Icon](https://github.com/ShubertMunthali/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png)
+<img src="https://github.com/ShubertMunthali/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png" width="30" height="30"/>
 
 ## Tools
 ### Language
