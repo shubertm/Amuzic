@@ -159,6 +159,7 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onArtistClick = { artistPos ->
                                             songsViewModel.onArtistClicked(artistPos)
+                                            songsViewModel.hideBars()
                                             navController
                                                 .navigate(Screens.ALL_SONGS)
                                         }
@@ -174,6 +175,7 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onAlbumClicked = { albumPos ->
                                             songsViewModel.onAlbumClicked(albumPos)
+                                            songsViewModel.hideBars()
                                             navController
                                                 .navigate(Screens.ALL_SONGS)
                                         }
@@ -189,6 +191,7 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onFolderClicked = { folderPos ->
                                             songsViewModel.onFolderClicked(folderPos)
+                                            songsViewModel.hideBars()
                                             navController
                                                 .navigate(Screens.ALL_SONGS)
                                         }

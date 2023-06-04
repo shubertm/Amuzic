@@ -56,6 +56,8 @@ fun BoxScope.PlayBar(
         Column(
             Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(topStartPercent = 20, topEndPercent = 20))
+                .clickable {}
                 .background(
                     Color.LightGray,
                     RoundedCornerShape(topStartPercent = 20, topEndPercent = 20)

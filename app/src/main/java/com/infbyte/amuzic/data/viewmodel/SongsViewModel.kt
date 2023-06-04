@@ -219,6 +219,11 @@ class SongsViewModel @Inject constructor() : ViewModel() {
         switchOffBoolState(_showPlayBar)
     }
 
+    fun hideBars() {
+        hideTopBar()
+        hidePlayBar()
+    }
+
     fun toggleBarsByScroll(
         value: Int
     ) {
