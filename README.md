@@ -24,3 +24,4 @@
     * [KtLint](https://pinterest.github.io/ktlint)
 ### Architecture
 * [Modern App Architecture](https://developer.android.com/topic/architecture)
+  - MVVM

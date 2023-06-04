@@ -132,6 +132,9 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onSongClicked(song: Song) {
+        if (currentSong.value == song) {
+            return
+        }
         _currentSong.value = song
         showAndDelayHidePlayBar()
         player.prepareSong(song)
