@@ -49,7 +49,8 @@ fun BoxScope.TopBar(
                 .background(Color.White)
                 .fillMaxWidth()
                 .border(0.dp, Color.LightGray)
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .clickable {},
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

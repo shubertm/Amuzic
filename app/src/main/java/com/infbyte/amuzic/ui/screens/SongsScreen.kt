@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
-import com.infbyte.amuzic.ui.theme.ivory
+import com.infbyte.amuzic.ui.theme.Ivory
 import com.infbyte.amuzic.utils.calcScroll
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -91,57 +91,51 @@ fun Song(song: Song, onClick: (Song) -> Unit) {
             .fillMaxWidth()
             .padding(8.dp)
             .clip(RoundedCornerShape(10))
-            .background(
-                ivory,
-                RoundedCornerShape(10)
-            )
+            .background(Ivory)
             .clickable {
                 onClick(song)
-            }
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        if (song.thumbnail != null) {
+            Box(Modifier.padding(8.dp)) {
+                Image(
+                    bitmap = song.thumbnail.asImageBitmap(),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(48.dp),
+                    contentDescription = ""
+                )
+            }
+        } else {
+            Box(Modifier.padding(8.dp)) {
+                Image(
+                    painter = painterResource(R.drawable.ic_audiotrack),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(48.dp),
+                    contentDescription = ""
+                )
+            }
+        }
+        Column(
+            Modifier
+                .wrapContentSize()
+                .padding(start = 12.dp, end = 12.dp),
+            verticalArrangement = Arrangement.Center
         ) {
-            if (song.thumbnail != null) {
-                Box(Modifier.padding(8.dp)) {
-                    Image(
-                        bitmap = song.thumbnail.asImageBitmap(),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(48.dp),
-                        contentDescription = ""
-                    )
-                }
-            } else {
-                Box(Modifier.padding(8.dp)) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_audiotrack),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(48.dp),
-                        contentDescription = ""
-                    )
-                }
-            }
-            Column(
-                Modifier
-                    .wrapContentSize()
-                    .padding(start = 12.dp, end = 12.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    song.name,
-                    maxLines = 1
-                )
-                Text(
-                    song.artist,
-                    Modifier.padding(5.dp),
-                    fontSize = 12.sp,
-                    maxLines = 1
-                )
-            }
+            Text(
+                song.name,
+                maxLines = 1
+            )
+            Text(
+                song.artist,
+                Modifier.padding(5.dp),
+                fontSize = 12.sp,
+                maxLines = 1
+            )
         }
     }
 }

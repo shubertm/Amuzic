@@ -13,7 +13,7 @@ import dagger.assisted.AssistedInject
 
 class PlaybackManager @AssistedInject constructor(
     @Assisted context: Context,
-    @Assisted val audioFocusChangeListener: OnAudioFocusChangeListener
+    @Assisted private val audioFocusChangeListener: OnAudioFocusChangeListener
 ) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE)
         as AudioManager

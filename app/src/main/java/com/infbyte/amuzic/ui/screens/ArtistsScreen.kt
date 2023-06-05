@@ -6,8 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,15 +22,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Artist
+import com.infbyte.amuzic.ui.theme.Alabaster
 import com.infbyte.amuzic.utils.calcScroll
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -82,17 +85,22 @@ fun Artist(
         Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clip(RoundedCornerShape(10))
+            .background(Alabaster)
             .clickable {
                 onClick()
-            }
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            ImageVector.vectorResource(R.drawable.ic_audiotrack),
-            "",
-            Modifier
-                .size(48.dp)
-                .border(1.dp, Color.LightGray, RoundedCornerShape(30))
-        )
+        Box(Modifier.padding(8.dp)) {
+            Image(
+                ImageVector.vectorResource(R.drawable.ic_artist),
+                "",
+                Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(20))
+            )
+        }
         Column(
             Modifier.padding(start = 12.dp, end = 12.dp)
         ) {

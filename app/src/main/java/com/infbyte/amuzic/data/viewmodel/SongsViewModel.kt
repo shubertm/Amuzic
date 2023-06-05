@@ -132,7 +132,11 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onSongClicked(song: Song) {
-        if (currentSong.value == song) {
+        if (currentSong.value == song && !player.isActive()) {
+            onPlaySong()
+            return
+        }
+        if (currentSong.value == song && player.isActive()) {
             return
         }
         _currentSong.value = song
