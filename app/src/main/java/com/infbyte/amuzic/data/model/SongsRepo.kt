@@ -10,10 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class SongsRepo @Inject constructor() {
-    @Inject
-    @ApplicationContext
-    lateinit var appContext: Context
+class SongsRepo @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
 
     private val _songs = mutableListOf<Song>()
     val songs: List<Song> = _songs
@@ -36,10 +35,13 @@ class SongsRepo @Inject constructor() {
     private val selectionArgs = null
     private val sortOrder = null
 
-    suspend fun loadSongs(isLoading: () -> Unit, onComplete: () -> Unit) {
+    suspend fun loadSongs(
+        isLoading: () -> Unit,
+        onComplete: (songs: List<Song>) -> Unit
+    ) {
         withContext(Dispatchers.IO) {
             isLoading()
-            val contentResolver = appContext.contentResolver
+            val contentResolver = context.contentResolver
             val query = contentResolver.query(
                 uri,
                 projection,
@@ -93,7 +95,7 @@ class SongsRepo @Inject constructor() {
             loadArtists()
             loadAlbums()
             loadFolders()
-            onComplete()
+            onComplete(songs)
         }
     }
 

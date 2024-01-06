@@ -7,16 +7,30 @@ import android.media.AudioManager
 import android.media.AudioManager.OnAudioFocusChangeListener
 import android.os.Build
 import androidx.annotation.RequiresApi
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class PlaybackManager @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted private val audioFocusChangeListener: OnAudioFocusChangeListener
+class PlaybackManager @Inject constructor(
+    @ApplicationContext context: Context,
+    private val playbackListener: PlaybackListener
 ) {
+    private var hasAudioFocus = false
+    private val _isPlaying = mutableStateOf(false)
+    val isPlaying: State<Boolean> = _isPlaying
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE)
         as AudioManager
+    private val audioFocusChangeListener =
+        OnAudioFocusChangeListener { focusChange ->
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    hasAudioFocus = true
+                }
+
+                AudioManager.AUDIOFOCUS_LOSS -> pauseSong()
+            }
+        }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private val focusRequest = AudioFocusRequest.Builder(
@@ -31,8 +45,7 @@ class PlaybackManager @AssistedInject constructor(
             )
             setAcceptsDelayedFocusGain(true)
             setOnAudioFocusChangeListener(audioFocusChangeListener)
-        }
-        .build()
+        }.build()
 
     fun requestAudioFocus(isGranted: (Boolean) -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -41,30 +54,34 @@ class PlaybackManager @AssistedInject constructor(
             synchronized(lock) {
                 when (response) {
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> {
-                        isGranted(true)
+                        hasAudioFocus = true
                     }
 
                     AudioManager.AUDIOFOCUS_REQUEST_DELAYED -> {}
 
                     AudioManager.AUDIOFOCUS_REQUEST_FAILED -> {
-                        isGranted(false)
+                        hasAudioFocus = false
                     }
                 }
+                isGranted(hasAudioFocus)
             }
         }
     }
 
-    fun abandonAudioFocus() {
+    fun pauseSong() {
+        playbackListener.pauseSong()
+        abandonAudioFocus()
+        hasAudioFocus = false
+        checkPlayer()
+    }
+
+    fun checkPlayer() {
+        _isPlaying.value = playbackListener.isActive()
+    }
+
+    private fun abandonAudioFocus() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.abandonAudioFocusRequest(focusRequest)
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted context: Context,
-            @Assisted audioFocusChangeListener: OnAudioFocusChangeListener
-        ): PlaybackManager
     }
 }

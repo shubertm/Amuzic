@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.vectorResource
@@ -98,7 +100,8 @@ fun Artist(
                 "",
                 Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(20))
+                    .clip(RoundedCornerShape(20)),
+                colorFilter = ColorFilter.tint(Alabaster, BlendMode.Multiply)
             )
         }
         Column(

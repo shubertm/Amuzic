@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import com.infbyte.amuzic.playback.PlaybackMode
 
 @Composable
 fun MainScreen(
@@ -12,17 +13,16 @@ fun MainScreen(
     showPopup: Boolean,
     screen: String,
     onTogglePopup: () -> Unit,
-    onNavigateToScreen: (String) -> Unit,
+    onNavigateTo: (String) -> Unit,
     content: @Composable () -> Unit
 ) {
     content()
     Box(Modifier.fillMaxSize()) {
         TopBar(
             screen,
-            showTopBar.value
-        ) {
-            onTogglePopup()
-        }
+            showTopBar.value,
+            onTogglePopup = onTogglePopup
+        )
 
         ScreenOptionsPopup(
             showPopup,
@@ -30,7 +30,7 @@ fun MainScreen(
                 onTogglePopup()
             }
         ) {
-            onNavigateToScreen(it)
+            onNavigateTo(it)
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.infbyte.amuzic.data.viewmodel
 
-import android.media.AudioManager
+import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +13,10 @@ import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.data.model.SongsRepo
 import com.infbyte.amuzic.playback.PlaybackListener
 import com.infbyte.amuzic.playback.PlaybackManager
-import com.infbyte.amuzic.playback.PlaybackModes.REPEAT_ALL
+import com.infbyte.amuzic.playback.PlaybackMode
+import com.infbyte.amuzic.playback.PlaybackMode.REPEAT_ALL
+import com.infbyte.amuzic.playback.PlaybackMode.REPEAT_ONE
+import com.infbyte.amuzic.playback.PlaybackMode.SHUFFLE
 import com.infbyte.amuzic.ui.screens.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,32 +25,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SongsViewModel @Inject constructor() : ViewModel() {
-
-    @Inject lateinit var songsRepo: SongsRepo
-
-    @Inject lateinit var player: PlaybackListener
-
-    private lateinit var playbackManager: PlaybackManager
+class SongsViewModel @Inject constructor(
+    private val repo: SongsRepo,
+    private val playbackListener: PlaybackListener,
+    private val playbackManager: PlaybackManager
+) : ViewModel() {
 
     private val _isLoadingSongs = mutableStateOf(false)
     val isLoadingSongs: State<Boolean> = _isLoadingSongs
     private val _isLoaded = mutableStateOf(false)
     val isLoaded: State<Boolean> = _isLoaded
-
-    private var hasAudioFocus = false
-    val audioFocusChangeListener =
-        AudioManager.OnAudioFocusChangeListener { focusChange ->
-            when (focusChange) {
-                AudioManager.AUDIOFOCUS_GAIN -> {
-                    hasAudioFocus = true
-                }
-
-                AudioManager.AUDIOFOCUS_LOSS -> {
-                    onPauseSong()
-                }
-            }
-        }
 
     var confirmExit = false
         private set
@@ -63,11 +50,11 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     var songs = listOf<Song>()
         private set
     val artists
-        get() = songsRepo.artists
+        get() = this.repo.artists
     val albums
-        get() = songsRepo.albums
+        get() = this.repo.albums
     val folders
-        get() = songsRepo.folders
+        get() = this.repo.folders
     private val _showSongs = mutableStateOf(true)
     val showSongs: State<Boolean> = _showSongs
     private val _showArtists = mutableStateOf(false)
@@ -91,13 +78,17 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     val currentAlbum: State<Album?> = _currentAlbum
     private val _currentFolder = mutableStateOf<Folder?>(null)
     val currentFolder: State<Folder?> = _currentFolder
-    val mode = mutableStateOf(REPEAT_ALL)
+    private val _playbackMode = mutableStateOf(REPEAT_ALL)
+    val playbackMode: State<PlaybackMode> = _playbackMode
     val progress = mutableStateOf(0f)
-    val isPlaying = mutableStateOf(false)
 
-    fun setPlaybackManager(pManager: PlaybackManager) {
-        playbackManager = pManager
+    fun init(context: Context) {
+        viewModelScope.launch {
+            loadSongs(context)
+        }
     }
+
+    fun isPlaying(): State<Boolean> = playbackManager.isPlaying
 
     fun confirmExit() {
         viewModelScope.launch {
@@ -107,45 +98,21 @@ class SongsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun loadSongs() {
-        viewModelScope.launch {
-            songsRepo.loadSongs(
-                {
-                    _isLoadingSongs.value = true
-                    player.init(
-                        songsRepo.appContext,
-                        { onPlaybackPrepared() },
-                        { onPlaybackCompleted() }
-                    )
-                },
-                {
-                    _isLoadingSongs.value = false
-                    _isLoaded.value = true
-                    songs = songsRepo.songs
-                    _currentSong.value = songs.first()
-                    _currentSong.value?.let {
-                        player.initSong(it)
-                    }
-                }
-            )
-        }
-    }
-
     fun onSongClicked(song: Song) {
-        if (currentSong.value == song && !player.isActive()) {
+        if (currentSong.value == song && !playbackListener.isActive()) {
             onPlaySong()
             return
         }
-        if (currentSong.value == song && player.isActive()) {
+        if (currentSong.value == song && playbackListener.isActive()) {
             return
         }
         _currentSong.value = song
         showAndDelayHidePlayBar()
-        player.prepareSong(song)
+        playbackListener.prepareSong(song)
     }
 
     fun onPlayClicked() {
-        if (player.isActive()) {
+        if (playbackListener.isActive()) {
             onPauseSong()
             return
         }
@@ -163,7 +130,7 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     fun onArtistClicked(pos: Int) {
         _currentArtist.value = artists[pos]
         songs = currentArtist.value?.let { artist ->
-            songsRepo.songs.filter { song ->
+            repo.songs.filter { song ->
                 song.artist == artist.name
             }
         }!!
@@ -173,7 +140,7 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     fun onAlbumClicked(pos: Int) {
         _currentAlbum.value = albums[pos]
         songs = currentAlbum.value?.let { album ->
-            songsRepo.songs.filter { song ->
+            repo.songs.filter { song ->
                 song.album == album.name
             }
         }!!
@@ -183,7 +150,7 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     fun onFolderClicked(pos: Int) {
         _currentFolder.value = folders[pos]
         songs = currentFolder.value?.let { folder ->
-            songsRepo.songs.filter { song ->
+            repo.songs.filter { song ->
                 song.folder == folder.name
             }
         }!!
@@ -245,8 +212,16 @@ class SongsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun onTogglePlaybackMode() {
+        _playbackMode.value = when (playbackMode.value) {
+            REPEAT_ONE -> REPEAT_ALL
+            REPEAT_ALL -> SHUFFLE
+            SHUFFLE -> REPEAT_ONE
+        }
+    }
+
     private fun onAllSongsClicked() {
-        songs = songsRepo.songs
+        songs = this.repo.songs
     }
 
     private fun togglePlayBarByScrollDelta(delta: Int) {
@@ -343,33 +318,29 @@ class SongsViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch(Dispatchers.Default) {
             do {
                 progress.value = calcProgress()
-            } while (player.isActive())
+            } while (playbackListener.isActive())
         }
     }
 
     private fun calcProgress() =
-        player.progress().toFloat() / player.duration().toFloat()
+        playbackListener.progress().toFloat() / playbackListener.duration().toFloat()
 
     private fun onPlaySong() {
         playbackManager.requestAudioFocus { isGranted ->
-            hasAudioFocus = isGranted
-            if (hasAudioFocus) {
-                player.playSong()
-                isPlaying.value = player.isActive()
+            if (isGranted) {
+                playbackListener.playSong()
+                playbackManager.checkPlayer()
                 startProgressMonitor()
             }
         }
     }
 
     private fun onPauseSong() {
-        player.pauseSong()
-        playbackManager.abandonAudioFocus()
-        hasAudioFocus = false
-        isPlaying.value = player.isActive()
+        playbackManager.pauseSong()
     }
 
     private fun nextSong() {
-        val currentPos = songs.indexOf(_currentSong.value)
+        val currentPos = songs.indexOf(currentSong.value)
         val nextPos = currentPos + 1
         if (nextPos < songs.size) {
             onSongClicked(songs[nextPos])
@@ -380,7 +351,7 @@ class SongsViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun prevSong() {
-        val currentPos = songs.indexOf(_currentSong.value)
+        val currentPos = songs.indexOf(currentSong.value)
         val prevPos = currentPos - 1
         if (prevPos >= 0) {
             onSongClicked(songs[prevPos])
@@ -390,15 +361,46 @@ class SongsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun onShuffle() {
+        val song = songs.filter { it != currentSong.value }.random()
+        onSongClicked(song)
+    }
+
     private fun onPlaybackPrepared() {
         onPlaySong()
     }
 
     private fun onPlaybackCompleted() {
-        when (mode.value) {
+        when (_playbackMode.value) {
+            REPEAT_ONE -> { onPlayClicked() }
             REPEAT_ALL -> {
                 onNextClicked()
             }
+            SHUFFLE -> { onShuffle() }
+        }
+    }
+
+    private fun loadSongs(context: Context) {
+        viewModelScope.launch {
+            repo.loadSongs(
+                {
+                    _isLoadingSongs.value = true
+                    playbackListener.init(
+                        context,
+                        { onPlaybackPrepared() },
+                        { onPlaybackCompleted() }
+                    )
+                },
+                {
+                    _isLoadingSongs.value = false
+                    _isLoaded.value = true
+                    songs = it
+                    _currentSong.value = songs.first()
+                    _currentSong.value?.let {
+                        playbackListener.initSong(it)
+                    }
+                }
+            )
         }
     }
 }

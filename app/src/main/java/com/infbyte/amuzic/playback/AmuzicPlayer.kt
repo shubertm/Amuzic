@@ -4,10 +4,6 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import com.infbyte.amuzic.data.model.Song
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import javax.inject.Inject
 
 class AmuzicPlayer @Inject constructor() :
@@ -76,13 +72,4 @@ class AmuzicPlayer @Inject constructor() :
         if (!isInitSong) onPreparedHandler()
         isInitSong = false
     }
-}
-
-@Module
-@InstallIn(ViewModelComponent::class)
-abstract class AmuzicPlayerModule() {
-    @Binds
-    abstract fun bindPlaybackListener(
-        player: AmuzicPlayer
-    ): PlaybackListener
 }

@@ -23,16 +23,20 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.infbyte.amuzic.R
+import com.infbyte.amuzic.playback.PlaybackMode
 
 @Composable
 fun BoxScope.TopBar(
     title: String,
     isVisible: Boolean,
-    showCategoryPopup: () -> Unit
+    onTogglePopup: () -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -70,14 +74,15 @@ fun BoxScope.TopBar(
                         bottom = 12.dp,
                         start = 32.dp,
                         end = 32.dp
-                    ),
+                    )
+                    .clickable { onTogglePopup() },
                 color = Color.White
             )
             Box(
                 Modifier
                     .wrapContentSize()
                     .clickable {
-                        showCategoryPopup()
+                        onTogglePopup()
                     },
                 contentAlignment = Alignment.Center
             ) {

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -35,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
+import com.infbyte.amuzic.playback.PlaybackMode
 
 @Composable
 fun BoxScope.PlayBar(
@@ -42,9 +45,11 @@ fun BoxScope.PlayBar(
     isPlaying: State<Boolean>,
     song: Song,
     progress: State<Float>,
+    playbackMode: State<PlaybackMode>,
     onPlayClick: () -> Unit,
     onNextClick: () -> Unit,
-    onPrevClick: () -> Unit
+    onPrevClick: () -> Unit,
+    onTogglePlaybackMode: () -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible.value,
@@ -58,8 +63,9 @@ fun BoxScope.PlayBar(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStartPercent = 20, topEndPercent = 20))
                 .clickable {}
+                .border(0.dp, Color.LightGray)
                 .background(
-                    Color.LightGray,
+                    MaterialTheme.colors.background,
                     RoundedCornerShape(topStartPercent = 20, topEndPercent = 20)
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -69,13 +75,25 @@ fun BoxScope.PlayBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
+                    when (playbackMode.value) {
+                        PlaybackMode.REPEAT_ONE ->
+                            painterResource(R.drawable.ic_repeat_one)
+                        PlaybackMode.REPEAT_ALL -> painterResource(R.drawable.ic_repeat)
+                        PlaybackMode.SHUFFLE -> painterResource(R.drawable.ic_shuffle)
+                    },
+                    "",
+                    Modifier.clickable { onTogglePlaybackMode() }
+                )
+                Icon(
                     painterResource(R.drawable.ic_skip_previous),
                     "",
                     Modifier
-                        .background(Color.Gray, CircleShape)
+                        .background(MaterialTheme.colors.background, CircleShape)
                         .clip(CircleShape)
+                        .border(0.dp, Color.DarkGray)
                         .size(32.dp)
-                        .clickable { onPrevClick() }
+                        .clickable { onPrevClick() },
+                    tint = MaterialTheme.colors.primary
                 )
                 Box(
                     Modifier
@@ -104,10 +122,12 @@ fun BoxScope.PlayBar(
                     painterResource(R.drawable.ic_skip_next),
                     "",
                     Modifier
-                        .background(Color.Gray, CircleShape)
+                        .background(MaterialTheme.colors.background, CircleShape)
                         .clip(CircleShape)
+                        .border(0.dp, Color.DarkGray)
                         .size(32.dp)
-                        .clickable { onNextClick() }
+                        .clickable { onNextClick() },
+                    tint = MaterialTheme.colors.primary
                 )
             }
             Column(
@@ -118,7 +138,10 @@ fun BoxScope.PlayBar(
                         .fillMaxWidth()
                         .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                         .height(32.dp)
-                        .background(Color.DarkGray, RoundedCornerShape(20)),
+                        .background(
+                            MaterialTheme.colors.primary,
+                            RoundedCornerShape(20)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

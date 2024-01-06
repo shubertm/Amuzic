@@ -24,7 +24,6 @@ import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
 import com.infbyte.amuzic.data.viewmodel.SongsViewModel
-import com.infbyte.amuzic.playback.PlaybackManager
 import com.infbyte.amuzic.ui.screens.AlbumsScreen
 import com.infbyte.amuzic.ui.screens.ArtistsScreen
 import com.infbyte.amuzic.ui.screens.FoldersScreen
@@ -37,25 +36,16 @@ import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
 import com.infbyte.amuzic.utils.UI_CONTROLS_HINT
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val songsViewModel: SongsViewModel by viewModels()
 
-    @Inject lateinit var playbackManagerFactory: PlaybackManager.Factory
-
-    private lateinit var playbackManager: PlaybackManager
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            playbackManager = playbackManagerFactory.create(
-                this,
-                songsViewModel.audioFocusChangeListener
-            )
-            songsViewModel.setPlaybackManager(playbackManager)
-            songsViewModel.loadSongs()
+            songsViewModel.init(this)
         } else {
             finish()
         }
@@ -66,12 +56,7 @@ class MainActivity : ComponentActivity() {
         AmuzicContracts.RequestPermissionApi30()
     ) { isGranted ->
         if (isGranted) {
-            playbackManager = playbackManagerFactory.create(
-                this,
-                songsViewModel.audioFocusChangeListener
-            )
-            songsViewModel.setPlaybackManager(playbackManager)
-            songsViewModel.loadSongs()
+            songsViewModel.init(this)
         } else {
             finish()
         }
@@ -91,12 +76,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             } else {
-                playbackManager = playbackManagerFactory.create(
-                    this,
-                    songsViewModel.audioFocusChangeListener
-                )
-                songsViewModel.setPlaybackManager(playbackManager)
-                songsViewModel.loadSongs()
+                songsViewModel.init(this)
             }
         }
         setContent {
@@ -116,7 +96,7 @@ class MainActivity : ComponentActivity() {
                             onTogglePopup = {
                                 songsViewModel.onTogglePopup()
                             },
-                            onNavigateToScreen = { screen ->
+                            onNavigateTo = { screen ->
                                 songsViewModel.onScreenSelected(screen)
                                 navController.navigate(screen)
                             }
@@ -206,9 +186,10 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 PlayBar(
                                     songsViewModel.showPlayBar,
-                                    songsViewModel.isPlaying,
+                                    songsViewModel.isPlaying(),
                                     it,
                                     songsViewModel.progress,
+                                    songsViewModel.playbackMode,
                                     onPlayClick = {
                                         songsViewModel.onPlayClicked()
                                     },
@@ -217,6 +198,9 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onPrevClick = {
                                         songsViewModel.onPrevClicked()
+                                    },
+                                    onTogglePlaybackMode = {
+                                        songsViewModel.onTogglePlaybackMode()
                                     }
                                 )
                             }
