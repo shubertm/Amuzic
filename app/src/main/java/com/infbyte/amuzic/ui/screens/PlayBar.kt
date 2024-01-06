@@ -78,8 +78,10 @@ fun BoxScope.PlayBar(
                     when (playbackMode.value) {
                         PlaybackMode.REPEAT_ONE ->
                             painterResource(R.drawable.ic_repeat_one)
-                        PlaybackMode.REPEAT_ALL -> painterResource(R.drawable.ic_repeat)
-                        PlaybackMode.SHUFFLE -> painterResource(R.drawable.ic_shuffle)
+                        PlaybackMode.REPEAT_ALL ->
+                            painterResource(R.drawable.ic_repeat)
+                        PlaybackMode.SHUFFLE ->
+                            painterResource(R.drawable.ic_shuffle)
                     },
                     "",
                     Modifier.clickable { onTogglePlaybackMode() }
