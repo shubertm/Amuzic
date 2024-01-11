@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
-import com.infbyte.amuzic.data.viewmodel.SongsViewModel
+import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.screens.AlbumsScreen
 import com.infbyte.amuzic.ui.screens.ArtistsScreen
 import com.infbyte.amuzic.ui.screens.FoldersScreen
@@ -189,6 +189,7 @@ class MainActivity : ComponentActivity() {
                                     songsViewModel.isPlaying(),
                                     it,
                                     songsViewModel.progress,
+                                    songsViewModel.songDuration.value,
                                     songsViewModel.playbackMode,
                                     onPlayClick = {
                                         songsViewModel.onPlayClicked()

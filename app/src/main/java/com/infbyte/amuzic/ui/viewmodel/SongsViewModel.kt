@@ -1,4 +1,4 @@
-package com.infbyte.amuzic.data.viewmodel
+package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
@@ -81,6 +81,7 @@ class SongsViewModel @Inject constructor(
     private val _playbackMode = mutableStateOf(REPEAT_ALL)
     val playbackMode: State<PlaybackMode> = _playbackMode
     val progress = mutableStateOf(0f)
+    val songDuration = mutableStateOf(0)
 
     fun init(context: Context) {
         viewModelScope.launch {
@@ -120,11 +121,31 @@ class SongsViewModel @Inject constructor(
     }
 
     fun onNextClicked() {
-        nextSong()
+        when (playbackMode.value) {
+            REPEAT_ONE -> {
+                nextSong()
+            }
+            REPEAT_ALL -> {
+                nextSong()
+            }
+            SHUFFLE -> {
+                shuffle()
+            }
+        }
     }
 
     fun onPrevClicked() {
-        prevSong()
+        when (playbackMode.value) {
+            REPEAT_ONE -> {
+                prevSong()
+            }
+            REPEAT_ALL -> {
+                prevSong()
+            }
+            SHUFFLE -> {
+                shuffle()
+            }
+        }
     }
 
     fun onArtistClicked(pos: Int) {
@@ -328,6 +349,7 @@ class SongsViewModel @Inject constructor(
     private fun onPlaySong() {
         playbackManager.requestAudioFocus { isGranted ->
             if (isGranted) {
+                songDuration.value = playbackListener.duration()
                 playbackListener.playSong()
                 playbackManager.checkPlayer()
                 startProgressMonitor()
@@ -361,7 +383,7 @@ class SongsViewModel @Inject constructor(
         }
     }
 
-    private fun onShuffle() {
+    private fun shuffle() {
         val song = songs.filter { it != currentSong.value }.random()
         onSongClicked(song)
     }
@@ -371,12 +393,11 @@ class SongsViewModel @Inject constructor(
     }
 
     private fun onPlaybackCompleted() {
-        when (_playbackMode.value) {
-            REPEAT_ONE -> { onPlayClicked() }
-            REPEAT_ALL -> {
-                onNextClicked()
+        when (playbackMode.value) {
+            REPEAT_ONE -> { onPlaySong() }
+            else -> {
+                nextSong()
             }
-            SHUFFLE -> { onShuffle() }
         }
     }
 
@@ -391,13 +412,13 @@ class SongsViewModel @Inject constructor(
                         { onPlaybackCompleted() }
                     )
                 },
-                {
+                { songs ->
                     _isLoadingSongs.value = false
                     _isLoaded.value = true
-                    songs = it
+                    this@SongsViewModel.songs = songs
                     _currentSong.value = songs.first()
-                    _currentSong.value?.let {
-                        playbackListener.initSong(it)
+                    currentSong.value?.let { song ->
+                        playbackListener.initSong(song)
                     }
                 }
             )

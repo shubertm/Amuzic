@@ -1,5 +1,7 @@
 package com.infbyte.amuzic.ui.screens
 
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -20,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -30,11 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.playback.PlaybackMode
@@ -45,6 +51,7 @@ fun BoxScope.PlayBar(
     isPlaying: State<Boolean>,
     song: Song,
     progress: State<Float>,
+    seekBarMax: Int,
     playbackMode: State<PlaybackMode>,
     onPlayClick: () -> Unit,
     onNextClick: () -> Unit,
@@ -84,19 +91,22 @@ fun BoxScope.PlayBar(
                             painterResource(R.drawable.ic_shuffle)
                     },
                     "",
-                    Modifier.clickable { onTogglePlaybackMode() }
-                )
-                Icon(
-                    painterResource(R.drawable.ic_skip_previous),
-                    "",
                     Modifier
-                        .background(MaterialTheme.colors.background, CircleShape)
-                        .clip(CircleShape)
-                        .border(0.dp, Color.DarkGray)
+                        .padding(16.dp)
                         .size(32.dp)
-                        .clickable { onPrevClick() },
-                    tint = MaterialTheme.colors.primary
+                        .clip(CircleShape)
+                        .clickable { onTogglePlaybackMode() }
                 )
+                IconButton(
+                    onClick = { onPrevClick() },
+                    Modifier.background(Color.Gray, CircleShape)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_skip_previous),
+                        "",
+                        Modifier.size(32.dp)
+                    )
+                }
                 Box(
                     Modifier
                         .padding(start = 24.dp, end = 24.dp)
@@ -120,39 +130,103 @@ fun BoxScope.PlayBar(
                             }
                     )
                 }
+                IconButton(
+                    onClick = { onNextClick() },
+                    Modifier.background(Color.Gray, CircleShape)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_skip_next),
+                        "",
+                        Modifier.size(32.dp)
+                    )
+                }
                 Icon(
-                    painterResource(R.drawable.ic_skip_next),
+                    painterResource(R.drawable.ic_queue_music),
                     "",
                     Modifier
-                        .background(MaterialTheme.colors.background, CircleShape)
-                        .clip(CircleShape)
-                        .border(0.dp, Color.DarkGray)
+                        .padding(16.dp)
                         .size(32.dp)
-                        .clickable { onNextClick() },
-                    tint = MaterialTheme.colors.primary
+                        .clip(CircleShape)
+                        .clickable {}
                 )
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                        .height(32.dp)
-                        .background(
-                            MaterialTheme.colors.primary,
-                            RoundedCornerShape(20)
-                        ),
-                    contentAlignment = Alignment.Center
+                Column(
+                    Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         song.name,
                         textAlign = TextAlign.Center,
                         maxLines = 1
                     )
+                    SeekBar(
+                        progress = progress.value,
+                        max = seekBarMax,
+                        height = 36.dp,
+                        color = MaterialTheme.colors.primary,
+                        backgroundColor = MaterialTheme.colors.background,
+                        onSeekTo = {}
+                    )
+                    /* LinearProgressIndicator(
+                        progress = progress.value,
+                        color = MaterialTheme.colors.primary,
+                        backgroundColor = MaterialTheme.colors.background,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .height(
+                                16.dp
+                            )
+                            .background(
+                                MaterialTheme.colors.background,
+                                RoundedCornerShape(20)
+                            )
+                            .clip(RoundedCornerShape(20))
+                    )*/
                 }
             }
         }
     }
+}
+
+@Composable
+fun SeekBar(
+    progress: Float,
+    max: Int,
+    height: Dp,
+    color: Color,
+    backgroundColor: Color,
+    onSeekTo: (Int) -> Unit
+) {
+    AndroidView(
+        factory = { context ->
+            val seekBar = SeekBar(context)
+            val seekListener = object : OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    position: Int,
+                    fromUser: Boolean
+                ) {
+                    if (fromUser) {
+                        onSeekTo(position)
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            }
+            seekBar.max = 1
+            seekBar.setBackgroundColor(backgroundColor.toArgb())
+            seekBar.setOnSeekBarChangeListener(seekListener)
+            seekBar
+        },
+        modifier = Modifier.fillMaxWidth().height(height),
+        update = { seekBar ->
+            seekBar.progress = progress.toInt()
+        }
+    )
 }
