@@ -27,7 +27,7 @@ android {
     buildTypes {
         debug {
             manifestPlaceholders = [
-                appIcon: "@mipmap/ic_amuzic_debug",
+                appIcon: "@mipmap/ic_amuzic",
                 appRoundIcon: "@mipmap/ic_amuzic_debug_round",
                 appName: "@string/app_name_debug"
             ]
@@ -51,6 +51,7 @@ android {
     }
     buildFeatures {
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version

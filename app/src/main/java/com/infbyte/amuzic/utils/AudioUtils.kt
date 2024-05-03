@@ -48,7 +48,7 @@ fun ContentResolver.loadThumbnail(uri: Uri): Bitmap? {
     }
 }
 
-private fun loadThumbnail(context: Context, albumId: Long): String?{
+private fun loadThumbnail(context: Context, albumId: Long): String? {
     var path: String? = null
     val selection = "${MediaStore.Audio.Albums._ID} = ?"
     val selectionArgs = arrayOf("$albumId")
@@ -75,10 +75,8 @@ private fun loadThumbnail(context: Context, albumId: Long): String?{
 private fun decodeImage(uri: String?): Bitmap? {
     var thumbnail: Bitmap? = null
     try {
-        if(uri != null)
-            thumbnail = BitmapFactory.decodeFile(uri)
-    }
-    catch(e: Exception){
+        if (uri != null) thumbnail = BitmapFactory.decodeFile(uri)
+    } catch (e: Exception) {
         e.printStackTrace()
     }
     return thumbnail
