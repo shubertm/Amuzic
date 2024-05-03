@@ -19,7 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -32,7 +33,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Folder
-import com.infbyte.amuzic.ui.theme.CreamWhite
 import com.infbyte.amuzic.utils.calcScroll
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -83,7 +83,7 @@ fun Folder(folder: Folder, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(8.dp)
             .clip(RoundedCornerShape(10))
-            .background(CreamWhite)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable {
                 onClick()
             },

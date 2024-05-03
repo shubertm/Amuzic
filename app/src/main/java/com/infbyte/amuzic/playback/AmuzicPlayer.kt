@@ -10,6 +10,7 @@ class AmuzicPlayer @Inject constructor() :
     MediaPlayer(),
     MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener,
+    MediaPlayer.OnSeekCompleteListener,
     PlaybackListener {
     private var isInitSong = true
     private lateinit var context: Context
@@ -58,18 +59,25 @@ class AmuzicPlayer @Inject constructor() :
         stop()
     }
 
+    override fun seekTo(position: Float) {
+        val pos = (position * duration).toInt()
+        super.seekTo(pos)
+    }
+
     override fun progress() = currentPosition
 
     override fun duration() = duration
 
     override fun isActive() = this.isPlaying
 
-    override fun onCompletion(p0: MediaPlayer?) {
+    override fun onCompletion(player: MediaPlayer?) {
         onCompletionHandler()
     }
 
-    override fun onPrepared(p0: MediaPlayer?) {
+    override fun onPrepared(player: MediaPlayer?) {
         if (!isInitSong) onPreparedHandler()
         isInitSong = false
     }
+
+    override fun onSeekComplete(player: MediaPlayer?) {}
 }

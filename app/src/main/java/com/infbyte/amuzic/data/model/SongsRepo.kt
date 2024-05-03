@@ -136,8 +136,8 @@ class SongsRepo @Inject constructor(
 
     companion object {
         val ALBUM_PROJECTION = arrayOf(
-            MediaStore.Audio.AlbumColumns.ALBUM_ID,
-            MediaStore.Audio.AlbumColumns.ALBUM_ART
+            MediaStore.Audio.Artists.Albums.ALBUM_ID,
+            MediaStore.Audio.Artists.Albums.ALBUM_ART
         )
     }
 }

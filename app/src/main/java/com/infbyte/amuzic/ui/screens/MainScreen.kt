@@ -1,35 +1,174 @@
 package com.infbyte.amuzic.ui.screens
 
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.infbyte.amuzic.R
+import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
+import kotlinx.coroutines.launch
 
+@Preview
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-    showTopBar: State<Boolean>,
-    showPopup: Boolean,
-    screen: String,
-    onTogglePopup: () -> Unit,
-    onNavigateTo: (String) -> Unit,
-    content: @Composable () -> Unit
-) {
-    content()
-    Box(Modifier.fillMaxSize()) {
-        TopBar(
-            screen,
-            showTopBar.value,
-            onTogglePopup = onTogglePopup
-        )
+fun MainScreen() {
+    Box(Modifier.wrapContentHeight()) {
+        val pagerState = rememberPagerState(0) { 3 }
+        val scope = rememberCoroutineScope()
+        val songsViewModel: SongsViewModel = viewModel()
+        var searchQuery by rememberSaveable { mutableStateOf("") }
+        var isSearching by rememberSaveable { mutableStateOf(false) }
 
-        ScreenOptionsPopup(
-            showPopup,
-            onToggle = {
-                onTogglePopup()
+        Column {
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = {
+                    searchQuery = it
+                },
+                onSearch = {},
+                active = isSearching,
+                onActiveChange = {
+                    isSearching = !isSearching
+                },
+                Modifier.padding(start = 8.dp, end = 8.dp),
+                trailingIcon = { Icon(Icons.Outlined.Search, "") },
+                placeholder = { Text(stringResource(R.string.amuzic_search)) }
+            ) {
+                when (pagerState.currentPage) {
+                    0 -> SongsScreen(
+                        songs = songsViewModel.songs,
+                        onScroll = {}
+                    ) {}
+
+                    1 -> ArtistsScreen(
+                        artists = songsViewModel.artists,
+                        onScroll = {}
+                    ) {}
+
+                    2 -> AlbumsScreen(
+                        albums = songsViewModel.albums,
+                        onScroll = {}
+                    ) {}
+                }
             }
+            HorizontalPager(state = pagerState) { page ->
+                when (page) {
+                    0 -> SongsScreen(
+                        songs = songsViewModel.songs,
+                        onScroll = {}
+                    ) {}
+
+                    1 -> ArtistsScreen(
+                        artists = songsViewModel.artists,
+                        onScroll = {}
+                    ) {}
+
+                    2 -> AlbumsScreen(
+                        albums = songsViewModel.albums,
+                        onScroll = {}
+                    ) {}
+                }
+            }
+        }
+        NavigationBar(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
         ) {
-            onNavigateTo(it)
+            NavigationBarItem(
+                selected = pagerState.currentPage == 0,
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(0, animationSpec = tween(500, 300))
+                    }
+                },
+                icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
+                label = { Text(stringResource(R.string.amuzic_all)) }
+            )
+            NavigationBarItem(
+                selected = pagerState.currentPage == 1,
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(1, animationSpec = tween(500, 300))
+                    }
+                },
+                icon = { Icon(painterResource(R.drawable.ic_artist), "") },
+                label = { Text(stringResource(R.string.amuzic_artists)) }
+            )
+            NavigationBarItem(
+                selected = pagerState.currentPage == 2,
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(2, animationSpec = tween(500, 300))
+                    }
+                },
+                icon = { Icon(painterResource(R.drawable.ic_album), "") },
+                label = { Text(stringResource(R.string.amuzic_albums)) }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun NavBar() {
+    AmuzicTheme {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            SearchBar(
+                query = "",
+                onQueryChange = {},
+                onSearch = {},
+                active = false,
+                onActiveChange = {},
+                Modifier.padding(start = 8.dp, end = 8.dp),
+                trailingIcon = { Icon(Icons.Outlined.Search, "") },
+                placeholder = { Text(stringResource(R.string.amuzic_search)) }
+            ) {}
+            NavigationBar(Modifier.fillMaxWidth()) {
+                NavigationBarItem(
+                    selected = true,
+                    onClick = { /*TODO*/ },
+                    icon = { Icon(painterResource(R.drawable.ic_library_music), "") }
+                )
+                NavigationBarItem(
+                    selected = true,
+                    onClick = { /*TODO*/ },
+                    icon = { Icon(painterResource(R.drawable.ic_artist), "") }
+                )
+                NavigationBarItem(
+                    selected = true,
+                    onClick = { /*TODO*/ },
+                    icon = { Icon(painterResource(R.drawable.ic_album), "") }
+                )
+            }
         }
     }
 }

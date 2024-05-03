@@ -1,6 +1,7 @@
 package com.infbyte.amuzic.utils
 
 import android.content.ContentResolver
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -47,4 +48,40 @@ fun ContentResolver.loadThumbnail(uri: Uri): Bitmap? {
     }
 }
 
-private fun Uri.decodeImage() = BitmapFactory.decodeFile(this.toString())
+private fun loadThumbnail(context: Context, albumId: Long): String?{
+    var path: String? = null
+    val selection = "${MediaStore.Audio.Albums._ID} = ?"
+    val selectionArgs = arrayOf("$albumId")
+    val cursor = context.contentResolver.query(
+        MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+        ALBUM_PROJECTION,
+        selection,
+        selectionArgs,
+        null
+    )
+    when {
+        cursor == null -> {
+            println("Albums not returned")
+        }
+        cursor.moveToFirst() -> {
+            val albumArtCOLUMN = cursor.getColumnIndex(MediaStore.Audio.Artists.Albums.ALBUM_ART)
+            path = cursor.getString(albumArtCOLUMN)
+        }
+    }
+
+    return path
+}
+
+private fun decodeImage(uri: String?): Bitmap? {
+    var thumbnail: Bitmap? = null
+    try {
+        if(uri != null)
+            thumbnail = BitmapFactory.decodeFile(uri)
+    }
+    catch(e: Exception){
+        e.printStackTrace()
+    }
+    return thumbnail
+}
+
+private fun Uri.decodeImage() = BitmapFactory.decodeFile(toString())

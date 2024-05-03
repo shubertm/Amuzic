@@ -17,6 +17,8 @@ interface PlaybackListener {
 
     fun stopSong()
 
+    fun seekTo(position: Float)
+
     fun progress(): Int
 
     fun duration(): Int

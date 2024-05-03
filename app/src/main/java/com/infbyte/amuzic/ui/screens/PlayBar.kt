@@ -1,5 +1,6 @@
 package com.infbyte.amuzic.ui.screens
 
+import android.content.res.ColorStateList
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.compose.animation.AnimatedVisibility
@@ -20,13 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
@@ -51,12 +53,12 @@ fun BoxScope.PlayBar(
     isPlaying: State<Boolean>,
     song: Song,
     progress: State<Float>,
-    seekBarMax: Int,
     playbackMode: State<PlaybackMode>,
     onPlayClick: () -> Unit,
     onNextClick: () -> Unit,
     onPrevClick: () -> Unit,
-    onTogglePlaybackMode: () -> Unit
+    onTogglePlaybackMode: () -> Unit,
+    onSeekTo: (Float) -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible.value,
@@ -72,7 +74,7 @@ fun BoxScope.PlayBar(
                 .clickable {}
                 .border(0.dp, Color.LightGray)
                 .background(
-                    MaterialTheme.colors.background,
+                    MaterialTheme.colorScheme.background,
                     RoundedCornerShape(topStartPercent = 20, topEndPercent = 20)
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -81,22 +83,30 @@ fun BoxScope.PlayBar(
                 Modifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    when (playbackMode.value) {
-                        PlaybackMode.REPEAT_ONE ->
-                            painterResource(R.drawable.ic_repeat_one)
-                        PlaybackMode.REPEAT_ALL ->
-                            painterResource(R.drawable.ic_repeat)
-                        PlaybackMode.SHUFFLE ->
-                            painterResource(R.drawable.ic_shuffle)
+                IconButton(
+                    onClick = {
+                        onTogglePlaybackMode()
                     },
-                    "",
-                    Modifier
-                        .padding(16.dp)
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .clickable { onTogglePlaybackMode() }
-                )
+                    Modifier.padding(16.dp).background(
+                        MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Icon(
+                        when (playbackMode.value) {
+                            PlaybackMode.REPEAT_ONE ->
+                                painterResource(R.drawable.ic_repeat_one)
+
+                            PlaybackMode.REPEAT_ALL ->
+                                painterResource(R.drawable.ic_repeat)
+
+                            PlaybackMode.SHUFFLE ->
+                                painterResource(R.drawable.ic_shuffle)
+                        },
+                        "",
+                        Modifier
+                            .size(32.dp)
+                    )
+                }
                 IconButton(
                     onClick = { onPrevClick() },
                     Modifier.background(Color.Gray, CircleShape)
@@ -140,21 +150,25 @@ fun BoxScope.PlayBar(
                         Modifier.size(32.dp)
                     )
                 }
-                Icon(
-                    painterResource(R.drawable.ic_queue_music),
-                    "",
-                    Modifier
-                        .padding(16.dp)
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .clickable {}
-                )
+                IconButton(
+                    onClick = {},
+                    Modifier.padding(16.dp).background(
+                        MaterialTheme.colorScheme.background,
+                        CircleShape
+                    )
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_queue_music),
+                        "",
+                        Modifier.size(32.dp)
+                    )
+                }
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
-                    Modifier.fillMaxWidth(),
+                    Modifier.padding(8.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -162,30 +176,16 @@ fun BoxScope.PlayBar(
                         textAlign = TextAlign.Center,
                         maxLines = 1
                     )
-                    SeekBar(
-                        progress = progress.value,
-                        max = seekBarMax,
-                        height = 36.dp,
-                        color = MaterialTheme.colors.primary,
-                        backgroundColor = MaterialTheme.colors.background,
-                        onSeekTo = {}
+                    Slider(
+                        value = progress.value,
+                        onValueChange = { onSeekTo(it) },
+                        modifier = Modifier.padding(
+                            start = 32.dp,
+                            end = 32.dp,
+                            top = 8.dp,
+                            bottom = 8.dp
+                        ).height(32.dp)
                     )
-                    /* LinearProgressIndicator(
-                        progress = progress.value,
-                        color = MaterialTheme.colors.primary,
-                        backgroundColor = MaterialTheme.colors.background,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .height(
-                                16.dp
-                            )
-                            .background(
-                                MaterialTheme.colors.background,
-                                RoundedCornerShape(20)
-                            )
-                            .clip(RoundedCornerShape(20))
-                    )*/
                 }
             }
         }
@@ -195,11 +195,9 @@ fun BoxScope.PlayBar(
 @Composable
 fun SeekBar(
     progress: Float,
-    max: Int,
     height: Dp,
     color: Color,
-    backgroundColor: Color,
-    onSeekTo: (Int) -> Unit
+    onSeekTo: (Float) -> Unit
 ) {
     AndroidView(
         factory = { context ->
@@ -211,7 +209,7 @@ fun SeekBar(
                     fromUser: Boolean
                 ) {
                     if (fromUser) {
-                        onSeekTo(position)
+                        onSeekTo(position.toFloat() / 1000)
                     }
                 }
 
@@ -219,14 +217,17 @@ fun SeekBar(
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             }
-            seekBar.max = 1
-            seekBar.setBackgroundColor(backgroundColor.toArgb())
+            seekBar.max = 1000
+            seekBar.progressTintList = ColorStateList.valueOf(color.toArgb())
+            seekBar.thumbTintList = ColorStateList.valueOf(color.toArgb())
             seekBar.setOnSeekBarChangeListener(seekListener)
             seekBar
         },
-        modifier = Modifier.fillMaxWidth().height(height),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height),
         update = { seekBar ->
-            seekBar.progress = progress.toInt()
+            seekBar.progress = (progress * 1000).toInt()
         }
     )
 }

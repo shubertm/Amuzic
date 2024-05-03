@@ -1,10 +1,5 @@
 package com.infbyte.amuzic.ui.screens
 
-import android.view.MotionEvent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,65 +17,37 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
-import com.infbyte.amuzic.ui.theme.Ivory
 import com.infbyte.amuzic.utils.calcScroll
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SongsScreen(
-    isVisible: Boolean,
-    showPopup: MutableState<Boolean>,
     songs: List<Song>,
     onScroll: (Int) -> Unit,
     onSongClick: (Song) -> Unit
 ) {
-    AnimatedVisibility(
-        isVisible,
-        enter = fadeIn(tween(1000)),
-        exit = fadeOut(tween(1000))
-    ) {
-        val state = rememberLazyListState()
-        val modifier = if (showPopup.value) {
-            Modifier
-                .fillMaxSize()
-                .pointerInteropFilter {
-                    if (showPopup.value) {
-                        if (it.action == MotionEvent.ACTION_DOWN) {
-                            showPopup.value = false
-                        }
-                        return@pointerInteropFilter true
-                    }
-                    true
-                }
-        } else {
-            Modifier
-                .fillMaxSize()
-        }
-        LazyColumn(modifier, state) {
-            items(songs) { song ->
-                Song(song) {
-                    onSongClick(it)
-                }
+    val state = rememberLazyListState()
+    LazyColumn(Modifier.fillMaxSize(), state) {
+        items(songs) { song ->
+            Song(song) {
+                onSongClick(it)
             }
         }
-        if (state.isScrollInProgress) {
-            onScroll(calcScroll(state))
-        }
+    }
+    if (state.isScrollInProgress) {
+        onScroll(calcScroll(state))
     }
 }
 
@@ -91,7 +58,7 @@ fun Song(song: Song, onClick: (Song) -> Unit) {
             .fillMaxWidth()
             .padding(8.dp)
             .clip(RoundedCornerShape(10))
-            .background(Ivory)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable {
                 onClick(song)
             },
@@ -113,9 +80,7 @@ fun Song(song: Song, onClick: (Song) -> Unit) {
                 Image(
                     painter = painterResource(R.drawable.ic_audiotrack),
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(48.dp),
+                    modifier = Modifier.size(48.dp),
                     contentDescription = ""
                 )
             }

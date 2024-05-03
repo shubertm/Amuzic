@@ -1,6 +1,7 @@
 package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -18,11 +19,22 @@ import com.infbyte.amuzic.playback.PlaybackMode.REPEAT_ALL
 import com.infbyte.amuzic.playback.PlaybackMode.REPEAT_ONE
 import com.infbyte.amuzic.playback.PlaybackMode.SHUFFLE
 import com.infbyte.amuzic.ui.screens.Screens
+import com.infbyte.amuzic.ui.viewmodel.SongsState.Companion.INITIAL_STATE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SongsState(
+    private val currentSong: Song = Song(0, "", "", "", "", Uri.EMPTY, null),
+    private val songs: List<Song> = listOf(),
+    private val searchResult: List<Song> = listOf()
+) {
+    companion object {
+        val INITIAL_STATE = SongsState()
+    }
+}
 
 @HiltViewModel
 class SongsViewModel @Inject constructor(
@@ -30,6 +42,9 @@ class SongsViewModel @Inject constructor(
     private val playbackListener: PlaybackListener,
     private val playbackManager: PlaybackManager
 ) : ViewModel() {
+
+    private val _state = mutableStateOf(INITIAL_STATE)
+    val state: State<SongsState> = _state
 
     private val _isLoadingSongs = mutableStateOf(false)
     val isLoadingSongs: State<Boolean> = _isLoadingSongs
@@ -416,6 +431,7 @@ class SongsViewModel @Inject constructor(
                     _isLoadingSongs.value = false
                     _isLoaded.value = true
                     this@SongsViewModel.songs = songs
+                    _state.value = state.value.copy(currentSong = songs.first(), songs = songs)
                     _currentSong.value = songs.first()
                     currentSong.value?.let { song ->
                         playbackListener.initSong(song)
@@ -423,5 +439,9 @@ class SongsViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun onSeekTouch(position: Float) {
+        playbackListener.seekTo(position)
     }
 }

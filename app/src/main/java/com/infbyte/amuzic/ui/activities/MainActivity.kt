@@ -3,38 +3,21 @@ package com.infbyte.amuzic.ui.activities
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.navigation.compose.rememberNavController
 import com.infbyte.amuzic.BuildConfig
-import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
-import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
-import com.infbyte.amuzic.ui.screens.AlbumsScreen
-import com.infbyte.amuzic.ui.screens.ArtistsScreen
-import com.infbyte.amuzic.ui.screens.FoldersScreen
-import com.infbyte.amuzic.ui.screens.MainScreen
 import com.infbyte.amuzic.ui.screens.LoadingSongsProgress
-import com.infbyte.amuzic.ui.screens.PlayBar
-import com.infbyte.amuzic.ui.screens.Screens
-import com.infbyte.amuzic.ui.screens.SongsScreen
+import com.infbyte.amuzic.ui.screens.MainScreen
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
-import com.infbyte.amuzic.utils.UI_CONTROLS_HINT
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -83,24 +66,14 @@ class MainActivity : ComponentActivity() {
             AmuzicTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     if (songsViewModel.isLoadingSongs.value) {
                         LoadingSongsProgress()
                     } else {
                         val navController = rememberNavController()
-                        MainScreen(
-                            songsViewModel.showTopBar,
-                            songsViewModel.showPopup.value,
-                            songsViewModel.currentScreen.value,
-                            onTogglePopup = {
-                                songsViewModel.onTogglePopup()
-                            },
-                            onNavigateTo = { screen ->
-                                songsViewModel.onScreenSelected(screen)
-                                navController.navigate(screen)
-                            }
-                        ) {
+                        MainScreen()
+                        /*{
                             LaunchedEffect(UI_CONTROLS_HINT) {
                                 songsViewModel.showAndDelayHideTopBar()
                                 songsViewModel.showAndDelayHidePlayBar()
@@ -178,8 +151,8 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
-                        }
-                        songsViewModel.currentSong.value?.let {
+                        }*/
+                        /* songsViewModel.currentSong.value?.let {
                             Box(
                                 Modifier
                                     .fillMaxSize()
@@ -189,7 +162,6 @@ class MainActivity : ComponentActivity() {
                                     songsViewModel.isPlaying(),
                                     it,
                                     songsViewModel.progress,
-                                    songsViewModel.songDuration.value,
                                     songsViewModel.playbackMode,
                                     onPlayClick = {
                                         songsViewModel.onPlayClicked()
@@ -202,11 +174,12 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onTogglePlaybackMode = {
                                         songsViewModel.onTogglePlaybackMode()
-                                    }
+                                    },
+                                    onSeekTo = { songsViewModel.onSeekTouch(it) }
                                 )
                             }
-                        }
-                        BackHandler {
+                        }*/
+                        /*BackHandler {
                             if (songsViewModel.showPopup.value) {
                                 songsViewModel.showPopup.value = false
                                 return@BackHandler
@@ -229,7 +202,7 @@ class MainActivity : ComponentActivity() {
                             } else {
                                 finish()
                             }
-                        }
+                        }*/
                     }
                 }
             }

@@ -6,4 +6,8 @@
     <string name="albums">Albums</string>
     <string name="folders">Folders</string>
     <string name="confirm_exit">Tap back again to exit</string>
+    <string name="amuzic_all">All</string>
+    <string name="amuzic_artists">Artists</string>
+    <string name="amuzic_albums">Albums</string>
+    <string name="amuzic_search">Search</string>
 </resources>
