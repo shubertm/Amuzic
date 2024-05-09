@@ -31,13 +31,13 @@ import com.infbyte.amuzic.utils.calcScroll
 fun ArtistsScreen(
     artists: List<Artist>,
     onScroll: (Int) -> Unit,
-    onArtistClick: (Int) -> Unit
+    onArtistClick: (Artist) -> Unit
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
         itemsIndexed(artists) { index, artist ->
             Artist(artist) {
-                onArtistClick(index)
+                onArtistClick(artist)
             }
         }
     }

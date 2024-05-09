@@ -3,18 +3,29 @@ package com.infbyte.amuzic.ui.activities
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.infbyte.amuzic.BuildConfig
+import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
-import com.infbyte.amuzic.ui.screens.LoadingSongsProgress
+import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
+import com.infbyte.amuzic.ui.screens.PlayBar
+import com.infbyte.amuzic.ui.screens.Screens
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
@@ -60,6 +71,9 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 songsViewModel.init(this)
+                installSplashScreen().setKeepOnScreenCondition {
+                    !songsViewModel.isLoaded.value
+                }
             }
         }
         setContent {
@@ -68,141 +82,63 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (songsViewModel.isLoadingSongs.value) {
-                        LoadingSongsProgress()
-                    } else {
-                        val navController = rememberNavController()
-                        MainScreen()
-                        /*{
-                            LaunchedEffect(UI_CONTROLS_HINT) {
-                                songsViewModel.showAndDelayHideTopBar()
-                                songsViewModel.showAndDelayHidePlayBar()
-                            }
-                            SideEffect {
-                                if (songsViewModel.showPopup.value) {
-                                    songsViewModel.hideTopBar()
-                                    return@SideEffect
+                    val navController = rememberNavController()
+                    NavHost(navController, startDestination = Screens.MAIN) {
+                        composable(Screens.MAIN) {
+                            MainScreen(
+                                songsViewModel,
+                                onNavigate = { route -> navController.navigate(route) }
+                            )
+                        }
+                        composable(Screens.SONGS) {
+                            ArtistOrAlbumSongsScreen(
+                                songsViewModel,
+                                onNavigateBack = {
+                                    navController.popBackStack()
                                 }
-                                songsViewModel.showAndDelayHideTopBar()
-                            }
-                            NavHost(
-                                navController,
-                                startDestination = Screens.ALL_SONGS
-                            ) {
-                                composable(Screens.ALL_SONGS) {
-                                    SongsScreen(
-                                        songsViewModel.showSongs.value,
-                                        songsViewModel.showPopup,
-                                        songsViewModel.songs,
-                                        onScroll = { value ->
-                                            songsViewModel.toggleBarsByScroll(value)
-                                        },
-                                        onSongClick = { song ->
-                                            songsViewModel.onSongClicked(song)
-                                        }
-                                    )
-                                }
-                                composable(Screens.ARTISTS) {
-                                    ArtistsScreen(
-                                        songsViewModel.showArtists.value,
-                                        songsViewModel.showPopup,
-                                        songsViewModel.artists,
-                                        onScroll = { value ->
-                                            songsViewModel.toggleBarsByScroll(value)
-                                        },
-                                        onArtistClick = { artistPos ->
-                                            songsViewModel.onArtistClicked(artistPos)
-                                            songsViewModel.hideBars()
-                                            navController
-                                                .navigate(Screens.ALL_SONGS)
-                                        }
-                                    )
-                                }
-                                composable(Screens.ALBUMS) {
-                                    AlbumsScreen(
-                                        songsViewModel.showAlbums.value,
-                                        songsViewModel.showPopup,
-                                        songsViewModel.albums,
-                                        onScroll = { value ->
-                                            songsViewModel.toggleBarsByScroll(value)
-                                        },
-                                        onAlbumClicked = { albumPos ->
-                                            songsViewModel.onAlbumClicked(albumPos)
-                                            songsViewModel.hideBars()
-                                            navController
-                                                .navigate(Screens.ALL_SONGS)
-                                        }
-                                    )
-                                }
-                                composable(Screens.FOLDERS) {
-                                    FoldersScreen(
-                                        songsViewModel.showFolders.value,
-                                        songsViewModel.showPopup,
-                                        songsViewModel.folders,
-                                        onScroll = { value ->
-                                            songsViewModel.toggleBarsByScroll(value)
-                                        },
-                                        onFolderClicked = { folderPos ->
-                                            songsViewModel.onFolderClicked(folderPos)
-                                            songsViewModel.hideBars()
-                                            navController
-                                                .navigate(Screens.ALL_SONGS)
-                                        }
-                                    )
-                                }
-                            }
-                        }*/
-                        /* songsViewModel.currentSong.value?.let {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                            ) {
-                                PlayBar(
-                                    songsViewModel.showPlayBar,
-                                    songsViewModel.isPlaying(),
-                                    it,
-                                    songsViewModel.progress,
-                                    songsViewModel.playbackMode,
-                                    onPlayClick = {
-                                        songsViewModel.onPlayClicked()
-                                    },
-                                    onNextClick = {
-                                        songsViewModel.onNextClicked()
-                                    },
-                                    onPrevClick = {
-                                        songsViewModel.onPrevClicked()
-                                    },
-                                    onTogglePlaybackMode = {
-                                        songsViewModel.onTogglePlaybackMode()
-                                    },
-                                    onSeekTo = { songsViewModel.onSeekTouch(it) }
-                                )
-                            }
-                        }*/
-                        /*BackHandler {
-                            if (songsViewModel.showPopup.value) {
-                                songsViewModel.showPopup.value = false
-                                return@BackHandler
-                            }
-                            if (navController.popBackStack()) {
-                                navController.currentDestination
-                                    ?.route?.let { screen ->
-                                        songsViewModel.onScreenSelected(screen)
-                                    }
-                                return@BackHandler
-                            }
-                            if (!songsViewModel.confirmExit) {
-                                Toast.makeText(
-                                    this,
-                                    getString(R.string.confirm_exit),
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                                songsViewModel.confirmExit()
-                            } else {
-                                finish()
-                            }
-                        }*/
+                            )
+                        }
+                    }
+                    songsViewModel.currentSong.value?.let { song ->
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                        ) {
+                            PlayBar(
+                                songsViewModel.showPlayBar,
+                                songsViewModel.isPlaying(),
+                                song,
+                                songsViewModel.progress,
+                                songsViewModel.playbackMode,
+                                onPlayClick = {
+                                    songsViewModel.onPlayClicked()
+                                },
+                                onNextClick = {
+                                    songsViewModel.onNextClicked()
+                                },
+                                onPrevClick = {
+                                    songsViewModel.onPrevClicked()
+                                },
+                                onTogglePlaybackMode = {
+                                    songsViewModel.onTogglePlaybackMode()
+                                },
+                                onSeekTo = { songsViewModel.onSeekTouch(it) }
+                            )
+                        }
+                    }
+                    BackHandler {
+                        if (navController.popBackStack()) { return@BackHandler }
+                        if (!songsViewModel.confirmExit) {
+                            Toast.makeText(
+                                this,
+                                getString(R.string.amuzic_confirm_exit),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                            songsViewModel.confirmExit()
+                        } else {
+                            finish()
+                        }
                     }
                 }
             }

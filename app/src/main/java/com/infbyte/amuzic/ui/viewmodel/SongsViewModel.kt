@@ -4,7 +4,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infbyte.amuzic.data.model.Album
@@ -27,9 +31,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SongsState(
-    private val currentSong: Song = Song(0, "", "", "", "", Uri.EMPTY, null),
-    private val songs: List<Song> = listOf(),
-    private val searchResult: List<Song> = listOf()
+    val currentSong: Song = Song(0, "", "", "", "", Uri.EMPTY, null),
+    val songs: List<Song> = listOf(),
+    val searchResult: List<Song> = listOf(),
+    val icon: ImageBitmap? = null
 ) {
     companion object {
         val INITIAL_STATE = SongsState()
@@ -43,8 +48,8 @@ class SongsViewModel @Inject constructor(
     private val playbackManager: PlaybackManager
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(INITIAL_STATE)
-    val state: State<SongsState> = _state
+    var state by mutableStateOf(INITIAL_STATE)
+        private set
 
     private val _isLoadingSongs = mutableStateOf(false)
     val isLoadingSongs: State<Boolean> = _isLoadingSongs
@@ -163,24 +168,30 @@ class SongsViewModel @Inject constructor(
         }
     }
 
-    fun onArtistClicked(pos: Int) {
-        _currentArtist.value = artists[pos]
-        songs = currentArtist.value?.let { artist ->
-            repo.songs.filter { song ->
-                song.artist == artist.name
-            }
-        }!!
-        showSongs()
+    fun onArtistClicked(artist: Artist) {
+        viewModelScope.launch {
+            _currentArtist.value = artist
+            songs = currentArtist.value?.let { artist1 ->
+                repo.songs.filter { song ->
+                    song.artist == artist1.name
+                }
+            }!!
+            val icon = songs.map { it.thumbnail }.filterNotNull().firstOrNull()?.asImageBitmap()
+            state = state.copy(songs = songs, icon = icon)
+        }
     }
 
-    fun onAlbumClicked(pos: Int) {
-        _currentAlbum.value = albums[pos]
-        songs = currentAlbum.value?.let { album ->
-            repo.songs.filter { song ->
-                song.album == album.name
-            }
-        }!!
-        showSongs()
+    fun onAlbumClicked(album: Album) {
+        viewModelScope.launch {
+            _currentAlbum.value = album
+            songs = currentAlbum.value?.let { album1 ->
+                repo.songs.filter { song ->
+                    song.album == album1.name
+                }
+            }!!
+            val icon = songs.map { it.thumbnail }.filterNotNull().firstOrNull()?.asImageBitmap()
+            state = state.copy(songs = songs, icon = icon)
+        }
     }
 
     fun onFolderClicked(pos: Int) {
@@ -234,16 +245,14 @@ class SongsViewModel @Inject constructor(
         hidePlayBar()
     }
 
-    fun toggleBarsByScroll(
+    fun togglePlayBarByScroll(
         value: Int
     ) {
         if (value != 0) {
             calcScrollDelta(value) { delta ->
-                toggleTopBarByScrollDelta(delta)
                 togglePlayBarByScrollDelta(delta)
             }
         } else {
-            showAndDelayHideTopBar()
             showAndDelayHidePlayBar()
         }
     }
@@ -262,7 +271,7 @@ class SongsViewModel @Inject constructor(
 
     private fun togglePlayBarByScrollDelta(delta: Int) {
         if (delta > 0) {
-            _showPlayBar.value = true
+            showAndDelayHidePlayBar()
             return
         }
         if (delta < 0) {
@@ -292,8 +301,8 @@ class SongsViewModel @Inject constructor(
         scrollValue: Int,
         toggle: (Int) -> Unit
     ) {
-        val delta = this@SongsViewModel.scrollValue - scrollValue
-        this@SongsViewModel.scrollValue = scrollValue
+        val delta = this.scrollValue - scrollValue
+        this.scrollValue = scrollValue
         toggle(delta)
     }
 
@@ -301,7 +310,7 @@ class SongsViewModel @Inject constructor(
         if (!boolState.value) {
             viewModelScope.launch {
                 boolState.value = true
-                delay(5000)
+                delay(7000)
                 boolState.value = false
             }
         }
@@ -431,7 +440,7 @@ class SongsViewModel @Inject constructor(
                     _isLoadingSongs.value = false
                     _isLoaded.value = true
                     this@SongsViewModel.songs = songs
-                    _state.value = state.value.copy(currentSong = songs.first(), songs = songs)
+                    state = state.copy(currentSong = songs.first(), songs = songs, searchResult = songs)
                     _currentSong.value = songs.first()
                     currentSong.value?.let { song ->
                         playbackListener.initSong(song)
@@ -443,5 +452,18 @@ class SongsViewModel @Inject constructor(
 
     fun onSeekTouch(position: Float) {
         playbackListener.seekTo(position)
+    }
+
+    fun onSearch(query: String) {
+        viewModelScope.launch {
+            state = with(state) {
+                copy(searchResult = songs.filter { song -> song.name.contains(query, true) })
+            }
+        }
+    }
+
+    fun onExit() {
+        playbackListener.stopSong()
+        playbackListener.release()
     }
 }

@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -31,13 +31,13 @@ import com.infbyte.amuzic.utils.calcScroll
 fun AlbumsScreen(
     albums: List<Album>,
     onScroll: (Int) -> Unit,
-    onAlbumClicked: (Int) -> Unit
+    onAlbumClicked: (Album) -> Unit
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
-        itemsIndexed(albums) { index, album ->
+        items(albums) { album ->
             Album(album) {
-                onAlbumClicked(index)
+                onAlbumClicked(album)
             }
         }
     }

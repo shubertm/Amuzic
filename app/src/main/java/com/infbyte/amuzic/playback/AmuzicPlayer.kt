@@ -70,6 +70,10 @@ class AmuzicPlayer @Inject constructor() :
 
     override fun isActive() = this.isPlaying
 
+    override fun release() {
+        release()
+    }
+
     override fun onCompletion(player: MediaPlayer?) {
         onCompletionHandler()
     }

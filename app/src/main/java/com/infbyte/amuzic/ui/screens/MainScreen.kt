@@ -29,20 +29,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import kotlinx.coroutines.launch
 
-@Preview
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    songsViewModel: SongsViewModel,
+    onNavigate: (String) -> Unit
+) {
     Box(Modifier.wrapContentHeight()) {
         val pagerState = rememberPagerState(0) { 3 }
         val scope = rememberCoroutineScope()
-        val songsViewModel: SongsViewModel = viewModel()
         var searchQuery by rememberSaveable { mutableStateOf("") }
         var isSearching by rememberSaveable { mutableStateOf(false) }
 
@@ -51,11 +51,14 @@ fun MainScreen() {
                 query = searchQuery,
                 onQueryChange = {
                     searchQuery = it
+                    songsViewModel.onSearch(it)
                 },
                 onSearch = {},
                 active = isSearching,
                 onActiveChange = {
                     isSearching = !isSearching
+                    if (!isSearching) { searchQuery = "" }
+                    songsViewModel.onSearch(searchQuery)
                 },
                 Modifier.padding(start = 8.dp, end = 8.dp),
                 trailingIcon = { Icon(Icons.Outlined.Search, "") },
@@ -63,37 +66,65 @@ fun MainScreen() {
             ) {
                 when (pagerState.currentPage) {
                     0 -> SongsScreen(
-                        songs = songsViewModel.songs,
-                        onScroll = {}
-                    ) {}
+                        songs = songsViewModel.state.searchResult,
+                        onScroll = { scrollValue ->
+                            songsViewModel.togglePlayBarByScroll(scrollValue)
+                        },
+                        onSongClick = { song ->
+                            searchQuery = ""
+                            isSearching = false
+                            songsViewModel.onSongClicked(song)
+                        }
+                    )
 
                     1 -> ArtistsScreen(
                         artists = songsViewModel.artists,
-                        onScroll = {}
-                    ) {}
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                        onArtistClick = { artist ->
+                            songsViewModel.onArtistClicked(artist)
+                            onNavigate(Screens.SONGS)
+                        }
+                    )
 
                     2 -> AlbumsScreen(
                         albums = songsViewModel.albums,
-                        onScroll = {}
-                    ) {}
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                        onAlbumClicked = { album ->
+                            songsViewModel.onAlbumClicked(album)
+                            onNavigate(Screens.SONGS)
+                        }
+                    )
                 }
             }
             HorizontalPager(state = pagerState) { page ->
                 when (page) {
                     0 -> SongsScreen(
-                        songs = songsViewModel.songs,
-                        onScroll = {}
-                    ) {}
+                        songs = songsViewModel.state.songs,
+                        onScroll = { scrollValue ->
+                            songsViewModel.togglePlayBarByScroll(scrollValue)
+                        },
+                        onSongClick = { song ->
+                            songsViewModel.onSongClicked(song)
+                        }
+                    )
 
                     1 -> ArtistsScreen(
                         artists = songsViewModel.artists,
-                        onScroll = {}
-                    ) {}
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                        onArtistClick = { artist ->
+                            songsViewModel.onArtistClicked(artist)
+                            onNavigate(Screens.SONGS)
+                        }
+                    )
 
                     2 -> AlbumsScreen(
                         albums = songsViewModel.albums,
-                        onScroll = {}
-                    ) {}
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                        onAlbumClicked = { album ->
+                            songsViewModel.onAlbumClicked(album)
+                            onNavigate(Screens.SONGS)
+                        }
+                    )
                 }
             }
         }
@@ -110,7 +141,7 @@ fun MainScreen() {
                     }
                 },
                 icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
-                label = { Text(stringResource(R.string.amuzic_all)) }
+                label = { Text(stringResource(R.string.amuzic_songs)) }
             )
             NavigationBarItem(
                 selected = pagerState.currentPage == 1,
