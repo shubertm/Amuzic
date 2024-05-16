@@ -9,13 +9,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 
-class PlaybackManager @Inject constructor(
-    @ApplicationContext context: Context,
-    private val playbackListener: PlaybackListener
+class PlaybackManager(
+    context: Context
 ) {
+    private lateinit var playbackListener: PlaybackListener
     private var hasAudioFocus = false
     private val _isPlaying = mutableStateOf(false)
     val isPlaying: State<Boolean> = _isPlaying
@@ -77,6 +75,10 @@ class PlaybackManager @Inject constructor(
 
     fun checkPlayer() {
         _isPlaying.value = playbackListener.isActive()
+    }
+
+    fun setPlaybackListener(listener: PlaybackListener) {
+        playbackListener = listener
     }
 
     private fun abandonAudioFocus() {

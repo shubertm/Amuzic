@@ -25,5 +25,5 @@ interface PlaybackListener {
 
     fun isActive(): Boolean
 
-    fun release()
+    fun releasePlayer()
 }

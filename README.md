@@ -1,13 +1,23 @@
 <h1 align="center">Amuzic</h1>
 <p align="center">
 <a href="https://github.com/shubertthei/Amuzic/actions/workflows/build.yml"> 
-<img src="https://github.com/shubertthei/Amuzic/actions/workflows/build.yml/badge.svg">
+<img src="https://github.com/shubertthei/Amuzic/actions/workflows/build.yml/badge.svg" alt="build status">
 </a>
 </p>
 
 ## Overview
-<p align="center">
-<img src="https://github.com/shubertthei/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png" width="60" height="60"/>
+
+<style>
+    #app_icon {
+        border-radius:10px;
+    }
+</style>
+
+<p id="app_icon" align="center">
+<img
+    src="https://github.com/shubertthei/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png" 
+    width="60" height="60" alt="amuzic icon"
+/>
 </p>
 
 ## Tools

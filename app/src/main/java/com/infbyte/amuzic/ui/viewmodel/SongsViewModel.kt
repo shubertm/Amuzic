@@ -105,6 +105,7 @@ class SongsViewModel @Inject constructor(
 
     fun init(context: Context) {
         viewModelScope.launch {
+            playbackManager.setPlaybackListener(playbackListener)
             loadSongs(context)
         }
     }
@@ -464,6 +465,6 @@ class SongsViewModel @Inject constructor(
 
     fun onExit() {
         playbackListener.stopSong()
-        playbackListener.release()
+        playbackListener.releasePlayer()
     }
 }

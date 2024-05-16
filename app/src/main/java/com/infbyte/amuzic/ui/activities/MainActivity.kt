@@ -137,6 +137,7 @@ class MainActivity : ComponentActivity() {
                                 .show()
                             songsViewModel.confirmExit()
                         } else {
+                            songsViewModel.onExit()
                             finish()
                         }
                     }

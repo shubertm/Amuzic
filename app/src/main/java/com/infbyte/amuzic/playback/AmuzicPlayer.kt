@@ -70,7 +70,7 @@ class AmuzicPlayer @Inject constructor() :
 
     override fun isActive() = this.isPlaying
 
-    override fun release() {
+    override fun releasePlayer() {
         release()
     }
 
