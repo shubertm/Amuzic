@@ -7,16 +7,11 @@
 
 ## Overview
 
-<style>
-    #app_icon {
-        border-radius:10px;
-    }
-</style>
-
 <p id="app_icon" align="center">
 <img
     src="https://github.com/shubertthei/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png" 
     width="60" height="60" alt="amuzic icon"
+    style="border-radius:10px;"
 />
 </p>
 
