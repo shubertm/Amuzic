@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,13 +36,13 @@ import com.infbyte.amuzic.utils.calcScroll
 fun SongsScreen(
     songs: List<Song>,
     onScroll: (Int) -> Unit,
-    onSongClick: (Song) -> Unit
+    onSongClick: (Int) -> Unit
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
-        items(songs) { song ->
+        itemsIndexed(songs) { index, song ->
             Song(song) {
-                onSongClick(it)
+                onSongClick(index)
             }
         }
     }
@@ -52,7 +52,7 @@ fun SongsScreen(
 }
 
 @Composable
-fun Song(song: Song, onClick: (Song) -> Unit) {
+fun Song(song: Song, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -60,7 +60,7 @@ fun Song(song: Song, onClick: (Song) -> Unit) {
             .clip(RoundedCornerShape(10))
             .background(MaterialTheme.colorScheme.surface)
             .clickable {
-                onClick(song)
+                onClick()
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -92,7 +92,7 @@ fun Song(song: Song, onClick: (Song) -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                song.name,
+                song.title,
                 maxLines = 1
             )
             Text(

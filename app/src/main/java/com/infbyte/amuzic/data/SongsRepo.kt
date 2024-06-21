@@ -1,9 +1,15 @@
-package com.infbyte.amuzic.data.model
+package com.infbyte.amuzic.data
 
 import android.content.ContentUris
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import com.infbyte.amuzic.data.model.Album
+import com.infbyte.amuzic.data.model.Artist
+import com.infbyte.amuzic.data.model.Folder
+import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.utils.loadThumbnail
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -80,21 +86,25 @@ class SongsRepo @Inject constructor(
                             contentResolver.loadThumbnail(albumId)
                         }
                     val path = it.getString(pathColumn)
-                    _songs += Song(
-                        id,
-                        title,
-                        artist,
-                        album,
-                        extractFolderName(path),
-                        songUri,
-                        thumbnail
-                    )
+
+                    val meta = MediaMetadata.Builder()
+                        .setAlbumTitle(album)
+                        .setArtist(artist)
+                        .setTitle(title)
+                        .build()
+
+                    val item = MediaItem.Builder()
+                        .setMediaMetadata(meta)
+                        .setUri(songUri)
+                        .setMediaId(id.toString())
+                        .build()
+                    _songs += Song(item, extractFolderName(path), thumbnail)
                 }
                 query.close()
             }
             loadArtists()
             loadAlbums()
-            loadFolders()
+            // loadFolders()
             onComplete(songs)
         }
     }
@@ -123,10 +133,14 @@ class SongsRepo @Inject constructor(
 
     private fun loadFolders() {
         folders = songs.map {
-            it.folder
+            extractFolderName(it.folder)
         }.toSet()
             .map { folder ->
-                val numberOfSongs = songs.count { song -> song.folder == folder }
+                val numberOfSongs = songs.count { song ->
+                    extractFolderName(
+                        song.folder
+                    ) == folder
+                }
                 Folder(folder, numberOfSongs)
             }
     }

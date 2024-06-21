@@ -1,87 +1,45 @@
 package com.infbyte.amuzic.playback
 
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.MediaPlayer
-import com.infbyte.amuzic.data.model.Song
-import javax.inject.Inject
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player.RepeatMode
 
-class AmuzicPlayer @Inject constructor() :
-    MediaPlayer(),
-    MediaPlayer.OnCompletionListener,
-    MediaPlayer.OnPreparedListener,
-    MediaPlayer.OnSeekCompleteListener,
-    PlaybackListener {
-    private var isInitSong = true
-    private lateinit var context: Context
-    private lateinit var onPreparedHandler: () -> Unit
-    private lateinit var onCompletionHandler: () -> Unit
+interface AmuzicPlayer {
 
-    override fun init(
-        context: Context,
-        onPrepared: () -> Unit,
-        onComplete: () -> Unit
-    ) {
-        this.context = context
-        onPreparedHandler = onPrepared
-        onCompletionHandler = onComplete
-        setOnPreparedListener(this)
-        setOnCompletionListener(this)
-        setAudioAttributes(
-            AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .build()
-        )
-    }
+    val shuffleMode: Boolean
 
-    override fun initSong(song: Song) {
-        isInitSong = true
-        setDataSource(context, song.uri)
-        prepare()
-    }
+    val currentSong: MediaItem
 
-    override fun prepareSong(song: Song) {
-        reset()
-        setDataSource(context, song.uri)
-        prepare()
-    }
+    var onTransition: (Int, Float) -> Unit
 
-    override fun playSong() {
-        start()
-    }
+    fun init(context: Context)
 
-    override fun pauseSong() {
-        pause()
-    }
+    fun selectSong(index: Int)
 
-    override fun stopSong() {
-        stop()
-    }
+    fun playSong()
 
-    override fun seekTo(position: Float) {
-        val pos = (position * duration).toInt()
-        super.seekTo(pos)
-    }
+    fun pauseSong()
 
-    override fun progress() = currentPosition
+    fun stopSong()
 
-    override fun duration() = duration
+    fun nextSong()
 
-    override fun isActive() = this.isPlaying
+    fun prevSong()
 
-    override fun releasePlayer() {
-        release()
-    }
+    fun seekTo(position: Float)
 
-    override fun onCompletion(player: MediaPlayer?) {
-        onCompletionHandler()
-    }
+    fun progress(): Float
 
-    override fun onPrepared(player: MediaPlayer?) {
-        if (!isInitSong) onPreparedHandler()
-        isInitSong = false
-    }
+    fun duration(): Float
 
-    override fun onSeekComplete(player: MediaPlayer?) {}
+    fun isActive(): Boolean
+
+    fun releasePlayer()
+
+    fun addToPlayList(songs: List<MediaItem>)
+
+    fun createPlayList(songs: List<MediaItem>)
+
+    @RepeatMode
+    fun switchMode(): Int
 }

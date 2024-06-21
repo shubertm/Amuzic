@@ -13,7 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 class PlaybackManager(
     context: Context
 ) {
-    private lateinit var playbackListener: PlaybackListener
+    private lateinit var amuzicPlayer: AmuzicPlayer
     private var hasAudioFocus = false
     private val _isPlaying = mutableStateOf(false)
     val isPlaying: State<Boolean> = _isPlaying
@@ -67,18 +67,18 @@ class PlaybackManager(
     }
 
     fun pauseSong() {
-        playbackListener.pauseSong()
+        amuzicPlayer.pauseSong()
         abandonAudioFocus()
         hasAudioFocus = false
         checkPlayer()
     }
 
     fun checkPlayer() {
-        _isPlaying.value = playbackListener.isActive()
+        _isPlaying.value = amuzicPlayer.isActive()
     }
 
-    fun setPlaybackListener(listener: PlaybackListener) {
-        playbackListener = listener
+    fun setPlaybackListener(listener: AmuzicPlayer) {
+        amuzicPlayer = listener
     }
 
     private fun abandonAudioFocus() {

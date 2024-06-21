@@ -1,8 +1,10 @@
 package com.infbyte.amuzic.ui.activities
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
@@ -22,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
+import com.infbyte.amuzic.playback.AmuzicPlayerService
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
 import com.infbyte.amuzic.ui.screens.PlayBar
@@ -58,6 +62,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (!songsViewModel.isLoaded.value) {
             if (!isReadPermissionGranted(this)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -76,6 +81,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
         setContent {
             AmuzicTheme {
                 // A surface container using the 'background' color from the theme
@@ -99,32 +105,31 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    songsViewModel.currentSong.value?.let { song ->
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                        ) {
-                            PlayBar(
-                                songsViewModel.showPlayBar,
-                                songsViewModel.isPlaying(),
-                                song,
-                                songsViewModel.progress,
-                                songsViewModel.playbackMode,
-                                onPlayClick = {
-                                    songsViewModel.onPlayClicked()
-                                },
-                                onNextClick = {
-                                    songsViewModel.onNextClicked()
-                                },
-                                onPrevClick = {
-                                    songsViewModel.onPrevClicked()
-                                },
-                                onTogglePlaybackMode = {
-                                    songsViewModel.onTogglePlaybackMode()
-                                },
-                                onSeekTo = { songsViewModel.onSeekTouch(it) }
+                    Box(Modifier.fillMaxSize()) {
+                        LaunchedEffect(key1 = "") {
+                            Log.d(
+                                "MAIN",
+                                "${songsViewModel.state.songDuration}, ${songsViewModel.state.progress}"
                             )
                         }
+                        PlayBar(
+                            songsViewModel.showPlayBar,
+                            songsViewModel.state,
+                            songsViewModel.state,
+                            onPlayClick = {
+                                songsViewModel.onPlayClicked()
+                            },
+                            onNextClick = {
+                                songsViewModel.onNextClicked()
+                            },
+                            onPrevClick = {
+                                songsViewModel.onPrevClicked()
+                            },
+                            onTogglePlaybackMode = {
+                                songsViewModel.onTogglePlaybackMode()
+                            },
+                            onSeekTo = { songsViewModel.onSeekTouch(it) }
+                        )
                     }
                     BackHandler {
                         if (navController.popBackStack()) { return@BackHandler }
@@ -137,12 +142,18 @@ class MainActivity : ComponentActivity() {
                                 .show()
                             songsViewModel.confirmExit()
                         } else {
-                            songsViewModel.onExit()
                             finish()
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("Main", "closing Amuzic")
+        stopService(Intent(this, AmuzicPlayerService::class.java))
+        songsViewModel.onExit()
     }
 }

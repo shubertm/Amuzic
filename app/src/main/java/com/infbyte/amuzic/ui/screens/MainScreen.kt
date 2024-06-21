@@ -70,15 +70,15 @@ fun MainScreen(
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },
-                        onSongClick = { song ->
+                        onSongClick = { songIndex ->
                             searchQuery = ""
                             isSearching = false
-                            songsViewModel.onSongClicked(song)
+                            songsViewModel.onSongClicked(songIndex)
                         }
                     )
 
                     1 -> ArtistsScreen(
-                        artists = songsViewModel.artists,
+                        artists = songsViewModel.state.artists,
                         onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                         onArtistClick = { artist ->
                             songsViewModel.onArtistClicked(artist)
@@ -87,7 +87,7 @@ fun MainScreen(
                     )
 
                     2 -> AlbumsScreen(
-                        albums = songsViewModel.albums,
+                        albums = songsViewModel.state.albums,
                         onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                         onAlbumClicked = { album ->
                             songsViewModel.onAlbumClicked(album)
@@ -103,13 +103,13 @@ fun MainScreen(
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },
-                        onSongClick = { song ->
-                            songsViewModel.onSongClicked(song)
+                        onSongClick = { songIndex ->
+                            songsViewModel.onSongClicked(songIndex)
                         }
                     )
 
                     1 -> ArtistsScreen(
-                        artists = songsViewModel.artists,
+                        artists = songsViewModel.state.artists,
                         onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                         onArtistClick = { artist ->
                             songsViewModel.onArtistClicked(artist)
@@ -118,7 +118,7 @@ fun MainScreen(
                     )
 
                     2 -> AlbumsScreen(
-                        albums = songsViewModel.albums,
+                        albums = songsViewModel.state.albums,
                         onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                         onAlbumClicked = { album ->
                             songsViewModel.onAlbumClicked(album)

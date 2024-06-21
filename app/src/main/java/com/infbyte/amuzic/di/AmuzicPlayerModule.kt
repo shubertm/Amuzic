@@ -1,8 +1,8 @@
 package com.infbyte.amuzic.di
 
 import android.content.Context
+import com.infbyte.amuzic.playback.AmuzicPlayerImpl
 import com.infbyte.amuzic.playback.AmuzicPlayer
-import com.infbyte.amuzic.playback.PlaybackListener
 import com.infbyte.amuzic.playback.PlaybackManager
 import dagger.Binds
 import dagger.Module
@@ -13,11 +13,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Module
 @InstallIn(ViewModelComponent::class)
-abstract class AmuzicPlayerModule() {
+abstract class AmuzicPlayerModule {
     @Binds
     abstract fun bindPlaybackListener(
-        player: AmuzicPlayer
-    ): PlaybackListener
+        player: AmuzicPlayerImpl
+    ): AmuzicPlayer
 }
 
 @Module

@@ -2,13 +2,14 @@ package com.infbyte.amuzic.data.model
 
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.media3.common.MediaItem
 
 data class Song(
-    val id: Long,
-    val name: String,
-    val artist: String,
-    val album: String,
-    val folder: String,
-    val uri: Uri,
-    val thumbnail: Bitmap?
-)
+    val item: MediaItem = MediaItem.fromUri(Uri.EMPTY),
+    val folder: String = "",
+    val thumbnail: Bitmap? = null
+) {
+    val title = item.mediaMetadata.title.toString()
+    val artist = item.mediaMetadata.artist.toString()
+    val album = item.mediaMetadata.albumTitle.toString()
+}

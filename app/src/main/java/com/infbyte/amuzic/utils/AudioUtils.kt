@@ -9,7 +9,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Size
 import androidx.annotation.RequiresApi
-import com.infbyte.amuzic.data.model.SongsRepo.Companion.ALBUM_PROJECTION
+import com.infbyte.amuzic.data.SongsRepo.Companion.ALBUM_PROJECTION
 import java.io.FileNotFoundException
 
 fun ContentResolver.loadThumbnail(albumId: Long): Bitmap? {
@@ -72,14 +72,4 @@ private fun loadThumbnail(context: Context, albumId: Long): String? {
     return path
 }
 
-private fun decodeImage(uri: String?): Bitmap? {
-    var thumbnail: Bitmap? = null
-    try {
-        if (uri != null) thumbnail = BitmapFactory.decodeFile(uri)
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return thumbnail
-}
-
-private fun Uri.decodeImage() = BitmapFactory.decodeFile(toString())
+fun Uri.decodeImage(): Bitmap? = BitmapFactory.decodeFile(toString())
