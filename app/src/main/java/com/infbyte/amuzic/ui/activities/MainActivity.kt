@@ -4,10 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
@@ -93,7 +90,20 @@ class MainActivity : ComponentActivity() {
                         composable(Screens.MAIN) {
                             MainScreen(
                                 songsViewModel,
-                                onNavigate = { route -> navController.navigate(route) }
+                                onNavigate = { route -> navController.navigate(route) },
+                                onExit = {
+                                    if (!songsViewModel.confirmExit) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            getString(R.string.amuzic_confirm_exit),
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                        songsViewModel.confirmExit()
+                                    } else {
+                                        finish()
+                                    }
+                                }
                             )
                         }
                         composable(Screens.SONGS) {
@@ -106,12 +116,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     Box(Modifier.fillMaxSize()) {
-                        LaunchedEffect(key1 = "") {
-                            Log.d(
-                                "MAIN",
-                                "${songsViewModel.state.songDuration}, ${songsViewModel.state.progress}"
-                            )
-                        }
                         PlayBar(
                             songsViewModel.showPlayBar,
                             songsViewModel.state,
@@ -131,20 +135,6 @@ class MainActivity : ComponentActivity() {
                             onSeekTo = { songsViewModel.onSeekTouch(it) }
                         )
                     }
-                    BackHandler {
-                        if (navController.popBackStack()) { return@BackHandler }
-                        if (!songsViewModel.confirmExit) {
-                            Toast.makeText(
-                                this,
-                                getString(R.string.amuzic_confirm_exit),
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                            songsViewModel.confirmExit()
-                        } else {
-                            finish()
-                        }
-                    }
                 }
             }
         }
@@ -152,7 +142,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("Main", "closing Amuzic")
         stopService(Intent(this, AmuzicPlayerService::class.java))
         songsViewModel.onExit()
     }

@@ -67,12 +67,7 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
     }!!
 
     override fun selectSong(index: Int) {
-        mediaController?.run {
-            val item = getMediaItemAt(index)
-            if (item != currentMediaItem) {
-                seekTo(index, 0)
-            }
-        }
+        mediaController?.run { seekTo(index, 0) }
     }
 
     override fun playSong() {

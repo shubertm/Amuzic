@@ -1,5 +1,6 @@
 package com.infbyte.amuzic.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     songsViewModel: SongsViewModel,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    onExit: () -> Unit
 ) {
     Box(Modifier.wrapContentHeight()) {
         val pagerState = rememberPagerState(0) { 3 }
@@ -51,49 +53,69 @@ fun MainScreen(
                 query = searchQuery,
                 onQueryChange = {
                     searchQuery = it
-                    songsViewModel.onSearch(it)
+                    when (pagerState.currentPage) {
+                        0 -> songsViewModel.onSearchSongs(it)
+                        1 -> songsViewModel.onSearchArtists(it)
+                        2 -> songsViewModel.onSearchAlbums(it)
+                    }
                 },
                 onSearch = {},
                 active = isSearching,
                 onActiveChange = {
                     isSearching = !isSearching
                     if (!isSearching) { searchQuery = "" }
-                    songsViewModel.onSearch(searchQuery)
+                    when (pagerState.currentPage) {
+                        0 -> songsViewModel.onSearchSongs(searchQuery)
+                        1 -> songsViewModel.onSearchArtists(searchQuery)
+                        2 -> songsViewModel.onSearchAlbums(searchQuery)
+                    }
                 },
                 Modifier.padding(start = 8.dp, end = 8.dp),
                 trailingIcon = { Icon(Icons.Outlined.Search, "") },
                 placeholder = { Text(stringResource(R.string.amuzic_search)) }
             ) {
                 when (pagerState.currentPage) {
-                    0 -> SongsScreen(
-                        songs = songsViewModel.state.searchResult,
-                        onScroll = { scrollValue ->
-                            songsViewModel.togglePlayBarByScroll(scrollValue)
-                        },
-                        onSongClick = { songIndex ->
-                            searchQuery = ""
-                            isSearching = false
-                            songsViewModel.onSongClicked(songIndex)
-                        }
-                    )
+                    0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
+                        NoSearchResultScreen()
+                    } else {
+                        SongsScreen(
+                            songs = songsViewModel.state.songsSearchResult,
+                            onScroll = { scrollValue ->
+                                songsViewModel.togglePlayBarByScroll(scrollValue)
+                            },
+                            onSongClick = { songIndex ->
+                                searchQuery = ""
+                                isSearching = false
+                                songsViewModel.onSongClicked(songIndex)
+                            }
+                        )
+                    }
 
-                    1 -> ArtistsScreen(
-                        artists = songsViewModel.state.artists,
-                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                        onArtistClick = { artist ->
-                            songsViewModel.onArtistClicked(artist)
-                            onNavigate(Screens.SONGS)
-                        }
-                    )
+                    1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
+                        NoSearchResultScreen()
+                    } else {
+                        ArtistsScreen(
+                            artists = songsViewModel.state.artistsSearchResult,
+                            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                            onArtistClick = { artist ->
+                                songsViewModel.onArtistClicked(artist)
+                                onNavigate(Screens.SONGS)
+                            }
+                        )
+                    }
 
-                    2 -> AlbumsScreen(
-                        albums = songsViewModel.state.albums,
-                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                        onAlbumClicked = { album ->
-                            songsViewModel.onAlbumClicked(album)
-                            onNavigate(Screens.SONGS)
-                        }
-                    )
+                    2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
+                        NoSearchResultScreen()
+                    } else {
+                        AlbumsScreen(
+                            albums = songsViewModel.state.albumsSearchResult,
+                            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                            onAlbumClicked = { album ->
+                                songsViewModel.onAlbumClicked(album)
+                                onNavigate(Screens.SONGS)
+                            }
+                        )
+                    }
                 }
             }
             HorizontalPager(state = pagerState) { page ->
@@ -137,6 +159,10 @@ fun MainScreen(
                 selected = pagerState.currentPage == 0,
                 onClick = {
                     scope.launch {
+                        songsViewModel.onNavigateToAllSongs()
+                        if (isSearching) {
+                            songsViewModel.onSearchSongs(searchQuery)
+                        }
                         pagerState.animateScrollToPage(0, animationSpec = tween(500, 300))
                     }
                 },
@@ -147,6 +173,9 @@ fun MainScreen(
                 selected = pagerState.currentPage == 1,
                 onClick = {
                     scope.launch {
+                        if (isSearching) {
+                            songsViewModel.onSearchArtists(searchQuery)
+                        }
                         pagerState.animateScrollToPage(1, animationSpec = tween(500, 300))
                     }
                 },
@@ -157,12 +186,23 @@ fun MainScreen(
                 selected = pagerState.currentPage == 2,
                 onClick = {
                     scope.launch {
+                        if (isSearching) {
+                            songsViewModel.onSearchAlbums(searchQuery)
+                        }
                         pagerState.animateScrollToPage(2, animationSpec = tween(500, 300))
                     }
                 },
                 icon = { Icon(painterResource(R.drawable.ic_album), "") },
                 label = { Text(stringResource(R.string.amuzic_albums)) }
             )
+        }
+        BackHandler {
+            if (isSearching) {
+                isSearching = false
+                searchQuery = ""
+                return@BackHandler
+            }
+            onExit()
         }
     }
 }

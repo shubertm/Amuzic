@@ -33,7 +33,9 @@ data class AmuzicState(
     val songs: List<Song> = listOf(),
     val artists: List<Artist> = listOf(),
     val albums: List<Album> = listOf(),
-    val searchResult: List<Song> = listOf(),
+    val songsSearchResult: List<Song> = listOf(),
+    val artistsSearchResult: List<Artist> = listOf(),
+    val albumsSearchResult: List<Album> = listOf(),
     val icon: ImageBitmap? = null,
     val isPlaying: Boolean = false,
     val progress: Float = 0f,
@@ -56,7 +58,7 @@ class SongsViewModel @Inject constructor(
     private val amuzicPlayer: AmuzicPlayer
 ) : ViewModel() {
 
-    var state by mutableStateOf(INITIAL_STATE.copy(artists = repo.artists, albums = repo.albums))
+    var state by mutableStateOf(INITIAL_STATE)
         private set
 
     private val _isLoadingSongs = mutableStateOf(false)
@@ -87,11 +89,13 @@ class SongsViewModel @Inject constructor(
     }
 
     fun onSongClicked(index: Int) {
-        state = state.updateCurrentSong(index)
-        amuzicPlayer.createPlayList(state.songs.map { it.item })
-        amuzicPlayer.selectSong(index)
+        if (state.currentSong != state.songs[index]) {
+            state = state.updateCurrentSong(index)
+            amuzicPlayer.createPlayList(state.songs.map { it.item })
+            amuzicPlayer.selectSong(index)
+            onPlaySong()
+        }
         showAndDelayHidePlayBar()
-        onPlaySong()
     }
 
     fun onPlayClicked() {
@@ -147,14 +151,40 @@ class SongsViewModel @Inject constructor(
         amuzicPlayer.seekTo(position)
     }
 
-    fun onSearch(query: String) {
+    fun onSearchSongs(query: String) {
         viewModelScope.launch {
             state = with(state) {
                 copy(
-                    searchResult = songs.filter { song -> song.title.contains(query, true) }
+                    songsSearchResult = songs.filter { song -> song.title.contains(query, true) }
                 )
             }
         }
+    }
+    fun onSearchArtists(query: String) {
+        viewModelScope.launch {
+            state = with(state) {
+                copy(
+                    artistsSearchResult = artists.filter {
+                            artist ->
+                        artist.name.contains(query, true)
+                    }
+                )
+            }
+        }
+    }
+
+    fun onSearchAlbums(query: String) {
+        viewModelScope.launch {
+            state = with(state) {
+                copy(
+                    albumsSearchResult = albums.filter { album -> album.name.contains(query, true) }
+                )
+            }
+        }
+    }
+
+    fun onNavigateToAllSongs() {
+        state = state.copy(songs = repo.songs)
     }
 
     fun onExit() {
@@ -229,7 +259,15 @@ class SongsViewModel @Inject constructor(
                 onComplete = { songs ->
                     _isLoadingSongs.value = false
                     _isLoaded.value = true
-                    state = state.copy(currentSong = songs.first(), songs = songs, searchResult = songs)
+                    state = state.copy(
+                        currentSong = songs.first(),
+                        songs = songs,
+                        artists = repo.artists,
+                        albums = repo.albums,
+                        songsSearchResult = songs,
+                        artistsSearchResult = repo.artists,
+                        albumsSearchResult = repo.albums
+                    )
                     launch(Dispatchers.Main) {
                         amuzicPlayer.createPlayList(songs.map { it.item })
                     }

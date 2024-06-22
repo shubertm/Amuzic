@@ -1,5 +1,6 @@
 package com.infbyte.amuzic.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,14 +51,16 @@ fun ArtistOrAlbumSongsScreen(
 
     Column {
         Row(
-            Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(),
+            Modifier
+                .padding(start = 8.dp, end = 8.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             SearchBar(
                 query = searchQuery,
                 onQueryChange = {
                     searchQuery = it
-                    songsViewModel.onSearch(it)
+                    songsViewModel.onSearchSongs(it)
                 },
                 onSearch = {},
                 active = isSearching,
@@ -66,7 +69,7 @@ fun ArtistOrAlbumSongsScreen(
                     if (!isSearching) {
                         searchQuery = ""
                     }
-                    songsViewModel.onSearch(searchQuery)
+                    songsViewModel.onSearchSongs(searchQuery)
                 },
                 Modifier.fillMaxWidth(if (!isSearching) 0.85f else 1f),
                 leadingIcon = {
@@ -86,15 +89,19 @@ fun ArtistOrAlbumSongsScreen(
                 trailingIcon = { Icon(Icons.Outlined.Search, "") },
                 placeholder = { Text(stringResource(R.string.amuzic_search)) }
             ) {
-                SongsScreen(
-                    songs = songsViewModel.state.searchResult,
-                    onScroll = { scrollVAlue -> songsViewModel.togglePlayBarByScroll(scrollVAlue) },
-                    onSongClick = { songIndex ->
-                        searchQuery = ""
-                        isSearching = false
-                        songsViewModel.onSongClicked(songIndex)
-                    }
-                )
+                if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
+                    SongsScreen(
+                        songs = songsViewModel.state.songsSearchResult,
+                        onScroll = { scrollVAlue -> songsViewModel.togglePlayBarByScroll(scrollVAlue) },
+                        onSongClick = { songIndex ->
+                            searchQuery = ""
+                            isSearching = false
+                            songsViewModel.onSongClicked(songIndex)
+                        }
+                    )
+                } else {
+                    NoSearchResultScreen()
+                }
             }
             if (!isSearching) {
                 songsViewModel.state.icon?.let { thumbnail ->
@@ -126,6 +133,15 @@ fun ArtistOrAlbumSongsScreen(
             }
         )
     }
+
+    BackHandler {
+        if (isSearching) {
+            isSearching = false
+            searchQuery = ""
+            return@BackHandler
+        }
+        onNavigateBack()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,7 +154,10 @@ fun PreviewSearchBar() {
             verticalArrangement = Arrangement.Center
         ) {
             Row(
-                Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth().wrapContentHeight(),
+                Modifier
+                    .padding(start = 8.dp, end = 8.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SearchBar(
