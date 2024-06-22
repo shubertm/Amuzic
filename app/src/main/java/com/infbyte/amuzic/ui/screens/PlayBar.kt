@@ -53,7 +53,8 @@ fun BoxScope.PlayBar(
     onNextClick: () -> Unit,
     onPrevClick: () -> Unit,
     onTogglePlaybackMode: () -> Unit,
-    onSeekTo: (Float) -> Unit
+    onSeekTo: (Float) -> Unit,
+    onShowPlayListClick: () -> Unit
 ) {
     AnimatedVisibility(
         visible = isVisible.value,
@@ -145,7 +146,7 @@ fun BoxScope.PlayBar(
                     )
                 }
                 IconButton(
-                    onClick = {},
+                    onClick = { onShowPlayListClick() },
                     Modifier
                         .padding(16.dp)
                         .clip(CircleShape)
@@ -208,7 +209,8 @@ fun PreviewPlayBar() {
                 onNextClick = {},
                 onPrevClick = {},
                 onTogglePlaybackMode = {},
-                onSeekTo = {}
+                onSeekTo = {},
+                onShowPlayListClick = {}
             )
         }
     }

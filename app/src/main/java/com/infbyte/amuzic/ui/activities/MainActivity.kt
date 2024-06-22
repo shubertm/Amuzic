@@ -26,6 +26,7 @@ import com.infbyte.amuzic.playback.AmuzicPlayerService
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
 import com.infbyte.amuzic.ui.screens.PlayBar
+import com.infbyte.amuzic.ui.screens.PlayListScreen
 import com.infbyte.amuzic.ui.screens.Screens
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
@@ -132,7 +133,16 @@ class MainActivity : ComponentActivity() {
                             onTogglePlaybackMode = {
                                 songsViewModel.onTogglePlaybackMode()
                             },
-                            onSeekTo = { songsViewModel.onSeekTouch(it) }
+                            onSeekTo = { songsViewModel.onSeekTouch(it) },
+                            onShowPlayListClick = { songsViewModel.onTogglePlayList(true) }
+                        )
+
+                        PlayListScreen(
+                            show = songsViewModel.state.showPlayList,
+                            songs = songsViewModel.state.currentPlaylist,
+                            onSongClick = { songIndex ->
+                                songsViewModel.onSongClicked(songIndex)
+                            }
                         )
                     }
                 }

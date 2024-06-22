@@ -19,6 +19,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -120,15 +121,20 @@ fun MainScreen(
             }
             HorizontalPager(state = pagerState) { page ->
                 when (page) {
-                    0 -> SongsScreen(
-                        songs = songsViewModel.state.songs,
-                        onScroll = { scrollValue ->
-                            songsViewModel.togglePlayBarByScroll(scrollValue)
-                        },
-                        onSongClick = { songIndex ->
-                            songsViewModel.onSongClicked(songIndex)
+                    0 -> {
+                        LaunchedEffect(key1 = "") {
+                            songsViewModel.onNavigateToAllSongs()
                         }
-                    )
+                        SongsScreen(
+                            songs = songsViewModel.state.songs,
+                            onScroll = { scrollValue ->
+                                songsViewModel.togglePlayBarByScroll(scrollValue)
+                            },
+                            onSongClick = { songIndex ->
+                                songsViewModel.onSongClicked(songIndex)
+                            }
+                        )
+                    }
 
                     1 -> ArtistsScreen(
                         artists = songsViewModel.state.artists,
@@ -159,7 +165,6 @@ fun MainScreen(
                 selected = pagerState.currentPage == 0,
                 onClick = {
                     scope.launch {
-                        songsViewModel.onNavigateToAllSongs()
                         if (isSearching) {
                             songsViewModel.onSearchSongs(searchQuery)
                         }
@@ -197,6 +202,10 @@ fun MainScreen(
             )
         }
         BackHandler {
+            if (songsViewModel.state.showPlayList) {
+                songsViewModel.onTogglePlayList(false)
+                return@BackHandler
+            }
             if (isSearching) {
                 isSearching = false
                 searchQuery = ""

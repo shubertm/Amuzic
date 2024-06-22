@@ -31,6 +31,7 @@ data class AmuzicState(
     val currentArtist: Artist = Artist(),
     val currentAlbum: Album = Album(),
     val songs: List<Song> = listOf(),
+    val currentPlaylist: List<Song> = listOf(),
     val artists: List<Artist> = listOf(),
     val albums: List<Album> = listOf(),
     val songsSearchResult: List<Song> = listOf(),
@@ -38,6 +39,7 @@ data class AmuzicState(
     val albumsSearchResult: List<Album> = listOf(),
     val icon: ImageBitmap? = null,
     val isPlaying: Boolean = false,
+    val showPlayList: Boolean = false,
     val progress: Float = 0f,
     val songDuration: Float = 1f,
     @RepeatMode val mode: Int = Player.REPEAT_MODE_OFF,
@@ -89,13 +91,18 @@ class SongsViewModel @Inject constructor(
     }
 
     fun onSongClicked(index: Int) {
-        if (state.currentSong != state.songs[index]) {
-            state = state.updateCurrentSong(index)
-            amuzicPlayer.createPlayList(state.songs.map { it.item })
-            amuzicPlayer.selectSong(index)
-            onPlaySong()
+        state.apply {
+            val song = songs[index]
+            if (currentSong != song) {
+                state = copy(currentSong = song, currentPlaylist = songs)
+                amuzicPlayer.createPlayList(songs.map { it.item })
+                amuzicPlayer.selectSong(index)
+                onPlaySong()
+            }
+            if (!showPlayList) {
+                showAndDelayHidePlayBar()
+            }
         }
-        showAndDelayHidePlayBar()
     }
 
     fun onPlayClicked() {
@@ -160,6 +167,7 @@ class SongsViewModel @Inject constructor(
             }
         }
     }
+
     fun onSearchArtists(query: String) {
         viewModelScope.launch {
             state = with(state) {
@@ -184,7 +192,13 @@ class SongsViewModel @Inject constructor(
     }
 
     fun onNavigateToAllSongs() {
-        state = state.copy(songs = repo.songs)
+        viewModelScope.launch {
+            state = state.copy(songs = repo.songs)
+        }
+    }
+
+    fun onTogglePlayList(show: Boolean) {
+        state = state.copy(showPlayList = show)
     }
 
     fun onExit() {
@@ -262,6 +276,7 @@ class SongsViewModel @Inject constructor(
                     state = state.copy(
                         currentSong = songs.first(),
                         songs = songs,
+                        currentPlaylist = songs,
                         artists = repo.artists,
                         albums = repo.albums,
                         songsSearchResult = songs,

@@ -135,6 +135,10 @@ fun ArtistOrAlbumSongsScreen(
     }
 
     BackHandler {
+        if (songsViewModel.state.showPlayList) {
+            songsViewModel.onTogglePlayList(false)
+            return@BackHandler
+        }
         if (isSearching) {
             isSearching = false
             searchQuery = ""
