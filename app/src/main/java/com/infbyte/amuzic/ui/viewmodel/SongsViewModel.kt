@@ -22,6 +22,7 @@ import com.infbyte.amuzic.playback.AmuzicPlayer
 import com.infbyte.amuzic.ui.viewmodel.AmuzicState.Companion.INITIAL_STATE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,10 +46,6 @@ data class AmuzicState(
     @RepeatMode val mode: Int = Player.REPEAT_MODE_OFF,
     val shuffle: Boolean = false
 ) {
-    fun updateCurrentSong(index: Int): AmuzicState {
-        return copy(currentSong = songs[index])
-    }
-
     companion object {
         val INITIAL_STATE = AmuzicState()
     }
@@ -73,6 +70,8 @@ class SongsViewModel @Inject constructor(
     private val _showPlayBar = mutableStateOf(false)
     val showPlayBar: State<Boolean> = _showPlayBar
     private var scrollValue = 0
+
+    private var playBarDelayJob: Job? = null
 
     fun init(context: Context) {
         amuzicPlayer.onTransition = { index, duration ->
@@ -230,9 +229,13 @@ class SongsViewModel @Inject constructor(
 
     private fun switchOnDelayOffBoolState(boolState: MutableState<Boolean>) {
         if (!boolState.value) {
-            viewModelScope.launch {
+            if (playBarDelayJob != null) {
+                playBarDelayJob?.cancel()
+                playBarDelayJob = null
+            }
+            playBarDelayJob = viewModelScope.launch {
                 boolState.value = true
-                delay(7000)
+                delay(10000)
                 boolState.value = false
             }
         }
