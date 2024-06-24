@@ -1,4 +1,4 @@
-package com.infbyte.amuzic.data
+package com.infbyte.amuzic.data.repo
 
 import android.content.ContentUris
 import android.content.Context

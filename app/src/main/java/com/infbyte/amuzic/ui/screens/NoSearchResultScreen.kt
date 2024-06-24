@@ -1,9 +1,12 @@
 package com.infbyte.amuzic.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -30,11 +33,15 @@ fun NoSearchResultScreen() {
             Modifier.padding(top = 96.dp).size(96.dp),
             tint = MaterialTheme.colorScheme.primary
         )
-        Text(
-            stringResource(R.string.amuzic_no_matches_found),
-            Modifier.padding(8.dp),
-            style = MaterialTheme.typography.titleMedium
-        )
+        Box(
+            Modifier.padding(8.dp).background(MaterialTheme.colorScheme.background, RoundedCornerShape(5.dp))
+        ) {
+            Text(
+                stringResource(R.string.amuzic_no_matches_found),
+                Modifier.padding(8.dp),
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
     }
 }
 

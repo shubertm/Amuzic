@@ -17,7 +17,7 @@ import androidx.media3.common.Player.RepeatMode
 import com.infbyte.amuzic.data.model.Album
 import com.infbyte.amuzic.data.model.Artist
 import com.infbyte.amuzic.data.model.Song
-import com.infbyte.amuzic.data.SongsRepo
+import com.infbyte.amuzic.data.repo.SongsRepo
 import com.infbyte.amuzic.playback.AmuzicPlayer
 import com.infbyte.amuzic.ui.viewmodel.AmuzicState.Companion.INITIAL_STATE
 import dagger.hilt.android.lifecycle.HiltViewModel
