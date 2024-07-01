@@ -47,7 +47,6 @@ fun MainScreen(
         val pagerState = rememberPagerState(0) { 3 }
         val scope = rememberCoroutineScope()
         var searchQuery by rememberSaveable { mutableStateOf("") }
-        var isSearching by rememberSaveable { mutableStateOf(false) }
 
         Column {
             SearchBar(
@@ -61,10 +60,10 @@ fun MainScreen(
                     }
                 },
                 onSearch = {},
-                active = isSearching,
+                active = songsViewModel.state.isSearching,
                 onActiveChange = {
-                    isSearching = !isSearching
-                    if (!isSearching) { searchQuery = "" }
+                    songsViewModel.onToggleSearching()
+                    if (!songsViewModel.state.isSearching) { searchQuery = "" }
                     when (pagerState.currentPage) {
                         0 -> songsViewModel.onSearchSongs(searchQuery)
                         1 -> songsViewModel.onSearchArtists(searchQuery)
@@ -86,8 +85,8 @@ fun MainScreen(
                             },
                             onSongClick = { songIndex ->
                                 searchQuery = ""
-                                isSearching = false
                                 songsViewModel.onSongClicked(songIndex)
+                                songsViewModel.onToggleSearching()
                             }
                         )
                     }
@@ -99,6 +98,8 @@ fun MainScreen(
                             artists = songsViewModel.state.artistsSearchResult,
                             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                             onArtistClick = { artist ->
+                                searchQuery = ""
+                                songsViewModel.onToggleSearching()
                                 songsViewModel.onArtistClicked(artist)
                                 onNavigate(Screens.SONGS)
                             }
@@ -112,6 +113,8 @@ fun MainScreen(
                             albums = songsViewModel.state.albumsSearchResult,
                             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                             onAlbumClicked = { album ->
+                                searchQuery = ""
+                                songsViewModel.onToggleSearching()
                                 songsViewModel.onAlbumClicked(album)
                                 onNavigate(Screens.SONGS)
                             }
@@ -165,7 +168,7 @@ fun MainScreen(
                 selected = pagerState.currentPage == 0,
                 onClick = {
                     scope.launch {
-                        if (isSearching) {
+                        if (songsViewModel.state.isSearching) {
                             songsViewModel.onSearchSongs(searchQuery)
                         }
                         pagerState.animateScrollToPage(0, animationSpec = tween(500, 300))
@@ -178,7 +181,7 @@ fun MainScreen(
                 selected = pagerState.currentPage == 1,
                 onClick = {
                     scope.launch {
-                        if (isSearching) {
+                        if (songsViewModel.state.isSearching) {
                             songsViewModel.onSearchArtists(searchQuery)
                         }
                         pagerState.animateScrollToPage(1, animationSpec = tween(500, 300))
@@ -191,7 +194,7 @@ fun MainScreen(
                 selected = pagerState.currentPage == 2,
                 onClick = {
                     scope.launch {
-                        if (isSearching) {
+                        if (songsViewModel.state.isSearching) {
                             songsViewModel.onSearchAlbums(searchQuery)
                         }
                         pagerState.animateScrollToPage(2, animationSpec = tween(500, 300))
@@ -206,8 +209,8 @@ fun MainScreen(
                 songsViewModel.onTogglePlayList(false)
                 return@BackHandler
             }
-            if (isSearching) {
-                isSearching = false
+            if (songsViewModel.state.isSearching) {
+                songsViewModel.onToggleSearching()
                 searchQuery = ""
                 return@BackHandler
             }

@@ -45,9 +45,6 @@ fun ArtistOrAlbumSongsScreen(
     var searchQuery by rememberSaveable {
         mutableStateOf("")
     }
-    var isSearching by rememberSaveable {
-        mutableStateOf(false)
-    }
 
     Column {
         Row(
@@ -63,21 +60,21 @@ fun ArtistOrAlbumSongsScreen(
                     songsViewModel.onSearchSongs(it)
                 },
                 onSearch = {},
-                active = isSearching,
+                active = songsViewModel.state.isSearching,
                 onActiveChange = {
-                    isSearching = !isSearching
-                    if (!isSearching) {
+                    songsViewModel.onToggleSearching()
+                    if (!songsViewModel.state.isSearching) {
                         searchQuery = ""
                     }
                     songsViewModel.onSearchSongs(searchQuery)
                 },
-                Modifier.fillMaxWidth(if (!isSearching) 0.85f else 1f),
+                Modifier.fillMaxWidth(if (!songsViewModel.state.isSearching) 0.85f else 1f),
                 leadingIcon = {
                     IconButton(
                         onClick = {
-                            if (isSearching) {
+                            if (songsViewModel.state.isSearching) {
                                 searchQuery = ""
-                                isSearching = false
+                                songsViewModel.onToggleSearching()
                                 return@IconButton
                             }
                             onNavigateBack()
@@ -95,15 +92,15 @@ fun ArtistOrAlbumSongsScreen(
                         onScroll = { scrollVAlue -> songsViewModel.togglePlayBarByScroll(scrollVAlue) },
                         onSongClick = { songIndex ->
                             searchQuery = ""
-                            isSearching = false
                             songsViewModel.onSongClicked(songIndex)
+                            songsViewModel.onToggleSearching()
                         }
                     )
                 } else {
                     NoSearchResultScreen()
                 }
             }
-            if (!isSearching) {
+            if (!songsViewModel.state.isSearching) {
                 songsViewModel.state.icon?.let { thumbnail ->
                     Image(
                         thumbnail,
@@ -139,8 +136,8 @@ fun ArtistOrAlbumSongsScreen(
             songsViewModel.onTogglePlayList(false)
             return@BackHandler
         }
-        if (isSearching) {
-            isSearching = false
+        if (songsViewModel.state.isSearching) {
+            songsViewModel.onToggleSearching()
             searchQuery = ""
             return@BackHandler
         }

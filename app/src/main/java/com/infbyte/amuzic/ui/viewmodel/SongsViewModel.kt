@@ -42,6 +42,7 @@ data class AmuzicState(
     val isPlaying: Boolean = false,
     val showPlayList: Boolean = false,
     val progress: Float = 0f,
+    val isSearching: Boolean = false,
     val songDuration: Float = 1f,
     @RepeatMode val mode: Int = Player.REPEAT_MODE_OFF,
     val shuffle: Boolean = false
@@ -91,11 +92,20 @@ class SongsViewModel @Inject constructor(
 
     fun onSongClicked(index: Int) {
         state.apply {
-            val song = songs[index]
+            val song = if (isSearching) {
+                songsSearchResult[index]
+            } else {
+                songs[index]
+            }
+            val actualIndex = if (isSearching) {
+                songs.indexOf(song)
+            } else {
+                index
+            }
             if (currentSong != song) {
                 state = copy(currentSong = song, currentPlaylist = songs)
                 amuzicPlayer.createPlayList(songs.map { it.item })
-                amuzicPlayer.selectSong(index)
+                amuzicPlayer.selectSong(actualIndex)
                 onPlaySong()
             }
             if (!showPlayList) {
@@ -155,6 +165,12 @@ class SongsViewModel @Inject constructor(
     fun onSeekTouch(position: Float) {
         state = state.copy(progress = position)
         amuzicPlayer.seekTo(position)
+    }
+
+    fun onToggleSearching() {
+        viewModelScope.launch {
+            state = state.copy(isSearching = !state.isSearching)
+        }
     }
 
     fun onSearchSongs(query: String) {
