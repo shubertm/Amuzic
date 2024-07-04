@@ -6,3 +6,7 @@ fun calcScroll(state: LazyListState): Int {
     val itemHeight = state.layoutInfo.visibleItemsInfo.firstOrNull()?.size ?: 0
     return state.firstVisibleItemIndex * itemHeight
 }
+
+fun String.getInitialChar(): String {
+    return first { it.isLetterOrDigit() }.uppercase()
+}

@@ -25,12 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
+import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.utils.calcScroll
+import com.infbyte.amuzic.utils.getInitialChar
 
 @Composable
 fun SongsScreen(
@@ -76,12 +77,14 @@ fun Song(song: Song, onClick: () -> Unit) {
                 )
             }
         } else {
-            Box(Modifier.padding(8.dp)) {
-                Image(
-                    painter = painterResource(R.drawable.ic_audiotrack),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(48.dp),
-                    contentDescription = ""
+            Box(
+                Modifier.padding(8.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                    .size(48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    song.title.getInitialChar(),
+                    style = MaterialTheme.typography.headlineLarge
                 )
             }
         }
@@ -102,5 +105,13 @@ fun Song(song: Song, onClick: () -> Unit) {
                 maxLines = 1
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewSong() {
+    AmuzicTheme {
+        Song(song = Song()) {}
     }
 }

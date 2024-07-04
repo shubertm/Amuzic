@@ -39,6 +39,7 @@ data class AmuzicState(
     val artistsSearchResult: List<Artist> = listOf(),
     val albumsSearchResult: List<Album> = listOf(),
     val icon: ImageBitmap? = null,
+    val artistOrAlbumInitialChar: String = "",
     val isPlaying: Boolean = false,
     val showPlayList: Boolean = false,
     val progress: Float = 0f,
@@ -76,7 +77,11 @@ class SongsViewModel @Inject constructor(
 
     fun init(context: Context) {
         amuzicPlayer.onTransition = { index, duration ->
-            state = state.copy(currentSong = state.songs[index], songDuration = duration, progress = 0f)
+            state = state.copy(
+                currentSong = state.currentPlaylist[index],
+                songDuration = duration,
+                progress = 0f
+            )
         }
         viewModelScope.launch { loadSongs(context) }
         startProgressMonitor()
@@ -134,7 +139,12 @@ class SongsViewModel @Inject constructor(
         viewModelScope.launch {
             val songs = repo.songs.filter { song -> song.artist == artist.name }
             val icon = songs.firstNotNullOfOrNull { it.thumbnail }?.asImageBitmap()
-            state = state.copy(currentArtist = artist, songs = songs, icon = icon)
+            state = state.copy(
+                currentArtist = artist,
+                songs = songs,
+                icon = icon,
+                artistOrAlbumInitialChar = artist.name.first().toString()
+            )
         }
     }
 
@@ -142,7 +152,12 @@ class SongsViewModel @Inject constructor(
         viewModelScope.launch {
             val songs = repo.songs.filter { song -> song.album == album.name }
             val icon = songs.firstNotNullOfOrNull { it.thumbnail }?.asImageBitmap()
-            state = state.copy(currentAlbum = album, songs = songs, icon = icon)
+            state = state.copy(
+                currentAlbum = album,
+                songs = songs,
+                icon = icon,
+                artistOrAlbumInitialChar = album.name.first().toString()
+            )
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -89,7 +89,7 @@ fun ArtistOrAlbumSongsScreen(
                 if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
                     SongsScreen(
                         songs = songsViewModel.state.songsSearchResult,
-                        onScroll = { scrollVAlue -> songsViewModel.togglePlayBarByScroll(scrollVAlue) },
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                         onSongClick = { songIndex ->
                             searchQuery = ""
                             songsViewModel.onSongClicked(songIndex)
@@ -111,15 +111,16 @@ fun ArtistOrAlbumSongsScreen(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                     )
-                } ?: Image(
-                    Icons.Outlined.Person,
-                    contentDescription = "",
-                    Modifier
-                        .padding(start = 8.dp, top = 8.dp)
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                )
+                } ?: Box(
+                    Modifier.padding(start = 8.dp, top = 8.dp).size(32.dp)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        songsViewModel.state.artistOrAlbumInitialChar,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
             }
         }
         SongsScreen(
@@ -178,15 +179,14 @@ fun PreviewSearchBar() {
                     trailingIcon = { Icon(Icons.Outlined.Search, "") },
                     placeholder = { Text(stringResource(R.string.amuzic_search)) }
                 ) {}
-                Image(
-                    Icons.Outlined.Person,
-                    contentDescription = "",
+                Box(
                     Modifier
                         .padding(start = 8.dp, top = 8.dp)
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                )
+                        .size(32.dp).background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Artist".first().toString(), style = MaterialTheme.typography.titleLarge)
+                }
             }
         }
     }

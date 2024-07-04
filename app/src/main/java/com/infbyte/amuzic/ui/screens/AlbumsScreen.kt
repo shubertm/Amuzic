@@ -1,6 +1,5 @@
 package com.infbyte.amuzic.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,12 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Album
+import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.utils.calcScroll
+import com.infbyte.amuzic.utils.getInitialChar
 
 @Composable
 fun AlbumsScreen(
@@ -59,12 +59,13 @@ fun Album(album: Album, onClick: () -> Unit) {
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(Modifier.padding(8.dp)) {
-            Image(
-                ImageVector.vectorResource(R.drawable.ic_album),
-                "",
-                Modifier.size(48.dp)
-            )
+        Box(
+            Modifier.padding(8.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape).size(
+                48.dp
+            ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(album.name.getInitialChar(), style = MaterialTheme.typography.headlineLarge)
         }
         Column(
             Modifier.padding(start = 12.dp, end = 12.dp)
@@ -77,5 +78,13 @@ fun Album(album: Album, onClick: () -> Unit) {
                 Modifier.padding(start = 5.dp)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAlbum() {
+    AmuzicTheme {
+        Album(album = Album("My album")) {}
     }
 }
