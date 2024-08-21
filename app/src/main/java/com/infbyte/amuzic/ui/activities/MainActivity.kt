@@ -164,8 +164,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopService(Intent(this, AmuzicPlayerService::class.java))
-        songsViewModel.onExit()
+        if (isFinishing) {
+            stopService(Intent(this, AmuzicPlayerService::class.java))
+            songsViewModel.onExit()
+        }
     }
 
     private fun launchPermRequest() {
