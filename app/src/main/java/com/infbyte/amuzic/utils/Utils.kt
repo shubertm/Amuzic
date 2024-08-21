@@ -1,5 +1,9 @@
 package com.infbyte.amuzic.utils
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.compose.foundation.lazy.LazyListState
 
 fun calcScroll(state: LazyListState): Int {
@@ -9,4 +13,16 @@ fun calcScroll(state: LazyListState): Int {
 
 fun String.getInitialChar(): String {
     return first { it.isLetterOrDigit() }.uppercase()
+}
+
+fun <C> List<C>.tryGetFirst(default: () -> C): C {
+    return if (isNotEmpty()) { first() } else default()
+}
+
+fun Context.openWebLink(@StringRes linkRes: Int) {
+    val link = getString(linkRes)
+    startActivity(
+        Intent(Intent.ACTION_VIEW)
+            .setData(Uri.parse(link))
+    )
 }

@@ -12,4 +12,20 @@
     <string name="amuzic_search">Search</string>
     <string name="amuzic_songs">Songs</string>
     <string name="amuzic_no_matches_found">No matches found</string>
+    <string name="amuzic_intro_1">Get ready for</string>
+    <string name="amuzic_intro_2">muzement</string>
+    <string name="amuzic_website">Website</string>
+    <string name="amuzic_copyright">Infbyte Technologies %s 2024"</string>
+    <string name="amuzic_privacy_policy">Privacy Policy</string>
+    <string name="amuzic_sponsor">Sponsor</string>
+    <string name="amuzic_appreciation">Your support is highly appreciated</string>
+    <string name="amuzic_btc">Bitcoin</string>
+    <string name="amuzic_eth">Ethereum</string>
+    <string name="amuzic_coffee">Buy me a coffee</string>
+    <string name="infbyte_website">https://infbyte.com</string>
+    <string name="amuzic_privacy_policy_link">https://www.infbyte.com/apps/amuzic/privacy-policy</string>
+    <string name="amuzic_copy">Copy</string>
+    <string name="btc_address">12ndrwkbsthfJNLHCgw49db7sZ3MHMkUPa</string>
+    <string name="eth_address">0x4906e6C45D466b9678eBbFb70bfBE3021d26Da5D</string>
+    <string name="amuzic_wallet_address">Wallet Address</string>
 </resources>

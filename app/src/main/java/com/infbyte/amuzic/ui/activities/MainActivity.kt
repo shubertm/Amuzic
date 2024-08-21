@@ -23,8 +23,12 @@ import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
 import com.infbyte.amuzic.playback.AmuzicPlayerService
+import com.infbyte.amuzic.ui.screens.AboutScreen
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
+import com.infbyte.amuzic.ui.screens.LoadingScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
+import com.infbyte.amuzic.ui.screens.NoMediaPermissionScreen
+import com.infbyte.amuzic.ui.screens.NoMusicAvailableScreen
 import com.infbyte.amuzic.ui.screens.PlayBar
 import com.infbyte.amuzic.ui.screens.PlayListScreen
 import com.infbyte.amuzic.ui.screens.Screens
@@ -40,10 +44,9 @@ class MainActivity : ComponentActivity() {
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
+        songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
             songsViewModel.init(this)
-        } else {
-            finish()
         }
     }
 
@@ -51,31 +54,21 @@ class MainActivity : ComponentActivity() {
     private val permissionLauncherApi30 = registerForActivityResult(
         AmuzicContracts.RequestPermissionApi30()
     ) { isGranted ->
+        songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
             songsViewModel.init(this)
-        } else {
-            finish()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!songsViewModel.isLoaded.value) {
-            if (!isReadPermissionGranted(this)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    permissionLauncherApi30.launch(
-                        "package:${BuildConfig.APPLICATION_ID}"
-                    )
-                } else {
-                    permissionLauncher.launch(
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                }
-            } else {
+        if (!songsViewModel.state.isLoaded) {
+            songsViewModel.setReadPermGranted(isReadPermissionGranted(this))
+            if (!songsViewModel.state.isReadPermGranted) { launchPermRequest() } else {
                 songsViewModel.init(this)
                 installSplashScreen().setKeepOnScreenCondition {
-                    !songsViewModel.isLoaded.value
+                    !songsViewModel.state.isLoaded
                 }
             }
         }
@@ -87,24 +80,43 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+                    if (!songsViewModel.state.isReadPermGranted) {
+                        NoMediaPermissionScreen(
+                            onStartListening = { launchPermRequest() },
+                            about = { navigateBack -> AboutScreen(onNavigateBack = { navigateBack() }) },
+                            onExit = { onExit() }
+                        )
+                        return@Surface
+                    }
+                    if (
+                        (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
+                        songsViewModel.state.isRefreshing
+                    ) {
+                        LoadingScreen()
+                        return@Surface
+                    }
+                    if (!songsViewModel.state.hasMusic) {
+                        NoMusicAvailableScreen(
+                            onRefresh = {
+                                if (!songsViewModel.state.isReadPermGranted) {
+                                    launchPermRequest()
+                                } else {
+                                    songsViewModel.setIsRefreshing(true)
+                                    songsViewModel.init(this)
+                                }
+                            },
+                            onExit = { onExit() },
+                            about = { navigateBack -> AboutScreen(onNavigateBack = { navigateBack() }) }
+                        )
+                        return@Surface
+                    }
                     NavHost(navController, startDestination = Screens.MAIN) {
                         composable(Screens.MAIN) {
                             MainScreen(
                                 songsViewModel,
                                 onNavigate = { route -> navController.navigate(route) },
-                                onExit = {
-                                    if (!songsViewModel.confirmExit) {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            getString(R.string.amuzic_confirm_exit),
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                        songsViewModel.confirmExit()
-                                    } else {
-                                        finish()
-                                    }
-                                }
+                                onExit = { onExit() },
+                                about = { navigateBack -> AboutScreen(onNavigateBack = { navigateBack() }) }
                             )
                         }
                         composable(Screens.SONGS) {
@@ -154,5 +166,31 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         stopService(Intent(this, AmuzicPlayerService::class.java))
         songsViewModel.onExit()
+    }
+
+    private fun launchPermRequest() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            permissionLauncherApi30.launch(
+                "package:${BuildConfig.APPLICATION_ID}"
+            )
+        } else {
+            permissionLauncher.launch(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        }
+    }
+
+    private fun onExit() {
+        if (!songsViewModel.confirmExit) {
+            Toast.makeText(
+                this,
+                getString(R.string.amuzic_confirm_exit),
+                Toast.LENGTH_SHORT
+            )
+                .show()
+            songsViewModel.confirmExit()
+        } else {
+            finish()
+        }
     }
 }

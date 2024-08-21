@@ -20,7 +20,7 @@ object AmuzicContracts {
             val packageUri = Uri.parse(input)
             this.context = context
             return Intent(
-                Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,
+                Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
                 packageUri
             )
         }

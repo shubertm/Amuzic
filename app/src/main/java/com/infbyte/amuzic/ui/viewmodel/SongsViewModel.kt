@@ -20,6 +20,7 @@ import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.data.repo.SongsRepo
 import com.infbyte.amuzic.playback.AmuzicPlayer
 import com.infbyte.amuzic.ui.viewmodel.AmuzicState.Companion.INITIAL_STATE
+import com.infbyte.amuzic.utils.tryGetFirst
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,7 +47,11 @@ data class AmuzicState(
     val isSearching: Boolean = false,
     val songDuration: Float = 1f,
     @RepeatMode val mode: Int = Player.REPEAT_MODE_OFF,
-    val shuffle: Boolean = false
+    val shuffle: Boolean = false,
+    val isReadPermGranted: Boolean = false,
+    val hasMusic: Boolean = false,
+    val isLoaded: Boolean = false,
+    val isRefreshing: Boolean = false
 ) {
     companion object {
         val INITIAL_STATE = AmuzicState()
@@ -61,10 +66,6 @@ class SongsViewModel @Inject constructor(
 
     var state by mutableStateOf(INITIAL_STATE)
         private set
-
-    private val _isLoadingSongs = mutableStateOf(false)
-    private val _isLoaded = mutableStateOf(false)
-    val isLoaded: State<Boolean> = _isLoaded
 
     var confirmExit = false
         private set
@@ -173,6 +174,10 @@ class SongsViewModel @Inject constructor(
         }
     }
 
+    fun hidePlayBar() {
+        _showPlayBar.value = false
+    }
+
     fun onTogglePlaybackMode() {
         state = state.copy(mode = amuzicPlayer.switchMode(), shuffle = amuzicPlayer.shuffleMode)
     }
@@ -229,6 +234,22 @@ class SongsViewModel @Inject constructor(
 
     fun onTogglePlayList(show: Boolean) {
         state = state.copy(showPlayList = show)
+    }
+
+    fun setReadPermGranted(granted: Boolean) {
+        state = state.copy(isReadPermGranted = granted)
+    }
+
+    fun setIsLoaded(loaded: Boolean) {
+        state = state.copy(isLoaded = loaded)
+    }
+
+    fun setHasNoMusic(hasNoMusic: Boolean) {
+        state = state.copy(hasMusic = hasNoMusic)
+    }
+
+    fun setIsRefreshing(isRefreshing: Boolean) {
+        state = state.copy(isRefreshing = isRefreshing)
     }
 
     fun onExit() {
@@ -301,22 +322,25 @@ class SongsViewModel @Inject constructor(
         viewModelScope.launch {
             repo.loadSongs(
                 isLoading = {
-                    _isLoadingSongs.value = true
                     amuzicPlayer.init(context)
                 },
                 onComplete = { songs ->
-                    _isLoadingSongs.value = false
-                    _isLoaded.value = true
-                    state = state.copy(
-                        currentSong = songs.first(),
-                        songs = songs,
-                        currentPlaylist = songs,
-                        artists = repo.artists,
-                        albums = repo.albums,
-                        songsSearchResult = songs,
-                        artistsSearchResult = repo.artists,
-                        albumsSearchResult = repo.albums
-                    )
+                    launch {
+                        if (state.isRefreshing && songs.isEmpty()) { delay(1000) }
+                        state = state.copy(
+                            currentSong = songs.tryGetFirst { state.currentSong },
+                            songs = songs,
+                            currentPlaylist = songs,
+                            artists = repo.artists,
+                            albums = repo.albums,
+                            songsSearchResult = songs,
+                            artistsSearchResult = repo.artists,
+                            albumsSearchResult = repo.albums,
+                            isLoaded = true,
+                            hasMusic = songs.isNotEmpty(),
+                            isRefreshing = false
+                        )
+                    }
                     launch(Dispatchers.Main) {
                         amuzicPlayer.createPlayList(songs.map { it.item })
                     }

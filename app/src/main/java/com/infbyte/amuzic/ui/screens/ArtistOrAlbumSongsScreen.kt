@@ -24,11 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,13 +49,12 @@ fun ArtistOrAlbumSongsScreen(
         mutableStateOf("")
     }
 
+    val searchFocusRequester = remember {
+        FocusRequester()
+    }
+
     Column {
-        Row(
-            Modifier
-                .padding(start = 8.dp, end = 8.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             SearchBar(
                 query = searchQuery,
                 onQueryChange = {
@@ -62,13 +64,13 @@ fun ArtistOrAlbumSongsScreen(
                 onSearch = {},
                 active = songsViewModel.state.isSearching,
                 onActiveChange = {
-                    songsViewModel.onToggleSearching()
                     if (!songsViewModel.state.isSearching) {
                         searchQuery = ""
+                        songsViewModel.onToggleSearching()
                     }
                     songsViewModel.onSearchSongs(searchQuery)
                 },
-                Modifier.fillMaxWidth(if (!songsViewModel.state.isSearching) 0.85f else 1f),
+                Modifier.fillMaxWidth().focusRequester(searchFocusRequester),
                 leadingIcon = {
                     IconButton(
                         onClick = {
@@ -83,7 +85,43 @@ fun ArtistOrAlbumSongsScreen(
                         Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
                     }
                 },
-                trailingIcon = { Icon(Icons.Outlined.Search, "") },
+                trailingIcon = {
+                    Row {
+                        IconButton(
+                            onClick = {
+                                if (!songsViewModel.state.isSearching) {
+                                    songsViewModel.onToggleSearching()
+                                    searchFocusRequester.requestFocus()
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Outlined.Search, "")
+                        }
+                        if (!songsViewModel.state.isSearching) {
+                            IconButton(onClick = {}) {
+                                songsViewModel.state.icon?.let { thumbnail ->
+                                    Image(
+                                        thumbnail,
+                                        contentDescription = "",
+                                        Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                    )
+                                } ?: Box(
+                                    Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        songsViewModel.state.artistOrAlbumInitialChar,
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
                 placeholder = { Text(stringResource(R.string.amuzic_search)) }
             ) {
                 if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
@@ -98,28 +136,6 @@ fun ArtistOrAlbumSongsScreen(
                     )
                 } else {
                     NoSearchResultScreen()
-                }
-            }
-            if (!songsViewModel.state.isSearching) {
-                songsViewModel.state.icon?.let { thumbnail ->
-                    Image(
-                        thumbnail,
-                        contentDescription = "",
-                        Modifier
-                            .padding(start = 8.dp, top = 8.dp)
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    )
-                } ?: Box(
-                    Modifier.padding(start = 8.dp, top = 8.dp).size(32.dp)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        songsViewModel.state.artistOrAlbumInitialChar,
-                        style = MaterialTheme.typography.titleLarge
-                    )
                 }
             }
         }
@@ -176,17 +192,25 @@ fun PreviewSearchBar() {
                             Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
                         }
                     },
-                    trailingIcon = { Icon(Icons.Outlined.Search, "") },
+                    trailingIcon = {
+                        Row {
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(Icons.Outlined.Search, "")
+                            }
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Box(
+                                    Modifier
+                                        .size(32.dp)
+                                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Artist".first().toString(), style = MaterialTheme.typography.titleLarge)
+                                }
+                            }
+                        }
+                    },
                     placeholder = { Text(stringResource(R.string.amuzic_search)) }
                 ) {}
-                Box(
-                    Modifier
-                        .padding(start = 8.dp, top = 8.dp)
-                        .size(32.dp).background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Artist".first().toString(), style = MaterialTheme.typography.titleLarge)
-                }
             }
         }
     }
