@@ -8,6 +8,7 @@
         tools:ignore="ScopedStorage"
         />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 
     <application
         android:name=".App"
@@ -34,7 +35,7 @@
             android:name=".playback.AmuzicPlayerService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
-            android:permission="android.permission.FOREGROUND_SERVICE">
+            android:permission="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService"/>
             </intent-filter>

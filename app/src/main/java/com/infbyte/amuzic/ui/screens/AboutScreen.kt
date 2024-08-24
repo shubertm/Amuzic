@@ -142,9 +142,7 @@ fun AboutScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
+                        Modifier.fillMaxWidth().padding(top = 16.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
