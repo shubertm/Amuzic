@@ -3,12 +3,10 @@ package com.infbyte.amuzic.ui.screens
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -19,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,8 +63,52 @@ fun MainScreen(
         about { showAbout = false }
         return
     }
-    Box(Modifier.wrapContentHeight()) {
-        Column {
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar(Modifier.fillMaxWidth()) {
+                NavigationBarItem(
+                    selected = pagerState.currentPage == 0,
+                    onClick = {
+                        scope.launch {
+                            if (songsViewModel.state.isSearching) {
+                                songsViewModel.onSearchSongs(searchQuery)
+                            }
+                            pagerState.animateScrollToPage(0, animationSpec = tween(500, 300))
+                        }
+                    },
+                    icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
+                    label = { Text(stringResource(R.string.amuzic_songs)) }
+                )
+                NavigationBarItem(
+                    selected = pagerState.currentPage == 1,
+                    onClick = {
+                        scope.launch {
+                            if (songsViewModel.state.isSearching) {
+                                songsViewModel.onSearchArtists(searchQuery)
+                            }
+                            pagerState.animateScrollToPage(1, animationSpec = tween(500, 300))
+                        }
+                    },
+                    icon = { Icon(painterResource(R.drawable.ic_artist), "") },
+                    label = { Text(stringResource(R.string.amuzic_artists)) }
+                )
+                NavigationBarItem(
+                    selected = pagerState.currentPage == 2,
+                    onClick = {
+                        scope.launch {
+                            if (songsViewModel.state.isSearching) {
+                                songsViewModel.onSearchAlbums(searchQuery)
+                            }
+                            pagerState.animateScrollToPage(2, animationSpec = tween(500, 300))
+                        }
+                    },
+                    icon = { Icon(painterResource(R.drawable.ic_album), "") },
+                    label = { Text(stringResource(R.string.amuzic_albums)) }
+                )
+            }
+        },
+        topBar = {
             Row(Modifier.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 SearchBar(
                     query = searchQuery,
@@ -90,7 +133,9 @@ fun MainScreen(
                             2 -> songsViewModel.onSearchAlbums(searchQuery)
                         }
                     },
-                    Modifier.fillMaxWidth().focusRequester(searchFocusRequester),
+                    Modifier
+                        .fillMaxWidth()
+                        .focusRequester(searchFocusRequester),
                     trailingIcon = {
                         Row {
                             IconButton(
@@ -166,100 +211,62 @@ fun MainScreen(
                     }
                 }
             }
-            HorizontalPager(state = pagerState) { page ->
-                when (page) {
-                    0 -> {
-                        LaunchedEffect(key1 = "") {
-                            songsViewModel.onNavigateToAllSongs()
-                        }
-                        SongsScreen(
-                            songs = songsViewModel.state.songs,
-                            onScroll = { scrollValue ->
-                                songsViewModel.togglePlayBarByScroll(scrollValue)
-                            },
-                            onSongClick = { songIndex ->
-                                songsViewModel.onSongClicked(songIndex)
-                            }
-                        )
+        }
+    ) { paddingValues ->
+        HorizontalPager(
+            state = pagerState,
+            Modifier.padding(
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding()
+            )
+        ) { page ->
+            when (page) {
+                0 -> {
+                    LaunchedEffect(key1 = "") {
+                        songsViewModel.onNavigateToAllSongs()
                     }
-
-                    1 -> ArtistsScreen(
-                        artists = songsViewModel.state.artists,
-                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                        onArtistClick = { artist ->
-                            songsViewModel.onArtistClicked(artist)
-                            onNavigate(Screens.SONGS)
-                        }
-                    )
-
-                    2 -> AlbumsScreen(
-                        albums = songsViewModel.state.albums,
-                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                        onAlbumClicked = { album ->
-                            songsViewModel.onAlbumClicked(album)
-                            onNavigate(Screens.SONGS)
+                    SongsScreen(
+                        songs = songsViewModel.state.songs,
+                        onScroll = { scrollValue ->
+                            songsViewModel.togglePlayBarByScroll(scrollValue)
+                        },
+                        onSongClick = { songIndex ->
+                            songsViewModel.onSongClicked(songIndex)
                         }
                     )
                 }
+
+                1 -> ArtistsScreen(
+                    artists = songsViewModel.state.artists,
+                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                    onArtistClick = { artist ->
+                        songsViewModel.onArtistClicked(artist)
+                        onNavigate(Screens.SONGS)
+                    }
+                )
+
+                2 -> AlbumsScreen(
+                    albums = songsViewModel.state.albums,
+                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                    onAlbumClicked = { album ->
+                        songsViewModel.onAlbumClicked(album)
+                        onNavigate(Screens.SONGS)
+                    }
+                )
             }
         }
-        NavigationBar(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        ) {
-            NavigationBarItem(
-                selected = pagerState.currentPage == 0,
-                onClick = {
-                    scope.launch {
-                        if (songsViewModel.state.isSearching) {
-                            songsViewModel.onSearchSongs(searchQuery)
-                        }
-                        pagerState.animateScrollToPage(0, animationSpec = tween(500, 300))
-                    }
-                },
-                icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
-                label = { Text(stringResource(R.string.amuzic_songs)) }
-            )
-            NavigationBarItem(
-                selected = pagerState.currentPage == 1,
-                onClick = {
-                    scope.launch {
-                        if (songsViewModel.state.isSearching) {
-                            songsViewModel.onSearchArtists(searchQuery)
-                        }
-                        pagerState.animateScrollToPage(1, animationSpec = tween(500, 300))
-                    }
-                },
-                icon = { Icon(painterResource(R.drawable.ic_artist), "") },
-                label = { Text(stringResource(R.string.amuzic_artists)) }
-            )
-            NavigationBarItem(
-                selected = pagerState.currentPage == 2,
-                onClick = {
-                    scope.launch {
-                        if (songsViewModel.state.isSearching) {
-                            songsViewModel.onSearchAlbums(searchQuery)
-                        }
-                        pagerState.animateScrollToPage(2, animationSpec = tween(500, 300))
-                    }
-                },
-                icon = { Icon(painterResource(R.drawable.ic_album), "") },
-                label = { Text(stringResource(R.string.amuzic_albums)) }
-            )
+    }
+    BackHandler {
+        if (songsViewModel.state.showPlayList) {
+            songsViewModel.onTogglePlayList(false)
+            return@BackHandler
         }
-        BackHandler {
-            if (songsViewModel.state.showPlayList) {
-                songsViewModel.onTogglePlayList(false)
-                return@BackHandler
-            }
-            if (songsViewModel.state.isSearching) {
-                songsViewModel.onToggleSearching()
-                searchQuery = ""
-                return@BackHandler
-            }
-            onExit()
+        if (songsViewModel.state.isSearching) {
+            songsViewModel.onToggleSearching()
+            searchQuery = ""
+            return@BackHandler
         }
+        onExit()
     }
 }
 

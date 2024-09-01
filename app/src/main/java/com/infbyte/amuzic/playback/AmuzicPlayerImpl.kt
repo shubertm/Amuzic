@@ -64,7 +64,7 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
             }
         }
         repeatMode
-    }!!
+    } ?: Player.REPEAT_MODE_OFF
 
     override fun selectSong(index: Int) {
         mediaController?.run { seekTo(index, 0) }
