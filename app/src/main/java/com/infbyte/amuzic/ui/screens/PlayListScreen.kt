@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +39,7 @@ fun BoxScope.PlayListScreen(
     ) {
         LazyColumn(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().navigationBarsPadding().statusBarsPadding()
                 .background(
                     MaterialTheme.colorScheme.background,
                     RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
