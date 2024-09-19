@@ -1,11 +1,14 @@
 package com.infbyte.amuzic.ui.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
+import com.infbyte.amuzic.utils.navigationBarsPadding
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -57,6 +62,9 @@ fun MainScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val searchFocusRequester = remember {
         FocusRequester()
+    }
+    var paddingValuesFromScaffold by remember {
+        mutableStateOf(PaddingValues())
     }
 
     if (showAbout) {
@@ -109,105 +117,108 @@ fun MainScreen(
             }
         },
         topBar = {
-            Row(Modifier.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = {
-                        searchQuery = it
-                        when (pagerState.currentPage) {
-                            0 -> songsViewModel.onSearchSongs(it)
-                            1 -> songsViewModel.onSearchArtists(it)
-                            2 -> songsViewModel.onSearchAlbums(it)
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = {
+                    searchQuery = it
+                    when (pagerState.currentPage) {
+                        0 -> songsViewModel.onSearchSongs(it)
+                        1 -> songsViewModel.onSearchArtists(it)
+                        2 -> songsViewModel.onSearchAlbums(it)
+                    }
+                },
+                onSearch = {},
+                active = songsViewModel.state.isSearching,
+                onActiveChange = {
+                    if (!songsViewModel.state.isSearching) {
+                        searchQuery = ""
+                        songsViewModel.onToggleSearching()
+                    }
+                    when (pagerState.currentPage) {
+                        0 -> songsViewModel.onSearchSongs(searchQuery)
+                        1 -> songsViewModel.onSearchArtists(searchQuery)
+                        2 -> songsViewModel.onSearchAlbums(searchQuery)
+                    }
+                },
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                        end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp
+                    )
+                    .navigationBarsPadding(songsViewModel.state.isSearching)
+                    .focusRequester(searchFocusRequester),
+                trailingIcon = {
+                    Row {
+                        IconButton(
+                            onClick = {
+                                if (!songsViewModel.state.isSearching) {
+                                    songsViewModel.onToggleSearching()
+                                    searchFocusRequester.requestFocus()
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Outlined.Search, "")
                         }
-                    },
-                    onSearch = {},
-                    active = songsViewModel.state.isSearching,
-                    onActiveChange = {
                         if (!songsViewModel.state.isSearching) {
-                            searchQuery = ""
-                            songsViewModel.onToggleSearching()
-                        }
-                        when (pagerState.currentPage) {
-                            0 -> songsViewModel.onSearchSongs(searchQuery)
-                            1 -> songsViewModel.onSearchArtists(searchQuery)
-                            2 -> songsViewModel.onSearchAlbums(searchQuery)
-                        }
-                    },
-                    Modifier
-                        .fillMaxWidth()
-                        .focusRequester(searchFocusRequester),
-                    trailingIcon = {
-                        Row {
                             IconButton(
                                 onClick = {
-                                    if (!songsViewModel.state.isSearching) {
-                                        songsViewModel.onToggleSearching()
-                                        searchFocusRequester.requestFocus()
-                                    }
+                                    songsViewModel.hidePlayBar()
+                                    showAbout = true
                                 }
                             ) {
-                                Icon(Icons.Outlined.Search, "")
-                            }
-                            if (!songsViewModel.state.isSearching) {
-                                IconButton(
-                                    onClick = {
-                                        songsViewModel.hidePlayBar()
-                                        showAbout = true
-                                    }
-                                ) {
-                                    Icon(Icons.Outlined.Info, contentDescription = "")
-                                }
+                                Icon(Icons.Outlined.Info, contentDescription = "")
                             }
                         }
-                    },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) }
-                ) {
-                    when (pagerState.currentPage) {
-                        0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
-                            NoSearchResultScreen()
-                        } else {
-                            SongsScreen(
-                                songs = songsViewModel.state.songsSearchResult,
-                                onScroll = { scrollValue ->
-                                    songsViewModel.togglePlayBarByScroll(scrollValue)
-                                },
-                                onSongClick = { songIndex ->
-                                    searchQuery = ""
-                                    songsViewModel.onSongClicked(songIndex)
-                                    songsViewModel.onToggleSearching()
-                                }
-                            )
-                        }
+                    }
+                },
+                placeholder = { Text(stringResource(R.string.amuzic_search)) }
+            ) {
+                when (pagerState.currentPage) {
+                    0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
+                        NoSearchResultScreen()
+                    } else {
+                        SongsScreen(
+                            songs = songsViewModel.state.songsSearchResult,
+                            onScroll = { scrollValue ->
+                                songsViewModel.togglePlayBarByScroll(scrollValue)
+                            },
+                            onSongClick = { songIndex ->
+                                searchQuery = ""
+                                songsViewModel.onSongClicked(songIndex)
+                                songsViewModel.onToggleSearching()
+                            }
+                        )
+                    }
 
-                        1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
-                            NoSearchResultScreen()
-                        } else {
-                            ArtistsScreen(
-                                artists = songsViewModel.state.artistsSearchResult,
-                                onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                                onArtistClick = { artist ->
-                                    searchQuery = ""
-                                    songsViewModel.onToggleSearching()
-                                    songsViewModel.onArtistClicked(artist)
-                                    onNavigate(Screens.SONGS)
-                                }
-                            )
-                        }
+                    1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
+                        NoSearchResultScreen()
+                    } else {
+                        ArtistsScreen(
+                            artists = songsViewModel.state.artistsSearchResult,
+                            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                            onArtistClick = { artist ->
+                                searchQuery = ""
+                                songsViewModel.onToggleSearching()
+                                songsViewModel.onArtistClicked(artist)
+                                onNavigate(Screens.SONGS)
+                            }
+                        )
+                    }
 
-                        2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
-                            NoSearchResultScreen()
-                        } else {
-                            AlbumsScreen(
-                                albums = songsViewModel.state.albumsSearchResult,
-                                onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                                onAlbumClicked = { album ->
-                                    searchQuery = ""
-                                    songsViewModel.onToggleSearching()
-                                    songsViewModel.onAlbumClicked(album)
-                                    onNavigate(Screens.SONGS)
-                                }
-                            )
-                        }
+                    2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
+                        NoSearchResultScreen()
+                    } else {
+                        AlbumsScreen(
+                            albums = songsViewModel.state.albumsSearchResult,
+                            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                            onAlbumClicked = { album ->
+                                searchQuery = ""
+                                songsViewModel.onToggleSearching()
+                                songsViewModel.onAlbumClicked(album)
+                                onNavigate(Screens.SONGS)
+                            }
+                        )
                     }
                 }
             }
@@ -215,10 +226,14 @@ fun MainScreen(
     ) { paddingValues ->
         HorizontalPager(
             state = pagerState,
-            Modifier.padding(
-                top = paddingValues.calculateTopPadding(),
-                bottom = paddingValues.calculateBottomPadding()
-            )
+            Modifier
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
+                )
+                .onGloballyPositioned {
+                    paddingValuesFromScaffold = paddingValues
+                }
         ) { page ->
             when (page) {
                 0 -> {
@@ -255,18 +270,20 @@ fun MainScreen(
                 )
             }
         }
-    }
-    BackHandler {
-        if (songsViewModel.state.showPlayList) {
-            songsViewModel.onTogglePlayList(false)
-            return@BackHandler
+        BackHandler {
+            if (songsViewModel.state.showPlayList) {
+                songsViewModel.onTogglePlayList(false)
+                return@BackHandler
+            }
+            Log.d("MainScreen", "${songsViewModel.state.isSearching}")
+
+            if (songsViewModel.state.isSearching) {
+                songsViewModel.onToggleSearching()
+                searchQuery = ""
+                return@BackHandler
+            }
+            onExit()
         }
-        if (songsViewModel.state.isSearching) {
-            songsViewModel.onToggleSearching()
-            searchQuery = ""
-            return@BackHandler
-        }
-        onExit()
     }
 }
 

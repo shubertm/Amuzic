@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
@@ -36,7 +38,7 @@ fun NoMusicAvailableScreen(
     Box(
         Modifier
             .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize(),
+            .fillMaxSize().navigationBarsPadding().statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         var showAbout by rememberSaveable { mutableStateOf(false) }

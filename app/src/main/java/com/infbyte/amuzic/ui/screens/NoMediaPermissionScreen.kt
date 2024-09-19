@@ -5,8 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
@@ -23,10 +26,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 
@@ -39,7 +48,9 @@ fun NoMediaPermissionScreen(
     Box(
         Modifier
             .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -61,26 +72,30 @@ fun NoMediaPermissionScreen(
             Icon(Icons.Outlined.Info, contentDescription = "")
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box {
-                Text(
-                    text = "Get ready for",
-                    Modifier.padding(top = 31.dp),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                ) // stringResource(id = R.string.amuzic_intro_1))
-                Icon(
-                    painter = painterResource(R.drawable.ic_amuzic_splash_foreground),
-                    contentDescription = "",
-                    Modifier
-                        .padding(start = 112.dp)
-                        .size(72.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    "muzement",
-                    Modifier.padding(start = 162.dp, top = 31.dp),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                ) // stringResource(R.string.amuzic_intro_2))
+            val id = "appIcon"
+            val inlineContent = mapOf(
+                id to InlineTextContent(
+                    Placeholder(32.sp, 32.sp, PlaceholderVerticalAlign.AboveBaseline)
+                ) {
+                    Icon(
+                        ImageVector.vectorResource(R.drawable.ic_amuzic_intro),
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            )
+            val text = buildAnnotatedString {
+                append("${stringResource(R.string.amuzic_intro_1)} ")
+                appendInlineContent(id, "[icon]")
+                append(stringResource(R.string.amuzic_intro_2))
             }
+
+            Text(
+                text,
+                Modifier.padding(start = 0.dp, top = 31.dp),
+                inlineContent = inlineContent,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            )
             Button(
                 onClick = { onStartListening() },
                 Modifier.padding(top = 64.dp),
