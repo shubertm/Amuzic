@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -53,90 +54,91 @@ fun ArtistOrAlbumSongsScreen(
         FocusRequester()
     }
 
-    Column {
-        Row(Modifier.padding(start = 8.dp, end = 8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = {
-                    searchQuery = it
-                    songsViewModel.onSearchSongs(it)
-                },
-                onSearch = {},
-                active = songsViewModel.state.isSearching,
-                onActiveChange = {
-                    if (!songsViewModel.state.isSearching) {
-                        searchQuery = ""
-                        songsViewModel.onToggleSearching()
+    Column(Modifier.navigationBarsPadding()) {
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = {
+                searchQuery = it
+                songsViewModel.onSearchSongs(it)
+            },
+            onSearch = {},
+            active = songsViewModel.state.isSearching,
+            onActiveChange = {
+                if (!songsViewModel.state.isSearching) {
+                    searchQuery = ""
+                    songsViewModel.onToggleSearching()
+                }
+                songsViewModel.onSearchSongs(searchQuery)
+            },
+            Modifier.fillMaxWidth().padding(
+                start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp
+            ).focusRequester(searchFocusRequester),
+            leadingIcon = {
+                IconButton(
+                    onClick = {
+                        if (songsViewModel.state.isSearching) {
+                            searchQuery = ""
+                            songsViewModel.onToggleSearching()
+                            return@IconButton
+                        }
+                        onNavigateBack()
                     }
-                    songsViewModel.onSearchSongs(searchQuery)
-                },
-                Modifier.fillMaxWidth().focusRequester(searchFocusRequester),
-                leadingIcon = {
+                ) {
+                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                }
+            },
+            trailingIcon = {
+                Row {
                     IconButton(
                         onClick = {
-                            if (songsViewModel.state.isSearching) {
-                                searchQuery = ""
+                            if (!songsViewModel.state.isSearching) {
                                 songsViewModel.onToggleSearching()
-                                return@IconButton
+                                searchFocusRequester.requestFocus()
                             }
-                            onNavigateBack()
                         }
                     ) {
-                        Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                        Icon(Icons.Outlined.Search, "")
                     }
-                },
-                trailingIcon = {
-                    Row {
-                        IconButton(
-                            onClick = {
-                                if (!songsViewModel.state.isSearching) {
-                                    songsViewModel.onToggleSearching()
-                                    searchFocusRequester.requestFocus()
-                                }
-                            }
-                        ) {
-                            Icon(Icons.Outlined.Search, "")
-                        }
-                        if (!songsViewModel.state.isSearching) {
-                            IconButton(onClick = {}) {
-                                songsViewModel.state.icon?.let { thumbnail ->
-                                    Image(
-                                        thumbnail,
-                                        contentDescription = "",
-                                        Modifier
-                                            .size(32.dp)
-                                            .clip(CircleShape)
-                                    )
-                                } ?: Box(
+                    if (!songsViewModel.state.isSearching) {
+                        IconButton(onClick = {}) {
+                            songsViewModel.state.icon?.let { thumbnail ->
+                                Image(
+                                    thumbnail,
+                                    contentDescription = "",
                                     Modifier
                                         .size(32.dp)
-                                        .clip(CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        songsViewModel.state.artistOrAlbumInitialChar,
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                }
+                                        .clip(CircleShape)
+                                )
+                            } ?: Box(
+                                Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    songsViewModel.state.artistOrAlbumInitialChar,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
                             }
                         }
                     }
-                },
-                placeholder = { Text(stringResource(R.string.amuzic_search)) }
-            ) {
-                if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
-                    SongsScreen(
-                        songs = songsViewModel.state.songsSearchResult,
-                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                        onSongClick = { songIndex ->
-                            searchQuery = ""
-                            songsViewModel.onSongClicked(songIndex)
-                            songsViewModel.onToggleSearching()
-                        }
-                    )
-                } else {
-                    NoSearchResultScreen()
                 }
+            },
+            placeholder = { Text(stringResource(R.string.amuzic_search)) }
+        ) {
+            if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
+                SongsScreen(
+                    songs = songsViewModel.state.songsSearchResult,
+                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                    onSongClick = { songIndex ->
+                        searchQuery = ""
+                        songsViewModel.onSongClicked(songIndex)
+                        songsViewModel.onToggleSearching()
+                    }
+                )
+            } else {
+                NoSearchResultScreen()
             }
         }
         SongsScreen(
