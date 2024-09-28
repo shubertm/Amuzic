@@ -42,7 +42,7 @@ class SongsRepo @Inject constructor(
     private val sortOrder = null
 
     suspend fun loadSongs(
-        isLoading: () -> Unit,
+        isLoading: suspend () -> Unit,
         onComplete: (songs: List<Song>) -> Unit
     ) {
         withContext(Dispatchers.IO) {

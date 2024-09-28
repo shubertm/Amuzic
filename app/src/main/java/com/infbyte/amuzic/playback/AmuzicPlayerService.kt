@@ -25,11 +25,11 @@ class AmuzicPlayerService : MediaSessionService() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         mediaSession?.run {
             player.release()
             release()
             mediaSession = null
         }
+        super.onDestroy()
     }
 }

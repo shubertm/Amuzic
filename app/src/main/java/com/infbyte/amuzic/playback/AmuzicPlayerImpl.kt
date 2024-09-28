@@ -2,15 +2,21 @@ package com.infbyte.amuzic.playback
 
 import android.content.ComponentName
 import android.content.Context
+import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import com.google.common.util.concurrent.ListenableFuture
+import java.util.concurrent.CancellationException
+import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
 class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
 
     private var mediaController: MediaController? = null
+    private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
 
     override val shuffleMode: Boolean get() = mediaController?.run { shuffleModeEnabled }!!
 
@@ -30,12 +36,33 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
         }
     }
 
-    override fun init(context: Context) {
+    override fun initController(context: Context) {
         val sessionToken = SessionToken(context, ComponentName(context, AmuzicPlayerService::class.java))
-        mediaController = MediaController.Builder(context, sessionToken).buildAsync().get()
-        mediaController?.run {
-            addListener(listener)
-        }
+
+        mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+
+        mediaControllerFuture.addListener(
+            {
+                try {
+                    mediaController = mediaControllerFuture.get()
+                    mediaController?.addListener(listener)
+                } catch (e: CancellationException) {
+                    Log.d(LOG_TAG, "Failed to initialize media controller, initialization was cancelled")
+                } catch (e: ExecutionException) {
+                    Log.d(LOG_TAG, "Failed to initialize media controller with exception ${e.printStackTrace()}")
+                } catch (e: InterruptedException) {
+                    Log.d(LOG_TAG, "Failed to initialize media controller, initialization was interrupted")
+                }
+            },
+            ContextCompat.getMainExecutor(context)
+        )
+    }
+
+    override fun releaseControllerFuture() {
+        MediaController.releaseFuture(mediaControllerFuture)
+    }
+
+    override suspend fun init() {
     }
 
     override fun createPlayList(songs: List<MediaItem>) {
@@ -110,5 +137,9 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
             removeListener(listener)
         }
         mediaController = null
+    }
+
+    companion object {
+        private const val LOG_TAG = "Amuzic Player"
     }
 }

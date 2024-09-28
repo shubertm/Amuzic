@@ -12,7 +12,11 @@ interface AmuzicPlayer {
 
     var onTransition: (Int, Float) -> Unit
 
-    fun init(context: Context)
+    suspend fun init()
+
+    fun initController(context: Context)
+
+    fun releaseControllerFuture()
 
     fun selectSong(index: Int)
 

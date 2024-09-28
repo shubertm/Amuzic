@@ -16,6 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -36,6 +39,7 @@ import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
     ) { isGranted ->
         songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
-            songsViewModel.init(this)
+            songsViewModel.init()
         }
     }
 
@@ -56,17 +60,23 @@ class MainActivity : ComponentActivity() {
     ) { isGranted ->
         songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
-            songsViewModel.init(this)
+            songsViewModel.init()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                songsViewModel.refreshController(this@MainActivity)
+            }
+        }
+
         if (!songsViewModel.state.isLoaded) {
             songsViewModel.setReadPermGranted(isReadPermissionGranted(this))
             if (!songsViewModel.state.isReadPermGranted) { launchPermRequest() } else {
-                songsViewModel.init(this)
+                songsViewModel.init()
                 installSplashScreen().setKeepOnScreenCondition {
                     !songsViewModel.state.isLoaded
                 }
@@ -102,7 +112,9 @@ class MainActivity : ComponentActivity() {
                                     launchPermRequest()
                                 } else {
                                     songsViewModel.setIsRefreshing(true)
-                                    songsViewModel.init(this)
+                                    lifecycleScope.launch {
+                                        songsViewModel.init()
+                                    }
                                 }
                             },
                             onExit = { onExit() },
@@ -160,6 +172,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        songsViewModel.releaseMediaControllerFuture()
     }
 
     override fun onDestroy() {

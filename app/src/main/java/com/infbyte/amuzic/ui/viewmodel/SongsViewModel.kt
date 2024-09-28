@@ -76,7 +76,12 @@ class SongsViewModel @Inject constructor(
 
     private var playBarDelayJob: Job? = null
 
-    fun init(context: Context) {
+    fun init() {
+        loadSongs()
+        startProgressMonitor()
+    }
+
+    fun refreshController(context: Context) {
         amuzicPlayer.onTransition = { index, duration ->
             state = state.copy(
                 currentSong = state.currentPlaylist[index],
@@ -84,8 +89,7 @@ class SongsViewModel @Inject constructor(
                 progress = 0f
             )
         }
-        viewModelScope.launch { loadSongs(context) }
-        startProgressMonitor()
+        amuzicPlayer.initController(context)
     }
 
     fun confirmExit() {
@@ -207,8 +211,7 @@ class SongsViewModel @Inject constructor(
         viewModelScope.launch {
             state = with(state) {
                 copy(
-                    artistsSearchResult = artists.filter {
-                            artist ->
+                    artistsSearchResult = artists.filter { artist ->
                         artist.name.contains(query, true)
                     }
                 )
@@ -254,6 +257,10 @@ class SongsViewModel @Inject constructor(
 
     fun onExit() {
         amuzicPlayer.releasePlayer()
+    }
+
+    fun releaseMediaControllerFuture() {
+        amuzicPlayer.releaseControllerFuture()
     }
 
     private fun showAndDelayHidePlayBar() {
@@ -318,15 +325,15 @@ class SongsViewModel @Inject constructor(
         amuzicPlayer.pauseSong()
     }
 
-    private fun loadSongs(context: Context) {
+    private fun loadSongs() {
         viewModelScope.launch {
             repo.loadSongs(
-                isLoading = {
-                    amuzicPlayer.init(context)
-                },
+                isLoading = {},
                 onComplete = { songs ->
-                    launch {
-                        if (state.isRefreshing && songs.isEmpty()) { delay(1000) }
+                    viewModelScope.launch {
+                        if (state.isRefreshing && songs.isEmpty()) {
+                            delay(1000)
+                        }
                         state = state.copy(
                             currentSong = songs.tryGetFirst { state.currentSong },
                             songs = songs,
@@ -341,7 +348,7 @@ class SongsViewModel @Inject constructor(
                             isRefreshing = false
                         )
                     }
-                    launch(Dispatchers.Main) {
+                    viewModelScope.launch(Dispatchers.Main) {
                         amuzicPlayer.createPlayList(songs.map { it.item })
                     }
                 }
