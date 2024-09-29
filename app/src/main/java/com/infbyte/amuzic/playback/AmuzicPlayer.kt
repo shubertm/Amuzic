@@ -12,8 +12,6 @@ interface AmuzicPlayer {
 
     var onTransition: (Int, Float) -> Unit
 
-    suspend fun init()
-
     fun initController(context: Context)
 
     fun releaseControllerFuture()

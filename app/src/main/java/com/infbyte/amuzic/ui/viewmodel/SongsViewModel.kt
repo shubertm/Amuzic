@@ -10,8 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.util.fastFirst
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.RepeatMode
 import com.infbyte.amuzic.data.model.Album
@@ -82,13 +84,6 @@ class SongsViewModel @Inject constructor(
     }
 
     fun refreshController(context: Context) {
-        amuzicPlayer.onTransition = { index, duration ->
-            state = state.copy(
-                currentSong = state.currentPlaylist[index],
-                songDuration = duration,
-                progress = 0f
-            )
-        }
         amuzicPlayer.initController(context)
     }
 
@@ -310,11 +305,22 @@ class SongsViewModel @Inject constructor(
                     val duration = amuzicPlayer.duration().coerceAtLeast(0f)
                     state = state.copy(progress = progress / duration)
                 }
-                state = state.copy(isPlaying = amuzicPlayer.isActive())
+                state = state.copy(
+                    isPlaying = amuzicPlayer.isActive(),
+                    currentSong = amuzicPlayer.currentSong.currentSongById()
+                )
                 progressHandler.postDelayed(this, 200)
             }
         }
         progressHandler.postDelayed(progressUpdateRunnable, 200)
+    }
+
+    private fun MediaItem.currentSongById(): Song {
+        return try {
+            state.currentPlaylist.fastFirst { this == it.item }
+        } catch (e: Exception) {
+            Song.EMPTY
+        }
     }
 
     private fun onPlaySong() {
@@ -328,7 +334,6 @@ class SongsViewModel @Inject constructor(
     private fun loadSongs() {
         viewModelScope.launch {
             repo.loadSongs(
-                isLoading = {},
                 onComplete = { songs ->
                     viewModelScope.launch {
                         if (state.isRefreshing && songs.isEmpty()) {

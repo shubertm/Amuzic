@@ -67,12 +67,12 @@ fun BoxScope.PlayBar(
         Column(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(topStartPercent = 20, topEndPercent = 20))
+                .clip(RoundedCornerShape(20.dp, 20.dp))
                 .clickable {}
                 .border(0.dp, Color.LightGray)
                 .background(
                     MaterialTheme.colorScheme.background,
-                    RoundedCornerShape(topStartPercent = 20, topEndPercent = 20)
+                    RoundedCornerShape(20.dp, 20.dp)
                 ).navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

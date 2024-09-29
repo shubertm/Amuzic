@@ -18,9 +18,9 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
     private var mediaController: MediaController? = null
     private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
 
-    override val shuffleMode: Boolean get() = mediaController?.run { shuffleModeEnabled }!!
+    override val shuffleMode: Boolean get() = mediaController?.run { shuffleModeEnabled } ?: false
 
-    override val currentSong: MediaItem get() = mediaController?.run { currentMediaItem }!!
+    override val currentSong: MediaItem get() = mediaController?.run { currentMediaItem } ?: MediaItem.EMPTY
 
     override var onTransition: (Int, Float) -> Unit = { _, _ -> }
 
@@ -59,10 +59,9 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
     }
 
     override fun releaseControllerFuture() {
+        mediaController?.removeListener(listener)
         MediaController.releaseFuture(mediaControllerFuture)
-    }
-
-    override suspend fun init() {
+        mediaController = null
     }
 
     override fun createPlayList(songs: List<MediaItem>) {
