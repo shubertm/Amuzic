@@ -3,6 +3,7 @@ package com.infbyte.amuzic.ui.viewmodel
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -123,6 +124,11 @@ class SongsViewModel @Inject constructor(
         if (amuzicPlayer.isActive()) {
             onPauseSong()
             return
+        }
+        if (state.progress == 0f) {
+            val index = state.currentPlaylist.indexOf(state.currentSong)
+            amuzicPlayer.createPlayList(state.currentPlaylist.map { it.item })
+            amuzicPlayer.selectSong(index)
         }
         onPlaySong()
     }
@@ -305,9 +311,10 @@ class SongsViewModel @Inject constructor(
                     val duration = amuzicPlayer.duration().coerceAtLeast(0f)
                     state = state.copy(progress = progress / duration)
                 }
+                val currentSong = amuzicPlayer.currentSong.currentSongById()
                 state = state.copy(
                     isPlaying = amuzicPlayer.isActive(),
-                    currentSong = amuzicPlayer.currentSong.currentSongById()
+                    currentSong = if (currentSong == Song.EMPTY) state.currentSong else currentSong
                 )
                 progressHandler.postDelayed(this, 200)
             }

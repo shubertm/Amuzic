@@ -138,7 +138,7 @@ fun ArtistOrAlbumSongsScreen(
                     }
                 )
             } else {
-                NoSearchResultScreen()
+                com.infbyte.amuze.ui.screens.NoSearchResultScreen()
             }
         }
         SongsScreen(

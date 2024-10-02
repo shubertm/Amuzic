@@ -7,6 +7,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -21,10 +22,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -39,12 +42,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.AmuzicState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoxScope.PlayBar(
     isVisible: State<Boolean>,
@@ -173,6 +178,7 @@ fun BoxScope.PlayBar(
                         textAlign = TextAlign.Center,
                         maxLines = 1
                     )
+                    val interactionSource = remember { MutableInteractionSource() }
                     Slider(
                         value = state.progress,
                         onValueChange = { onSeekTo(it) },
@@ -182,8 +188,17 @@ fun BoxScope.PlayBar(
                                 end = 32.dp,
                                 top = 8.dp,
                                 bottom = 8.dp
+                            ),
+                        track = {
+                            SliderDefaults.Track(it, Modifier.height(6.dp))
+                        },
+                        interactionSource = interactionSource,
+                        thumb = {
+                            SliderDefaults.Thumb(
+                                interactionSource,
+                                thumbSize = DpSize(3.dp, 16.dp)
                             )
-                            .height(32.dp)
+                        }
                     )
                 }
             }

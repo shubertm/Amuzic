@@ -85,6 +85,28 @@ fun Artist(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewArtistsScreen() {
+    AmuzicTheme {
+        ArtistsScreen(
+            listOf(
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist"),
+                Artist("artist")
+            ),
+            {}
+        ) { }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewArtist() {

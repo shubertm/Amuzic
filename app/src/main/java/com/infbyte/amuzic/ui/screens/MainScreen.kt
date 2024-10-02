@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -176,7 +175,7 @@ fun MainScreen(
             ) {
                 when (pagerState.currentPage) {
                     0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
-                        NoSearchResultScreen()
+                        com.infbyte.amuze.ui.screens.NoSearchResultScreen()
                     } else {
                         SongsScreen(
                             songs = songsViewModel.state.songsSearchResult,
@@ -192,7 +191,7 @@ fun MainScreen(
                     }
 
                     1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
-                        NoSearchResultScreen()
+                        com.infbyte.amuze.ui.screens.NoSearchResultScreen()
                     } else {
                         ArtistsScreen(
                             artists = songsViewModel.state.artistsSearchResult,
@@ -207,7 +206,7 @@ fun MainScreen(
                     }
 
                     2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
-                        NoSearchResultScreen()
+                        com.infbyte.amuze.ui.screens.NoSearchResultScreen()
                     } else {
                         AlbumsScreen(
                             albums = songsViewModel.state.albumsSearchResult,

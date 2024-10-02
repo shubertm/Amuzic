@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,16 +23,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.infbyte.amuze.ui.screens.AboutScreen
+import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
+import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AmuzicContracts
 import com.infbyte.amuzic.playback.AmuzicPlayerService
-import com.infbyte.amuzic.ui.screens.AboutScreen
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
-import com.infbyte.amuzic.ui.screens.LoadingScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
-import com.infbyte.amuzic.ui.screens.NoMediaPermissionScreen
-import com.infbyte.amuzic.ui.screens.NoMusicAvailableScreen
 import com.infbyte.amuzic.ui.screens.PlayBar
 import com.infbyte.amuzic.ui.screens.PlayListScreen
 import com.infbyte.amuzic.ui.screens.Screens
@@ -92,8 +92,18 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     if (!songsViewModel.state.isReadPermGranted) {
                         NoMediaPermissionScreen(
-                            onStartListening = { launchPermRequest() },
-                            about = { navigateBack -> AboutScreen(onNavigateBack = { navigateBack() }) },
+                            R.drawable.ic_amuzic_intro,
+                            com.infbyte.amuze.R.string.amuze_listen,
+                            onStartAction = { launchPermRequest() },
+                            aboutApp = { navigateBack ->
+                                AboutScreen(
+                                    stringResource(R.string.app_name),
+                                    BuildConfig.VERSION_NAME,
+                                    R.drawable.ic_amuzic_foreground,
+                                    R.string.amuzic_privacy_policy_link,
+                                    onNavigateBack = { navigateBack() }
+                                )
+                            },
                             onExit = { onExit() }
                         )
                         return@Surface
@@ -102,23 +112,30 @@ class MainActivity : ComponentActivity() {
                         (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
                         songsViewModel.state.isRefreshing
                     ) {
-                        LoadingScreen()
+                        com.infbyte.amuze.ui.screens.LoadingScreen()
                         return@Surface
                     }
                     if (!songsViewModel.state.hasMusic) {
-                        NoMusicAvailableScreen(
+                        NoMediaAvailableScreen(
+                            R.string.amuzic_no_muzic,
                             onRefresh = {
                                 if (!songsViewModel.state.isReadPermGranted) {
                                     launchPermRequest()
                                 } else {
                                     songsViewModel.setIsRefreshing(true)
-                                    lifecycleScope.launch {
-                                        songsViewModel.init()
-                                    }
+                                    songsViewModel.init()
                                 }
                             },
                             onExit = { onExit() },
-                            about = { navigateBack -> AboutScreen(onNavigateBack = { navigateBack() }) }
+                            aboutApp = { navigateBack ->
+                                AboutScreen(
+                                    stringResource(R.string.app_name),
+                                    BuildConfig.VERSION_NAME,
+                                    R.drawable.ic_amuzic_foreground,
+                                    R.string.amuzic_privacy_policy_link,
+                                    onNavigateBack = { navigateBack() }
+                                )
+                            }
                         )
                         return@Surface
                     }
@@ -128,7 +145,15 @@ class MainActivity : ComponentActivity() {
                                 songsViewModel,
                                 onNavigate = { route -> navController.navigate(route) },
                                 onExit = { onExit() },
-                                about = { navigateBack -> AboutScreen(onNavigateBack = { navigateBack() }) }
+                                about = { navigateBack ->
+                                    AboutScreen(
+                                        stringResource(R.string.app_name),
+                                        BuildConfig.VERSION_NAME,
+                                        R.drawable.ic_amuzic_foreground,
+                                        R.string.amuzic_privacy_policy_link,
+                                        onNavigateBack = { navigateBack() }
+                                    )
+                                }
                             )
                         }
                         composable(Screens.SONGS) {
