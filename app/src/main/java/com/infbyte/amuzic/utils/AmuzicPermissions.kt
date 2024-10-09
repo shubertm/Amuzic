@@ -8,7 +8,7 @@ import android.os.Environment
 
 object AmuzicPermissions {
     fun isReadPermissionGranted(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
             context

@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
         }
 
         if (!songsViewModel.state.isLoaded) {
-            songsViewModel.setReadPermGranted(isReadPermissionGranted(this))
+            songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
             if (!songsViewModel.state.isReadPermGranted) { launchPermRequest() } else {
                 songsViewModel.init()
                 installSplashScreen().setKeepOnScreenCondition {

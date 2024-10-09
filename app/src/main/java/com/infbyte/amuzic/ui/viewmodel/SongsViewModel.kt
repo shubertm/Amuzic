@@ -3,7 +3,6 @@ package com.infbyte.amuzic.ui.viewmodel
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -111,7 +110,7 @@ class SongsViewModel @Inject constructor(
             if (currentSong != song) {
                 state = copy(currentSong = song, currentPlaylist = songs)
                 amuzicPlayer.createPlayList(songs.map { it.item })
-                amuzicPlayer.selectSong(actualIndex)
+                amuzicPlayer.selectSong(actualIndex, 0.2f)
                 onPlaySong()
             }
             if (!showPlayList) {
@@ -124,11 +123,6 @@ class SongsViewModel @Inject constructor(
         if (amuzicPlayer.isActive()) {
             onPauseSong()
             return
-        }
-        if (state.progress == 0f) {
-            val index = state.currentPlaylist.indexOf(state.currentSong)
-            amuzicPlayer.createPlayList(state.currentPlaylist.map { it.item })
-            amuzicPlayer.selectSong(index)
         }
         onPlaySong()
     }
@@ -359,9 +353,9 @@ class SongsViewModel @Inject constructor(
                             hasMusic = songs.isNotEmpty(),
                             isRefreshing = false
                         )
-                    }
-                    viewModelScope.launch(Dispatchers.Main) {
-                        amuzicPlayer.createPlayList(songs.map { it.item })
+                        launch(Dispatchers.Main) {
+                            amuzicPlayer.createPlayList(songs.map { it.item })
+                        }
                     }
                 }
             )

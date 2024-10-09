@@ -76,7 +76,7 @@ fun BoxScope.PlayBar(
                 .clickable {}
                 .border(0.dp, Color.LightGray)
                 .background(
-                    MaterialTheme.colorScheme.background,
+                    MaterialTheme.colorScheme.surfaceContainerLow,
                     RoundedCornerShape(20.dp, 20.dp)
                 ).navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally

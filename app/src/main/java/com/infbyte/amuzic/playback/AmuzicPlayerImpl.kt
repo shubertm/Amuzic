@@ -46,6 +46,7 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
                 try {
                     mediaController = mediaControllerFuture.get()
                     mediaController?.addListener(listener)
+                    mediaController?.prepare()
                 } catch (e: CancellationException) {
                     Log.d(LOG_TAG, "Failed to initialize media controller, initialization was cancelled")
                 } catch (e: ExecutionException) {
@@ -92,8 +93,11 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
         repeatMode
     } ?: Player.REPEAT_MODE_OFF
 
-    override fun selectSong(index: Int) {
-        mediaController?.run { seekTo(index, 0) }
+    override fun selectSong(index: Int, position: Float) {
+        mediaController?.run {
+            val pos = (position * duration).toLong()
+            seekTo(index, pos)
+        }
     }
 
     override fun playSong() {
@@ -119,7 +123,7 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
     override fun seekTo(position: Float) {
         mediaController?.run {
             val pos = (position * duration).toLong()
-            this.seekTo(pos)
+            seekTo(pos)
         }
     }
 

@@ -27,7 +27,6 @@ object AmuzicContracts {
 
         override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
             val granted = isReadPermissionGranted(context!!)
-            context = null
             return granted
         }
     }

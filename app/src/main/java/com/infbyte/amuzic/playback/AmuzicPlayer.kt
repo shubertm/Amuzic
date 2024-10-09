@@ -16,7 +16,7 @@ interface AmuzicPlayer {
 
     fun releaseControllerFuture()
 
-    fun selectSong(index: Int)
+    fun selectSong(index: Int, position: Float)
 
     fun playSong()
 
