@@ -9,6 +9,7 @@ import androidx.media3.session.MediaSessionService
 class AmuzicPlayerService : MediaSessionService() {
 
     private var mediaSession: MediaSession? = null
+
     override fun onCreate() {
         super.onCreate()
         val player = ExoPlayer.Builder(this).setAudioAttributes(

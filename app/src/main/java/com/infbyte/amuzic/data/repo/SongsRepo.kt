@@ -35,7 +35,8 @@ class SongsRepo @Inject constructor(
         MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.ALBUM,
         MediaStore.Audio.Media.ALBUM_ID,
-        MediaStore.Audio.Media.DATA
+        MediaStore.Audio.Media.DATA,
+        MediaStore.Audio.Media.DURATION
     )
     private val selection = null
     private val selectionArgs = null
@@ -68,6 +69,7 @@ class SongsRepo @Inject constructor(
                     it.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
                 val pathColumn =
                     it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
 
                 while (it.moveToNext()) {
                     val id = it.getLong(idColumn)
@@ -98,7 +100,8 @@ class SongsRepo @Inject constructor(
                         .setUri(songUri)
                         .setMediaId(id.toString())
                         .build()
-                    _songs += Song(item, extractFolderName(path), thumbnail)
+                    val duration = it.getLong(durationColumn)
+                    _songs += Song(item, extractFolderName(path), thumbnail, duration)
                 }
                 query.close()
             }

@@ -16,7 +16,7 @@ interface AmuzicPlayer {
 
     fun releaseControllerFuture()
 
-    fun selectSong(index: Int, position: Float)
+    fun selectSong(index: Int, position: Long)
 
     fun playSong()
 
@@ -44,4 +44,6 @@ interface AmuzicPlayer {
 
     @RepeatMode
     fun switchMode(): Int
+
+    fun areSongsAvailable(): Boolean
 }

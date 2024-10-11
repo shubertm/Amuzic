@@ -7,7 +7,8 @@ import androidx.media3.common.MediaItem
 data class Song(
     val item: MediaItem = MediaItem.fromUri(Uri.EMPTY),
     val folder: String = "",
-    val thumbnail: Bitmap? = null
+    val thumbnail: Bitmap? = null,
+    val duration: Long = 0L
 ) {
     val title = item.mediaMetadata.title.toString()
     val artist = item.mediaMetadata.artist.toString()

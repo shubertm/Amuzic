@@ -93,11 +93,8 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
         repeatMode
     } ?: Player.REPEAT_MODE_OFF
 
-    override fun selectSong(index: Int, position: Float) {
-        mediaController?.run {
-            val pos = (position * duration).toLong()
-            seekTo(index, pos)
-        }
+    override fun selectSong(index: Int, position: Long) {
+        mediaController?.run { seekTo(index, position) }
     }
 
     override fun playSong() {
@@ -131,7 +128,7 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
 
     override fun duration(): Float = mediaController?.run { duration.toFloat() } ?: 0f
 
-    override fun isActive() = mediaController?.run { isPlaying } ?: false
+    override fun isActive(): Boolean = mediaController?.run { isPlaying } ?: false
 
     override fun releasePlayer() {
         mediaController?.run {
@@ -140,6 +137,10 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
             removeListener(listener)
         }
         mediaController = null
+    }
+
+    override fun areSongsAvailable(): Boolean {
+        return mediaController?.run { mediaItemCount > 0 } ?: false
     }
 
     companion object {
