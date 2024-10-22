@@ -1,7 +1,7 @@
 <h1 align="center">Amuzic</h1>
 <p align="center">
-<a href="https://github.com/shubertthei/Amuzic/actions/workflows/build.yml"> 
-<img src="https://github.com/shubertthei/Amuzic/actions/workflows/build.yml/badge.svg" alt="build status">
+<a href="https://github.com/shubertm/Amuzic/actions/workflows/build.yml"> 
+<img src="https://github.com/shubertm/Amuzic/actions/workflows/build.yml/badge.svg" alt="build status">
 </a>
 </p>
 
@@ -9,7 +9,7 @@
 
 <p id="app_icon" align="center">
 <img
-    src="https://github.com/shubertthei/Amuzic/blob/main/app/src/main/ic_amuzic-playstore.png"
+    src="https://github.com/shubertm/Amuzic/blob/main/app/src/main/amuzic.svg"
     width="60" height="60" alt="amuzic icon"
     style="border-radius:10px;"/>
 </p>
