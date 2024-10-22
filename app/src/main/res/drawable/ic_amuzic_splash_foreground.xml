@@ -12,7 +12,7 @@
         android:fillColor="@color/ic_amuzic_background"/>
     <path
         android:pathData="M0,724.05a136.85,186.95 0,1 0,273.7 0a136.85,186.95 0,1 0,-273.7 0z"
-        android:fillColor="@color/ic_amuzic_background2"/>
+        android:fillColor="@color/ic_amuzic_background"/>
     <path
         android:pathData="M583.4,819.08l-167.6,-629.17l148.09,-48.45l167.6,629.17"
         android:fillColor="@color/ic_amuzic_background"/>
