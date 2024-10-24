@@ -19,7 +19,7 @@ jobs:
                   java-version: '17'
                   distribution: 'adopt'
 
-            - name: Decode keystore
+            - name: Decode Keystore
               run: |
                 echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_keystore.txt
                 base64 -d base64_keystore.txt > ./app/amuzic_release_keystore.jks
@@ -34,7 +34,7 @@ jobs:
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
               run: ./gradlew assembleRelease
 
-            - name: Upload Release APK
+            - name: Upload APK
               uses: actions/upload-artifact@v4
               with:
                  name: amuzic-release
@@ -57,3 +57,5 @@ jobs:
               run: gh release create ${{ github.ref_name }} --title "Amuzic $(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)" --generate-notes
               env:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  files: ./app/build/outputs/release/*.apk
