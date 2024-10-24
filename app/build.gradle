@@ -27,6 +27,17 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("amuzic_release_keystore.jks")
+            storePassword System.getenv("SIGNING_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
     buildTypes {
         debug {
             manifestPlaceholders = [
@@ -38,11 +49,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
             manifestPlaceholders = [
                 appIcon: "@mipmap/ic_amuzic",
                 appRoundIcon: "@mipmap/ic_amuzic_round",
                 appName: "@string/app_name"
             ]
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

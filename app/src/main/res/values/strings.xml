@@ -23,7 +23,7 @@
     <string name="amuzic_eth">Ethereum</string>
     <string name="amuzic_coffee">Buy me a coffee</string>
     <string name="infbyte_website">https://infbyte.com</string>
-    <string name="amuzic_privacy_policy_link">https://www.infbyte.com/apps/amuzic/privacy-policy</string>
+    <string name="amuzic_privacy_policy_link">https://www.infbyte.com/apps/privacy-policy/amuzic</string>
     <string name="amuzic_copy">Copy</string>
     <string name="btc_address">12ndrwkbsthfJNLHCgw49db7sZ3MHMkUPa</string>
     <string name="eth_address">0x4906e6C45D466b9678eBbFb70bfBE3021d26Da5D</string>
