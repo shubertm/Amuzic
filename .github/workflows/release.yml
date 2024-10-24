@@ -23,15 +23,15 @@ jobs:
               run: |
                 echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_keystore.txt
                 base64 -d base64_keystore.txt > ./app/amuzic_release_keystore.jks
-              env:
-                  SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
-                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v4
 
             - name: Build Release App
+              env:
+                  SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
               run: ./gradlew assembleRelease
 
             - name: Upload Release APK
