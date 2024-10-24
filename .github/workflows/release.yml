@@ -27,7 +27,7 @@ jobs:
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v4
 
-            - name: Build Release App
+            - name: Release APK
               env:
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
@@ -38,9 +38,22 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                  name: amuzic-release
-                 path: ./app/build/outputs/apk/release/*.apk
+                 path: ./app/build/outputs/release/*.apk
+
+            - name: Release AAB
+              env:
+                  SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+              run: ./gradlew bundleRelease
+
+            - name: Upload AAB
+              uses: actions/upload-artifact@v4
+              with:
+                  name: amuzic-release
+                  path: ./app/build/outputs/release/*.aab
 
             - name: Create Release
-              run: gh release create ${{ github.ref_name }} --title "Amuze $(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 14 | rev)" --generate-notes
+              run: gh release create ${{ github.ref_name }} --title "Amuzic $(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)" --generate-notes
               env:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
