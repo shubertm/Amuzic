@@ -21,7 +21,7 @@ jobs:
 
             - name: Decode keystore
               run: |
-                echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_kestore.txt
+                echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_keystore.txt
                 base64 -d base64_keystore.txt > ./app/amuzic_release_keystore.jks
               env:
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
