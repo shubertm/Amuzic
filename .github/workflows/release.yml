@@ -50,7 +50,7 @@ jobs:
             - name: Upload AAB
               uses: actions/upload-artifact@v4
               with:
-                  name: amuzic
+                  name: amuzic-bundle
                   path: ./app/build/outputs/bundle/release/*.aab
 
             - name: Create Release
