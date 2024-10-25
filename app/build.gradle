@@ -30,9 +30,9 @@ android {
     signingConfigs {
         release {
             storeFile file("amuzic_release_keystore.jks")
-            storePassword System.getenv("SIGNING_KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
+            storePassword "amuzic_24" //System.getenv("SIGNING_KEYSTORE_PASSWORD")
+            keyAlias "amuzic_key" //System.getenv("KEY_ALIAS")
+            keyPassword "amuzic_2410" //System.getenv("KEY_PASSWORD")
             v1SigningEnabled true
             v2SigningEnabled true
         }
