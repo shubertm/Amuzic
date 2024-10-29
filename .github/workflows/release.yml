@@ -58,6 +58,6 @@ jobs:
                 ls ./app/build/outputs/apk/release -a
                 ls ./app/build/outputs/bundle/release -a
                 gh release create ${{ github.ref_name }} --title "Amuzic $(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)" --generate-notes
-                gh release upload ${{ github.ref_name }} ./app/build/outputs/apk/release/amuzic.apk ./app/build/outputs/bundle/release/amuzic-bundle.aab
+                gh release upload ${{ github.ref_name }} ./app/build/outputs/apk/release/app-release.apk #Amuzic ./app/build/outputs/bundle/release/app-release.aab #Amuzic
               env:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
