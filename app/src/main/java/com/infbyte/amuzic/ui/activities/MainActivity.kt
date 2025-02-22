@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.infbyte.amuze.ui.screens.AboutScreen
+import com.infbyte.amuze.ui.screens.LoadingScreen
 import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
 import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
 import com.infbyte.amuzic.BuildConfig
@@ -112,7 +113,7 @@ class MainActivity : ComponentActivity() {
                         (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
                         songsViewModel.state.isRefreshing
                     ) {
-                        com.infbyte.amuze.ui.screens.LoadingScreen()
+                        LoadingScreen()
                         return@Surface
                     }
                     if (!songsViewModel.state.hasMusic) {

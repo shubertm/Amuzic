@@ -3,6 +3,6 @@
     <item
         android:width="150dp"
         android:height="150dp"
-        android:drawable="@drawable/ic_amuzic_splash_foreground"
+        android:drawable="@drawable/ic_amuzic"
         android:gravity="center" />
 </layer-list>
