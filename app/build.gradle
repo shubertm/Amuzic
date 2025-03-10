@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 configurations {
@@ -10,14 +11,14 @@ configurations {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     namespace 'com.infbyte.amuzic'
 
     defaultConfig {
         applicationId "com.infbyte.amuzic"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0.0"
 
@@ -82,11 +83,11 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.compose.material3:material3-android:1.2.1'
-    def composeBom = platform('androidx.compose:compose-bom:2023.04.01')
+    implementation 'androidx.compose.material3:material3-android:1.3.1'
+    def composeBom = platform('androidx.compose:compose-bom:2025.02.00')
     implementation composeBom
     androidTestImplementation composeBom
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.15.0'
 
     implementation "androidx.compose.ui:ui"
 
@@ -100,7 +101,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:2.5.3"
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.7.1'
+    implementation 'androidx.activity:activity-compose:1.10.1'
 
     implementation "androidx.media3:media3-exoplayer:1.3.1"
     implementation "androidx.media3:media3-ui:1.3.1"
@@ -109,8 +110,8 @@ dependencies {
 
     implementation "com.infbyte:amuze:0.2.1"
 
-    implementation 'com.google.dagger:hilt-android:2.44'
-    kapt 'com.google.dagger:hilt-compiler:2.44'
+    implementation 'com.google.dagger:hilt-android:2.55'
+    kapt 'com.google.dagger:hilt-compiler:2.55'
 
     ktlint("com.pinterest:ktlint:0.47.1")
 

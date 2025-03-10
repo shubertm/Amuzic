@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -78,19 +79,28 @@ class MainActivity : ComponentActivity() {
             songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
             if (!songsViewModel.state.isReadPermGranted) { launchPermRequest() } else {
                 songsViewModel.init()
-                installSplashScreen().setKeepOnScreenCondition {
-                    !songsViewModel.state.isLoaded
-                }
             }
+        }
+
+        installSplashScreen().setKeepOnScreenCondition {
+            songsViewModel.sideEffect.showSplash
         }
 
         setContent {
             AmuzicTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
+                    Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+                    if (
+                        (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
+                        songsViewModel.state.isRefreshing
+                    ) {
+                        LoadingScreen()
+                        return@Surface
+                    }
+
                     if (!songsViewModel.state.isReadPermGranted) {
                         NoMediaPermissionScreen(
                             R.drawable.ic_amuzic_intro,
@@ -109,13 +119,7 @@ class MainActivity : ComponentActivity() {
                         )
                         return@Surface
                     }
-                    if (
-                        (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
-                        songsViewModel.state.isRefreshing
-                    ) {
-                        LoadingScreen()
-                        return@Surface
-                    }
+
                     if (!songsViewModel.state.hasMusic) {
                         NoMediaAvailableScreen(
                             R.string.amuzic_no_muzic,
@@ -140,6 +144,7 @@ class MainActivity : ComponentActivity() {
                         )
                         return@Surface
                     }
+
                     NavHost(navController, startDestination = Screens.MAIN) {
                         composable(Screens.MAIN) {
                             MainScreen(
@@ -214,15 +219,21 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun launchPermRequest() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
             permissionLauncherApi30.launch(
                 "package:${BuildConfig.APPLICATION_ID}"
             )
-        } else {
+            return
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             permissionLauncher.launch(
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
+            return
         }
+        permissionLauncher.launch(
+            Manifest.permission.READ_MEDIA_AUDIO
+        )
     }
 
     private fun onExit() {

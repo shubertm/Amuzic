@@ -60,6 +60,10 @@ data class AmuzicState(
     }
 }
 
+data class SideEffect(
+    val showSplash: Boolean = true
+)
+
 @HiltViewModel
 class SongsViewModel @Inject constructor(
     private val repo: SongsRepo,
@@ -67,6 +71,9 @@ class SongsViewModel @Inject constructor(
 ) : ViewModel() {
 
     var state by mutableStateOf(INITIAL_STATE)
+        private set
+
+    var sideEffect by mutableStateOf(SideEffect())
         private set
 
     var confirmExit = false
@@ -359,12 +366,20 @@ class SongsViewModel @Inject constructor(
                             hasMusic = songs.isNotEmpty(),
                             isRefreshing = false
                         )
+                        sideEffect = sideEffect.copy(showSplash = false)
                         launch(Dispatchers.Main) {
                             amuzicPlayer.createPlayList(songs.map { it.item })
                         }
                     }
                 }
             )
+        }
+    }
+
+    fun onCloseSplash() {
+        viewModelScope.launch {
+            delay(3_000)
+            sideEffect = sideEffect.copy(showSplash = false)
         }
     }
 }
