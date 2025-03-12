@@ -29,4 +29,5 @@
     <string name="eth_address">0x4906e6C45D466b9678eBbFb70bfBE3021d26Da5D</string>
     <string name="amuzic_wallet_address">Wallet Address</string>
     <string name="amuzic_no_muzic">No music available</string>
+    <string name="amuzic_listen">Listen</string>
 </resources>

@@ -8,15 +8,16 @@ import android.os.Environment
 import androidx.annotation.RequiresApi
 
 object AmuzicPermissions {
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun isReadPermissionGranted(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            context
-                .checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED ||
-                context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager()
         }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+        }
+
+        return  context
+            .checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 }

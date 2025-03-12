@@ -65,7 +65,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -104,7 +103,7 @@ class MainActivity : ComponentActivity() {
                     if (!songsViewModel.state.isReadPermGranted) {
                         NoMediaPermissionScreen(
                             R.drawable.ic_amuzic_intro,
-                            com.infbyte.amuze.R.string.amuze_listen,
+                            R.string.amuzic_listen,
                             onStartAction = { launchPermRequest() },
                             aboutApp = { navigateBack ->
                                 AboutScreen(

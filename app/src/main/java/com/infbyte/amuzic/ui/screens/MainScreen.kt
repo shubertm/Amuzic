@@ -44,7 +44,7 @@ import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.utils.navigationBarsPadding
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     songsViewModel: SongsViewModel,
