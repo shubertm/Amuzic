@@ -378,8 +378,10 @@ class SongsViewModel @Inject constructor(
 
     fun onCloseSplash() {
         viewModelScope.launch {
-            delay(3_000)
-            sideEffect = sideEffect.copy(showSplash = false)
+            if (sideEffect.showSplash) {
+                delay(3_000)
+                sideEffect = sideEffect.copy(showSplash = false)
+            }
         }
     }
 }

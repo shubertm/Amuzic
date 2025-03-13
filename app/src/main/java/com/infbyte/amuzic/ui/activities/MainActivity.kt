@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +28,6 @@ import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
 import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
-import com.infbyte.amuzic.contracts.AmuzicContracts
 import com.infbyte.amuzic.playback.AmuzicPlayerService
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
@@ -52,17 +50,9 @@ class MainActivity : ComponentActivity() {
         songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
             songsViewModel.init()
+            return@registerForActivityResult
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    private val permissionLauncherApi30 = registerForActivityResult(
-        AmuzicContracts.RequestPermissionApi30()
-    ) { isGranted ->
-        songsViewModel.setReadPermGranted(isGranted)
-        if (isGranted) {
-            songsViewModel.init()
-        }
+        songsViewModel.onCloseSplash()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -218,13 +208,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun launchPermRequest() {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
-            permissionLauncherApi30.launch(
-                "package:${BuildConfig.APPLICATION_ID}"
-            )
-            return
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
