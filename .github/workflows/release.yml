@@ -32,6 +32,7 @@ jobs:
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+                  BANNER_AD_UNIT_ID: ${{ secrets.BANNER_AD_UNIT_ID }}
               run: ./gradlew assembleRelease
 
             - name: Upload APK
@@ -45,6 +46,7 @@ jobs:
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+                  BANNER_AD_UNIT_ID: ${{ secrets.BANNER_AD_UNIT_ID }}
               run: ./gradlew bundleRelease
 
             - name: Upload AAB

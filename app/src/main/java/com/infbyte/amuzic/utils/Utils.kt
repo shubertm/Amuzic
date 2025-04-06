@@ -2,11 +2,11 @@ package com.infbyte.amuzic.utils
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
 
 fun calcScroll(state: LazyListState): Int {
     val itemHeight = state.layoutInfo.visibleItemsInfo.firstOrNull()?.size ?: 0
@@ -25,7 +25,7 @@ fun Context.openWebLink(@StringRes linkRes: Int) {
     val link = getString(linkRes)
     startActivity(
         Intent(Intent.ACTION_VIEW)
-            .setData(Uri.parse(link))
+            .setData(link.toUri())
     )
 }
 

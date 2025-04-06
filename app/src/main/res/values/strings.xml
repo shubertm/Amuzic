@@ -30,4 +30,10 @@
     <string name="amuzic_wallet_address">Wallet Address</string>
     <string name="amuzic_no_muzic">No music available</string>
     <string name="amuzic_listen">Listen</string>
+    <string name="amuzic_agree">Agree</string>
+    <string name="amuzic_cancel">Cancel</string>
+    <string name="amuzic_agree_rationale">By clicking Agree, you accept the terms and conditions stated in our <a href="https://www.infbyte.com/apps/privacy-policy/amuzic">Privacy Policy</a></string>
+    <string name="amuzic_service_explain">To play audio, Amuzic requires Audio permisson.</string>
+    <string name="amuzic_grant">Grant</string>
+    <string name="amuzic_grant_in_settings">Grant in settings</string>
 </resources>

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
+import com.infbyte.amuzic.ui.views.AdView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +55,7 @@ fun ArtistOrAlbumSongsScreen(
         FocusRequester()
     }
 
-    Column(Modifier.navigationBarsPadding()) {
+    Column(Modifier.navigationBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally) {
         SearchBar(
             query = searchQuery,
             onQueryChange = {
@@ -141,6 +142,7 @@ fun ArtistOrAlbumSongsScreen(
                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
             }
         }
+        AdView()
         SongsScreen(
             songs = songsViewModel.state.songs,
             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },

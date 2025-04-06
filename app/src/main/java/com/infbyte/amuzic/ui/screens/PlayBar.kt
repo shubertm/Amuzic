@@ -54,7 +54,6 @@ import com.infbyte.amuzic.ui.viewmodel.AmuzicState
 fun BoxScope.PlayBar(
     isVisible: State<Boolean>,
     state: AmuzicState,
-    playbackMode: AmuzicState,
     onPlayClick: () -> Unit,
     onNextClick: () -> Unit,
     onPrevClick: () -> Unit,
@@ -99,17 +98,17 @@ fun BoxScope.PlayBar(
                 ) {
                     Icon(
                         when {
-                            playbackMode.mode == Player.REPEAT_MODE_ONE ->
+                            state.mode == Player.REPEAT_MODE_ONE ->
                                 painterResource(R.drawable.ic_repeat_one)
-                            playbackMode.mode == Player.REPEAT_MODE_ALL ->
+                            state.mode == Player.REPEAT_MODE_ALL ->
                                 painterResource(R.drawable.ic_repeat)
-                            playbackMode.shuffle && playbackMode.mode == Player.REPEAT_MODE_OFF ->
+                            state.shuffle && state.mode == Player.REPEAT_MODE_OFF ->
                                 painterResource(R.drawable.ic_shuffle)
                             else -> painterResource(R.drawable.ic_repeat)
                         },
                         "",
                         Modifier.size(32.dp),
-                        tint = if (!playbackMode.shuffle && playbackMode.mode == Player.REPEAT_MODE_OFF) {
+                        tint = if (!state.shuffle && state.mode == Player.REPEAT_MODE_OFF) {
                             Color.LightGray
                         } else {
                             Color.Black
@@ -216,9 +215,6 @@ fun PreviewPlayBar() {
                     mutableStateOf(true)
                 },
                 state = remember {
-                    AmuzicState.INITIAL_STATE
-                },
-                remember {
                     AmuzicState.INITIAL_STATE
                 },
                 onPlayClick = {},

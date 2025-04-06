@@ -1,43 +1,37 @@
 package com.infbyte.amuzic.utils
 
 import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
+import android.provider.Settings
+import android.util.Log
 import android.util.Size
 import androidx.annotation.RequiresApi
-import com.infbyte.amuzic.data.repo.SongsRepo.Companion.ALBUM_PROJECTION
 import java.io.FileNotFoundException
 
-fun ContentResolver.loadThumbnail(albumId: Long): Bitmap? {
-    var path: String? = null
-    val selection = "${MediaStore.Audio.Albums._ID} = ?"
-    val selectionArgs = arrayOf("$albumId")
-    val cursor = this.query(
-        MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-        ALBUM_PROJECTION,
-        selection,
-        selectionArgs,
-        null
-    )
-    cursor?.let {
-        if (it.moveToFirst()) {
-            val albumArtCOLUMN = cursor
-                .getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM_ART)
-            path = cursor.getString(albumArtCOLUMN)
+fun loadThumbnail(path: String): Bitmap? {
+    return try {
+        with(MediaMetadataRetriever()) {
+            setDataSource(path)
+            val imageByteArray = embeddedPicture
+            val bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray?.size!!)
+            Log.d("Utils", path)
+            release()
+            bitmap
         }
-        it.close()
-    }
-    return Uri.parse(path).decodeImage()
+    } catch (_: Exception) { null }
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
 fun ContentResolver.loadThumbnail(uri: Uri): Bitmap? {
     val size = Size(60, 60)
     return try {
-        this.loadThumbnail(
+        loadThumbnail(
             uri,
             size,
             null
@@ -48,3 +42,11 @@ fun ContentResolver.loadThumbnail(uri: Uri): Bitmap? {
 }
 
 fun Uri.decodeImage(): Bitmap? = BitmapFactory.decodeFile(toString())
+
+fun Context.openAppSettings() {
+    val intent = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    )
+    startActivity(intent)
+}

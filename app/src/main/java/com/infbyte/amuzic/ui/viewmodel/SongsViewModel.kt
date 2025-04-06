@@ -51,6 +51,9 @@ data class AmuzicState(
     @RepeatMode val mode: Int = Player.REPEAT_MODE_OFF,
     val shuffle: Boolean = false,
     val isReadPermGranted: Boolean = false,
+    val isTermsAccepted: Boolean = true,
+    val numberOfAudioPermDeclines: Int = 0,
+    val isAudioPermDeclinedPermanently: Boolean = false,
     val hasMusic: Boolean = false,
     val isLoaded: Boolean = false,
     val isRefreshing: Boolean = false
@@ -61,7 +64,9 @@ data class AmuzicState(
 }
 
 data class SideEffect(
-    val showSplash: Boolean = true
+    val showSplash: Boolean = true,
+    val showPrivacyDialog: Boolean = false,
+    val showAppSettingsRedirect: Boolean = false
 )
 
 @HiltViewModel
@@ -245,6 +250,26 @@ class SongsViewModel @Inject constructor(
         state = state.copy(isReadPermGranted = granted)
     }
 
+    fun setTermsAccepted(accepted: Boolean) {
+        state = state.copy(isTermsAccepted = accepted)
+    }
+
+    fun updateAudioPermDeclinedPermanently() {
+        state = with(state) {
+            copy(isAudioPermDeclinedPermanently = numberOfAudioPermDeclines == 2)
+        }
+    }
+
+    fun updateNumberOfAudioPermDeclines() {
+        state = with(state) {
+            if (numberOfAudioPermDeclines == 2) {
+                copy(numberOfAudioPermDeclines = numberOfAudioPermDeclines - 1)
+            } else {
+                copy(numberOfAudioPermDeclines = numberOfAudioPermDeclines + 1)
+            }
+        }
+    }
+
     fun setIsLoaded(loaded: Boolean) {
         state = state.copy(isLoaded = loaded)
     }
@@ -376,10 +401,26 @@ class SongsViewModel @Inject constructor(
         }
     }
 
+    fun showPrivacyDialog() {
+        sideEffect = sideEffect.copy(showPrivacyDialog = true)
+    }
+
+    fun hidePrivacyDialog() {
+        sideEffect = sideEffect.copy(showPrivacyDialog = false)
+    }
+
+    fun showAppSettingsRedirect() {
+        sideEffect = sideEffect.copy(showAppSettingsRedirect = true)
+    }
+
+    fun hideAppSettingsRedirect() {
+        sideEffect = sideEffect.copy(showAppSettingsRedirect = false)
+    }
+
     fun onCloseSplash() {
         viewModelScope.launch {
             if (sideEffect.showSplash) {
-                delay(3_000)
+                delay(1_000)
                 sideEffect = sideEffect.copy(showSplash = false)
             }
         }

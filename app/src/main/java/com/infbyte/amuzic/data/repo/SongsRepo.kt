@@ -82,13 +82,14 @@ class SongsRepo @Inject constructor(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         id
                     )
+                    val path = it.getString(pathColumn)
+
                     val thumbnail =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             contentResolver.loadThumbnail(songUri)
                         } else {
-                            contentResolver.loadThumbnail(albumId)
+                            loadThumbnail(path)
                         }
-                    val path = it.getString(pathColumn)
 
                     val meta = MediaMetadata.Builder()
                         .setAlbumTitle(album)
@@ -103,7 +104,6 @@ class SongsRepo @Inject constructor(
                         .build()
                     val duration = it.getLong(durationColumn)
                     _songs += Song(item, extractFolderName(path), thumbnail, duration)
-                    Log.d("REPO", item.toString())
                 }
 
                 query.close()
@@ -157,8 +157,8 @@ class SongsRepo @Inject constructor(
 
     companion object {
         val ALBUM_PROJECTION = arrayOf(
-            MediaStore.Audio.Artists.Albums.ALBUM_ID,
-            MediaStore.Audio.Artists.Albums.ALBUM_ART
+            MediaStore.Audio.Albums._ID,
+            MediaStore.Audio.Albums.ALBUM_ART
         )
     }
 }

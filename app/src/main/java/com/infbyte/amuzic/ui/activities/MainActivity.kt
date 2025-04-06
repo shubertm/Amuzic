@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -22,13 +24,20 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.MobileAds
 import com.infbyte.amuze.ui.screens.AboutScreen
 import com.infbyte.amuze.ui.screens.LoadingScreen
 import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
 import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
+import com.infbyte.amuzic.contracts.AppSettingsContract
+import com.infbyte.amuzic.data.TERMS_ACCEPTED_KEY
+import com.infbyte.amuzic.data.readBoolean
+import com.infbyte.amuzic.data.writeBoolean
 import com.infbyte.amuzic.playback.AmuzicPlayerService
+import com.infbyte.amuzic.ui.dialogs.PrivacyPolicyDialog
+import com.infbyte.amuzic.ui.dialogs.AppSettingsRedirectDialog
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
 import com.infbyte.amuzic.ui.screens.PlayBar
@@ -37,6 +46,7 @@ import com.infbyte.amuzic.ui.screens.Screens
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
+import com.infbyte.amuzic.utils.AmuzicPermissions.showReqPermRationale
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -52,11 +62,24 @@ class MainActivity : ComponentActivity() {
             songsViewModel.init()
             return@registerForActivityResult
         }
-        songsViewModel.onCloseSplash()
+    }
+
+    private val appSettingsLauncher = registerForActivityResult(
+        AppSettingsContract()
+    ) { isGranted ->
+        songsViewModel.setReadPermGranted(isGranted)
+        if (isGranted) {
+            songsViewModel.init()
+            return@registerForActivityResult
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch {
+            MobileAds.initialize(this@MainActivity)
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -66,10 +89,22 @@ class MainActivity : ComponentActivity() {
 
         if (!songsViewModel.state.isLoaded) {
             songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
-            if (!songsViewModel.state.isReadPermGranted) { launchPermRequest() } else {
-                songsViewModel.init()
-            }
+
+            if (!songsViewModel.state.isReadPermGranted) {
+                lifecycleScope.launch {
+                    readBoolean(TERMS_ACCEPTED_KEY) { accepted ->
+                        songsViewModel.setTermsAccepted(accepted)
+                        if (accepted) {
+                            launchPermRequest()
+                            return@readBoolean
+                        }
+                        songsViewModel.showPrivacyDialog()
+                    }
+                }
+            } else { songsViewModel.init() }
         }
+
+        songsViewModel.onCloseSplash()
 
         installSplashScreen().setKeepOnScreenCondition {
             songsViewModel.sideEffect.showSplash
@@ -82,6 +117,32 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+
+                    if (songsViewModel.sideEffect.showPrivacyDialog) {
+                        PrivacyPolicyDialog(
+                            onAccept = {
+                                songsViewModel.hidePrivacyDialog()
+                                lifecycleScope.launch {
+                                    writeBoolean(TERMS_ACCEPTED_KEY, true)
+                                }
+                            },
+                            onDismiss = {
+                                songsViewModel.hidePrivacyDialog()
+                            }
+                        )
+                        return@Surface
+                    }
+
+                    if (songsViewModel.sideEffect.showAppSettingsRedirect) {
+                        AppSettingsRedirectDialog(
+                            onAccept = {
+                                songsViewModel.hideAppSettingsRedirect()
+                                appSettingsLauncher.launch(packageName)
+                            },
+                            onDismiss = { songsViewModel.hideAppSettingsRedirect() }
+                        )
+                    }
+
                     if (
                         (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
                         songsViewModel.state.isRefreshing
@@ -94,7 +155,19 @@ class MainActivity : ComponentActivity() {
                         NoMediaPermissionScreen(
                             R.drawable.ic_amuzic_intro,
                             R.string.amuzic_listen,
-                            onStartAction = { launchPermRequest() },
+                            onStartAction = {
+                                if (!songsViewModel.state.isTermsAccepted) {
+                                    songsViewModel.showPrivacyDialog()
+                                    return@NoMediaPermissionScreen
+                                }
+
+                                if (!showReqPermRationale()) {
+                                    songsViewModel.showAppSettingsRedirect()
+                                    return@NoMediaPermissionScreen
+                                }
+
+                                launchPermRequest()
+                            },
                             aboutApp = { navigateBack ->
                                 AboutScreen(
                                     stringResource(R.string.app_name),
@@ -163,7 +236,6 @@ class MainActivity : ComponentActivity() {
                     Box(Modifier.fillMaxSize()) {
                         PlayBar(
                             songsViewModel.showPlayBar,
-                            songsViewModel.state,
                             songsViewModel.state,
                             onPlayClick = {
                                 songsViewModel.onPlayClicked()

@@ -35,7 +35,7 @@ fun ArtistsScreen(
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
-        itemsIndexed(artists) { index, artist ->
+        itemsIndexed(artists) { _, artist ->
             Artist(artist) {
                 onArtistClick(artist)
             }

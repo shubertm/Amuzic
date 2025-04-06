@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
+import com.infbyte.amuzic.ui.views.AdView
 import com.infbyte.amuzic.utils.navigationBarsPadding
 import kotlinx.coroutines.launch
 
@@ -114,110 +115,115 @@ fun MainScreen(
             }
         },
         topBar = {
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = {
-                    searchQuery = it
-                    when (pagerState.currentPage) {
-                        0 -> songsViewModel.onSearchSongs(it)
-                        1 -> songsViewModel.onSearchArtists(it)
-                        2 -> songsViewModel.onSearchAlbums(it)
-                    }
-                },
-                onSearch = {},
-                active = songsViewModel.state.isSearching,
-                onActiveChange = {
-                    if (!songsViewModel.state.isSearching) {
-                        searchQuery = ""
-                        songsViewModel.onToggleSearching()
-                    }
-                    when (pagerState.currentPage) {
-                        0 -> songsViewModel.onSearchSongs(searchQuery)
-                        1 -> songsViewModel.onSearchArtists(searchQuery)
-                        2 -> songsViewModel.onSearchAlbums(searchQuery)
-                    }
-                },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-                        end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp
-                    )
-                    .navigationBarsPadding(songsViewModel.state.isSearching)
-                    .focusRequester(searchFocusRequester),
-                trailingIcon = {
-                    Row {
-                        IconButton(
-                            onClick = {
-                                if (!songsViewModel.state.isSearching) {
-                                    songsViewModel.onToggleSearching()
-                                    searchFocusRequester.requestFocus()
-                                }
-                            }
-                        ) {
-                            Icon(Icons.Outlined.Search, "")
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = {
+                        searchQuery = it
+                        when (pagerState.currentPage) {
+                            0 -> songsViewModel.onSearchSongs(it)
+                            1 -> songsViewModel.onSearchArtists(it)
+                            2 -> songsViewModel.onSearchAlbums(it)
                         }
+                    },
+                    onSearch = {},
+                    active = songsViewModel.state.isSearching,
+                    onActiveChange = {
                         if (!songsViewModel.state.isSearching) {
+                            searchQuery = ""
+                            songsViewModel.onToggleSearching()
+                        }
+                        when (pagerState.currentPage) {
+                            0 -> songsViewModel.onSearchSongs(searchQuery)
+                            1 -> songsViewModel.onSearchArtists(searchQuery)
+                            2 -> songsViewModel.onSearchAlbums(searchQuery)
+                        }
+                    },
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                            end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp
+                        )
+                        .navigationBarsPadding(songsViewModel.state.isSearching)
+                        .focusRequester(searchFocusRequester),
+                    trailingIcon = {
+                        Row {
                             IconButton(
                                 onClick = {
-                                    songsViewModel.hidePlayBar()
-                                    showAbout = true
+                                    if (!songsViewModel.state.isSearching) {
+                                        songsViewModel.onToggleSearching()
+                                        searchFocusRequester.requestFocus()
+                                    }
                                 }
                             ) {
-                                Icon(Icons.Outlined.Info, contentDescription = "")
+                                Icon(Icons.Outlined.Search, "")
+                            }
+                            if (!songsViewModel.state.isSearching) {
+                                IconButton(
+                                    onClick = {
+                                        songsViewModel.hidePlayBar()
+                                        showAbout = true
+                                    }
+                                ) {
+                                    Icon(Icons.Outlined.Info, contentDescription = "")
+                                }
                             }
                         }
-                    }
-                },
-                placeholder = { Text(stringResource(R.string.amuzic_search)) }
-            ) {
-                when (pagerState.currentPage) {
-                    0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
-                        com.infbyte.amuze.ui.screens.NoSearchResultScreen()
-                    } else {
-                        SongsScreen(
-                            songs = songsViewModel.state.songsSearchResult,
-                            onScroll = { scrollValue ->
-                                songsViewModel.togglePlayBarByScroll(scrollValue)
-                            },
-                            onSongClick = { songIndex ->
-                                searchQuery = ""
-                                songsViewModel.onSongClicked(songIndex)
-                                songsViewModel.onToggleSearching()
-                            }
-                        )
-                    }
+                    },
+                    placeholder = { Text(stringResource(R.string.amuzic_search)) }
+                ) {
+                    when (pagerState.currentPage) {
+                        0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
+                            com.infbyte.amuze.ui.screens.NoSearchResultScreen()
+                        } else {
+                            SongsScreen(
+                                songs = songsViewModel.state.songsSearchResult,
+                                onScroll = { scrollValue ->
+                                    songsViewModel.togglePlayBarByScroll(scrollValue)
+                                },
+                                onSongClick = { songIndex ->
+                                    searchQuery = ""
+                                    songsViewModel.onSongClicked(songIndex)
+                                    songsViewModel.onToggleSearching()
+                                }
+                            )
+                        }
 
-                    1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
-                        com.infbyte.amuze.ui.screens.NoSearchResultScreen()
-                    } else {
-                        ArtistsScreen(
-                            artists = songsViewModel.state.artistsSearchResult,
-                            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                            onArtistClick = { artist ->
-                                searchQuery = ""
-                                songsViewModel.onToggleSearching()
-                                songsViewModel.onArtistClicked(artist)
-                                onNavigate(Screens.SONGS)
-                            }
-                        )
-                    }
+                        1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
+                            com.infbyte.amuze.ui.screens.NoSearchResultScreen()
+                        } else {
+                            ArtistsScreen(
+                                artists = songsViewModel.state.artistsSearchResult,
+                                onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                                onArtistClick = { artist ->
+                                    searchQuery = ""
+                                    songsViewModel.onToggleSearching()
+                                    songsViewModel.onArtistClicked(artist)
+                                    onNavigate(Screens.SONGS)
+                                }
+                            )
+                        }
 
-                    2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
-                        com.infbyte.amuze.ui.screens.NoSearchResultScreen()
-                    } else {
-                        AlbumsScreen(
-                            albums = songsViewModel.state.albumsSearchResult,
-                            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                            onAlbumClicked = { album ->
-                                searchQuery = ""
-                                songsViewModel.onToggleSearching()
-                                songsViewModel.onAlbumClicked(album)
-                                onNavigate(Screens.SONGS)
-                            }
-                        )
+                        2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
+                            com.infbyte.amuze.ui.screens.NoSearchResultScreen()
+                        } else {
+                            AlbumsScreen(
+                                albums = songsViewModel.state.albumsSearchResult,
+                                onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                                onAlbumClicked = { album ->
+                                    searchQuery = ""
+                                    songsViewModel.onToggleSearching()
+                                    songsViewModel.onAlbumClicked(album)
+                                    onNavigate(Screens.SONGS)
+                                }
+                            )
+                        }
                     }
                 }
+                AdView()
             }
         }
     ) { paddingValues ->

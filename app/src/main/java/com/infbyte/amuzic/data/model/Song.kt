@@ -13,6 +13,8 @@ data class Song(
     val title = item.mediaMetadata.title.toString()
     val artist = item.mediaMetadata.artist.toString()
     val album = item.mediaMetadata.albumTitle.toString()
+    val uri = item.requestMetadata.mediaUri
+    val id = item.mediaId
 
     companion object {
         val EMPTY = Song()

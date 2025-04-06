@@ -41,6 +41,8 @@ android {
 
     buildTypes {
         debug {
+            resValue("string", "banner_ad_unit_id", "ca-app-pub-3940256099942544/9214589741")
+
             manifestPlaceholders = [
                 appIcon: "@mipmap/ic_amuzic_debug",
                 appRoundIcon: "@mipmap/ic_amuzic_debug_round",
@@ -50,6 +52,8 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
+
+            resValue("string", "banner_ad_unit_id", System.getenv("BANNER_AD_UNIT_ID") ?: "")
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
@@ -108,12 +112,16 @@ dependencies {
     implementation "androidx.media3:media3-common:1.3.1"
     implementation 'androidx.media3:media3-session:1.3.1'
 
-    implementation "com.infbyte:amuze:0.2.1"
+    implementation "com.infbyte:amuze:0.2.2"
 
     implementation 'com.google.dagger:hilt-android:2.55'
     kapt 'com.google.dagger:hilt-compiler:2.55'
 
     ktlint("com.pinterest:ktlint:0.47.1")
+
+    implementation("com.google.android.gms:play-services-ads:24.1.0")
+
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
