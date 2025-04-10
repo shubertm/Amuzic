@@ -16,11 +16,10 @@
         android:icon="${appIcon}"
         android:label="${appName}"
         android:roundIcon="${appRoundIcon}"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:theme="@style/Theme.Amuzic"
         android:supportsRtl="true">
         <activity
             android:name=".ui.activities.MainActivity"
-            android:theme="@style/Theme.Amuzic"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

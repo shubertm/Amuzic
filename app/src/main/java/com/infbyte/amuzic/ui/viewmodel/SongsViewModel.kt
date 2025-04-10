@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 data class AmuzicState(
@@ -415,14 +416,5 @@ class SongsViewModel @Inject constructor(
 
     fun hideAppSettingsRedirect() {
         sideEffect = sideEffect.copy(showAppSettingsRedirect = false)
-    }
-
-    fun onCloseSplash() {
-        viewModelScope.launch {
-            if (sideEffect.showSplash) {
-                delay(1_000)
-                sideEffect = sideEffect.copy(showSplash = false)
-            }
-        }
     }
 }

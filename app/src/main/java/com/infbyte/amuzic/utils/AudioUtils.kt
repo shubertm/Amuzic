@@ -9,7 +9,6 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import android.util.Size
 import androidx.annotation.RequiresApi
 import java.io.FileNotFoundException
@@ -20,7 +19,6 @@ fun loadThumbnail(path: String): Bitmap? {
             setDataSource(path)
             val imageByteArray = embeddedPicture
             val bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray?.size!!)
-            Log.d("Utils", path)
             release()
             bitmap
         }

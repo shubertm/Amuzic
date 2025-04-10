@@ -25,7 +25,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
-import com.google.android.ump.ConsentInformation
 import com.infbyte.amuze.ui.screens.AboutScreen
 import com.infbyte.amuze.ui.screens.LoadingScreen
 import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
@@ -85,6 +84,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         googleMobileAdsConsentManager = GoogleMobileAdsConsentManager(this)
@@ -120,12 +120,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             } else { songsViewModel.init() }
-        }
-
-        songsViewModel.onCloseSplash()
-
-        installSplashScreen().setKeepOnScreenCondition {
-            songsViewModel.sideEffect.showSplash
         }
 
         setContent {
