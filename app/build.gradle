@@ -6,6 +6,16 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+Properties properties = new Properties()
+properties.load(rootProject.file("local.properties").newDataInputStream())
+
+def testBannerAdUnitId = properties.getProperty("test.banner.ad.unit.id")
+def bannerAdUnitId = properties.getProperty("banner.ad.unit.id")
+def admobAppId = properties.getProperty("admob.app.id")
+def amuzicKeyAlias = properties.getProperty("key.alias")
+def signingKeyStorePass = properties.getProperty("key.store.pass")
+def keyPass = properties.getProperty("key.pass")
+
 configurations {
     ktlint
 }
@@ -31,9 +41,9 @@ android {
     signingConfigs {
         release {
             storeFile file("amuzic_release_keystore.jks")
-            storePassword System.getenv("SIGNING_KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
+            storePassword System.getenv("SIGNING_KEYSTORE_PASSWORD") ?: signingKeyStorePass
+            keyAlias System.getenv("KEY_ALIAS") ?: amuzicKeyAlias
+            keyPassword System.getenv("KEY_PASSWORD") ?: keyPass
             v1SigningEnabled true
             v2SigningEnabled true
         }
@@ -41,7 +51,8 @@ android {
 
     buildTypes {
         debug {
-            resValue("string", "banner_ad_unit_id", "ca-app-pub-3940256099942544/9214589741")
+            resValue("string", "banner_ad_unit_id", System.getenv("TEST_BANNER_AD_UNIT_ID") ?: "$testBannerAdUnitId")
+            resValue("string", "admob_app_id", System.getenv("ADMOB_APP_ID") ?: "$admobAppId")
 
             manifestPlaceholders = [
                 appIcon: "@mipmap/ic_amuzic_debug",
@@ -53,7 +64,8 @@ android {
             minifyEnabled true
             shrinkResources true
 
-            resValue("string", "banner_ad_unit_id", System.getenv("BANNER_AD_UNIT_ID") ?: "")
+            resValue("string", "admob_app_id", System.getenv("ADMOB_APP_ID") ?: "$admobAppId")
+            resValue("string", "banner_ad_unit_id", System.getenv("BANNER_AD_UNIT_ID") ?: "$bannerAdUnitId")
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 

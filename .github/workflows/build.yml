@@ -21,6 +21,9 @@ jobs:
               uses: gradle/actions/wrapper-validation@v3
 
             - name: Build Debug APK
+              env:
+                  TEST_BANNER_AD_UNIT_ID: ${{ secrets.TEST_BANNER_AD_UNIT_ID }}
+                  ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
               run: |
                   echo ${{ github.workspace }}
                   ./gradlew assembleDebug
