@@ -7,7 +7,10 @@ plugins {
 }
 
 Properties properties = new Properties()
-properties.load(rootProject.file("local.properties").newDataInputStream())
+File propertiesFile = rootProject.file("local.properties")
+if (propertiesFile.exists()) {
+    properties.load(propertiesFile.newDataInputStream())
+}
 
 def testBannerAdUnitId = properties.getProperty("test.banner.ad.unit.id")
 def bannerAdUnitId = properties.getProperty("banner.ad.unit.id")
