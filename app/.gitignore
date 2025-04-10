@@ -1,2 +1,6 @@
 /build
 *.jks
+*.aab
+*.apk
+/libs
+/release/screenshots/app_store_custom

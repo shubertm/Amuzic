@@ -25,10 +25,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
+import com.google.android.ump.ConsentInformation
 import com.infbyte.amuze.ui.screens.AboutScreen
 import com.infbyte.amuze.ui.screens.LoadingScreen
 import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
 import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
+import com.infbyte.amuze.utils.GoogleMobileAdsConsentManager
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AppSettingsContract
@@ -48,10 +50,17 @@ import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
 import com.infbyte.amuzic.utils.AmuzicPermissions.showReqPermRationale
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val isMobileAdsInitialized = AtomicBoolean(false)
+
+    private lateinit var googleMobileAdsConsentManager: GoogleMobileAdsConsentManager
+
     private val songsViewModel: SongsViewModel by viewModels()
 
     private val permissionLauncher = registerForActivityResult(
@@ -59,6 +68,7 @@ class MainActivity : ComponentActivity() {
     ) { isGranted ->
         songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
+
             songsViewModel.init()
             return@registerForActivityResult
         }
@@ -77,8 +87,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
-            MobileAds.initialize(this@MainActivity)
+        googleMobileAdsConsentManager = GoogleMobileAdsConsentManager(this)
+
+        googleMobileAdsConsentManager.checkConsent(this) {
+            if (googleMobileAdsConsentManager.canRequestAds) {
+                initMobileAds()
+            }
+        }
+
+        if (googleMobileAdsConsentManager.canRequestAds) {
+            initMobileAds()
         }
 
         lifecycleScope.launch {
@@ -174,6 +192,7 @@ class MainActivity : ComponentActivity() {
                                     BuildConfig.VERSION_NAME,
                                     R.drawable.ic_amuzic_foreground,
                                     R.string.amuzic_privacy_policy_link,
+                                    adsConsentManager = googleMobileAdsConsentManager,
                                     onNavigateBack = { navigateBack() }
                                 )
                             },
@@ -200,6 +219,7 @@ class MainActivity : ComponentActivity() {
                                     BuildConfig.VERSION_NAME,
                                     R.drawable.ic_amuzic_foreground,
                                     R.string.amuzic_privacy_policy_link,
+                                    adsConsentManager = googleMobileAdsConsentManager,
                                     onNavigateBack = { navigateBack() }
                                 )
                             }
@@ -219,6 +239,7 @@ class MainActivity : ComponentActivity() {
                                         BuildConfig.VERSION_NAME,
                                         R.drawable.ic_amuzic_foreground,
                                         R.string.amuzic_privacy_policy_link,
+                                        adsConsentManager = googleMobileAdsConsentManager,
                                         onNavigateBack = { navigateBack() }
                                     )
                                 }
@@ -289,6 +310,13 @@ class MainActivity : ComponentActivity() {
         permissionLauncher.launch(
             Manifest.permission.READ_MEDIA_AUDIO
         )
+    }
+
+    private fun initMobileAds() {
+        if (isMobileAdsInitialized.getAndSet(true)) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            MobileAds.initialize(this@MainActivity)
+        }
     }
 
     private fun onExit() {
