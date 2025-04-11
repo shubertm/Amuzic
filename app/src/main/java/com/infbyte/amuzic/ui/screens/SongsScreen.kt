@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.utils.accommodateFullBannerAds
 import com.infbyte.amuzic.utils.calcScroll
 import com.infbyte.amuzic.utils.getInitialChar
 
@@ -37,13 +37,13 @@ import com.infbyte.amuzic.utils.getInitialChar
 fun SongsScreen(
     songs: List<Song>,
     onScroll: (Int) -> Unit,
-    onSongClick: (Int) -> Unit
+    onSongClick: (Song) -> Unit
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
-        itemsIndexed(songs) { index, song ->
+        accommodateFullBannerAds(songs, showOnTopWithFewItems = false) { song ->
             Song(song) {
-                onSongClick(index)
+                onSongClick(song)
             }
         }
     }

@@ -12,10 +12,10 @@ import com.google.android.gms.ads.AdView
 import com.infbyte.amuzic.R
 
 @Composable
-fun AdView() {
+fun BannerAdView() {
     val adRequest = AdRequest.Builder().build()
     Box(
-        Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
+        Modifier.padding(top = 8.dp)
     ) {
         AndroidView(
             factory = { context ->

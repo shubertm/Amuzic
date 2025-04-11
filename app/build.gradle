@@ -14,6 +14,7 @@ if (propertiesFile.exists()) {
 
 def testBannerAdUnitId = properties.getProperty("test.banner.ad.unit.id")
 def bannerAdUnitId = properties.getProperty("banner.ad.unit.id")
+def banner1AdUnitId = properties.getProperty("banner.1.ad.unit.id")
 def admobAppId = properties.getProperty("admob.app.id")
 def amuzicKeyAlias = properties.getProperty("key.alias")
 def signingKeyStorePass = properties.getProperty("key.store.pass")
@@ -55,6 +56,7 @@ android {
     buildTypes {
         debug {
             resValue("string", "banner_ad_unit_id", System.getenv("TEST_BANNER_AD_UNIT_ID") ?: "$testBannerAdUnitId")
+            resValue("string", "banner_1_ad_unit_id", System.getenv("TEST_BANNER_AD_UNIT_ID") ?: "$testBannerAdUnitId")
             resValue("string", "admob_app_id", System.getenv("ADMOB_APP_ID") ?: "$admobAppId")
 
             manifestPlaceholders = [
@@ -69,6 +71,7 @@ android {
 
             resValue("string", "admob_app_id", System.getenv("ADMOB_APP_ID") ?: "$admobAppId")
             resValue("string", "banner_ad_unit_id", System.getenv("BANNER_AD_UNIT_ID") ?: "$bannerAdUnitId")
+            resValue("string", "banner_1_ad_unit_id", System.getenv("BANNER_1_AD_UNIT_ID") ?: "$banner1AdUnitId")
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 

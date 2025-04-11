@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.data.model.Album
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.utils.accommodateFullBannerAds
 import com.infbyte.amuzic.utils.calcScroll
 import com.infbyte.amuzic.utils.getInitialChar
 
@@ -35,7 +35,7 @@ fun AlbumsScreen(
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
-        items(albums) { album ->
+        accommodateFullBannerAds(albums, showOnTopWithFewItems = false) { album ->
             Album(album) {
                 onAlbumClicked(album)
             }

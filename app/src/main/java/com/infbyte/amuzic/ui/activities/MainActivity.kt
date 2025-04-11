@@ -271,8 +271,8 @@ class MainActivity : ComponentActivity() {
                         PlayListScreen(
                             show = songsViewModel.state.showPlayList,
                             songs = songsViewModel.state.currentPlaylist,
-                            onSongClick = { songIndex ->
-                                songsViewModel.onSongClicked(songIndex)
+                            onSongClick = { song ->
+                                songsViewModel.onSongClicked(song)
                             }
                         )
                     }

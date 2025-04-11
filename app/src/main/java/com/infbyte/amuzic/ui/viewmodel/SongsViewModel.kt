@@ -107,18 +107,18 @@ class SongsViewModel @Inject constructor(
         }
     }
 
-    fun onSongClicked(index: Int) {
+    fun onSongClicked(song: Song) {
         state.apply {
-            val song = if (isSearching) {
-                songsSearchResult[index]
-            } else {
-                songs[index]
-            }
-            val actualIndex = if (isSearching) {
+//            val song = if (isSearching) {
+            //        songsSearchResult[index]
+            //          } else {
+            //            songs[index]
+            //      }
+            val actualIndex = // if (isSearching) {
                 songs.indexOf(song)
-            } else {
-                index
-            }
+            // } else {
+            //  index
+            // }
             if (currentSong != song) {
                 state = copy(currentSong = song, currentPlaylist = songs)
                 amuzicPlayer.createPlayList(songs.map { it.item })

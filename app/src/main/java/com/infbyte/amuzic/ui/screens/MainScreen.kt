@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
-import com.infbyte.amuzic.ui.views.AdView
+import com.infbyte.amuzic.ui.views.BannerAdView
 import com.infbyte.amuzic.utils.navigationBarsPadding
 import kotlinx.coroutines.launch
 
@@ -184,9 +184,9 @@ fun MainScreen(
                                 onScroll = { scrollValue ->
                                     songsViewModel.togglePlayBarByScroll(scrollValue)
                                 },
-                                onSongClick = { songIndex ->
+                                onSongClick = { song ->
                                     searchQuery = ""
-                                    songsViewModel.onSongClicked(songIndex)
+                                    songsViewModel.onSongClicked(song)
                                     songsViewModel.onToggleSearching()
                                 }
                             )
@@ -223,7 +223,7 @@ fun MainScreen(
                         }
                     }
                 }
-                AdView()
+                BannerAdView()
             }
         }
     ) { paddingValues ->
@@ -245,8 +245,8 @@ fun MainScreen(
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },
-                        onSongClick = { songIndex ->
-                            songsViewModel.onSongClicked(songIndex)
+                        onSongClick = { song ->
+                            songsViewModel.onSongClicked(song)
                         }
                     )
                 }

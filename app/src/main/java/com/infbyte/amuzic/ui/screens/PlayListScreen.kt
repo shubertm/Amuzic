@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -21,12 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.utils.accommodateFullBannerAds
 
 @Composable
 fun BoxScope.PlayListScreen(
     show: Boolean,
     songs: List<Song>,
-    onSongClick: (Int) -> Unit
+    onSongClick: (Song) -> Unit
 ) {
     AnimatedVisibility(
         visible = show,
@@ -45,11 +45,41 @@ fun BoxScope.PlayListScreen(
                     RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                 )
         ) {
-            itemsIndexed(songs) { index, song ->
+            accommodateFullBannerAds(songs) { song ->
                 Song(song) {
-                    onSongClick(index)
+                    onSongClick(song)
                 }
             }
+
+            /* if (songs.size > 9) {
+                val numberOfGroups = songs.size / 9
+                var remainingSongs = songs
+
+                for (group in 0..numberOfGroups) {
+                    items(remainingSongs.take(9)) { song ->
+                        Song(song) {
+                            onSongClick(song)
+                        }
+                    }
+                    if (remainingSongs.isNotEmpty()) {
+                        if (remainingSongs.size >= 9) {
+                            item {
+                                FullBannerAdView()
+                            }
+                        }
+                        remainingSongs = remainingSongs.drop(9)
+                    }
+                }
+                return@LazyColumn
+            }
+            item {
+                FullBannerAdView()
+            }
+            items(songs) { song ->
+                Song(song) {
+                    onSongClick(song)
+                }
+            }*/
         }
     }
 }
