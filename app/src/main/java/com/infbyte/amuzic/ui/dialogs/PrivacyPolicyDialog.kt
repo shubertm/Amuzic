@@ -65,7 +65,6 @@ fun PrivacyPolicyDialog(
                 annotatedString,
                 Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 style = MaterialTheme.typography.bodySmall
-
             )
         }
     }

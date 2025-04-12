@@ -11,10 +11,10 @@ interface AmuzicPlayer {
     val currentSong: MediaItem
 
     var onTransition: (Int, Float) -> Unit
+    var sendIsPlaying: (Boolean) -> Unit
+    var sendProgress: (Float) -> Unit
 
     fun initController(context: Context)
-
-    fun releaseControllerFuture()
 
     fun selectSong(index: Int, position: Long)
 

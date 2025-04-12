@@ -1,8 +1,6 @@
 package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -10,10 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.util.fastFirst
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.RepeatMode
 import com.infbyte.amuzic.data.model.Album
@@ -52,8 +48,6 @@ data class AmuzicState(
     val shuffle: Boolean = false,
     val isReadPermGranted: Boolean = false,
     val isTermsAccepted: Boolean = true,
-    val numberOfAudioPermDeclines: Int = 0,
-    val isAudioPermDeclinedPermanently: Boolean = false,
     val hasMusic: Boolean = false,
     val isLoaded: Boolean = false,
     val isRefreshing: Boolean = false
@@ -90,13 +84,23 @@ class SongsViewModel @Inject constructor(
 
     private var playBarDelayJob: Job? = null
 
-    fun init() {
-        loadSongs()
-        startProgressMonitor()
+    init {
+        amuzicPlayer.onTransition = { index, duration ->
+            state = with(state) {
+                copy(currentSong = songs[index], songDuration = duration)
+            }
+        }
+        amuzicPlayer.sendIsPlaying = { isPlaying ->
+            state = state.copy(isPlaying = isPlaying)
+        }
+        amuzicPlayer.sendProgress = { progress ->
+            state = state.copy(progress = progress)
+        }
     }
 
-    fun refreshController(context: Context) {
-        amuzicPlayer.initController(context)
+    fun init(context: Context) {
+        refreshController(context)
+        loadSongs()
     }
 
     fun confirmExit() {
@@ -109,16 +113,7 @@ class SongsViewModel @Inject constructor(
 
     fun onSongClicked(song: Song) {
         state.apply {
-//            val song = if (isSearching) {
-            //        songsSearchResult[index]
-            //          } else {
-            //            songs[index]
-            //      }
-            val actualIndex = // if (isSearching) {
-                songs.indexOf(song)
-            // } else {
-            //  index
-            // }
+            val actualIndex = songs.indexOf(song)
             if (currentSong != song) {
                 state = copy(currentSong = song, currentPlaylist = songs)
                 amuzicPlayer.createPlayList(songs.map { it.item })
@@ -254,30 +249,6 @@ class SongsViewModel @Inject constructor(
         state = state.copy(isTermsAccepted = accepted)
     }
 
-    fun updateAudioPermDeclinedPermanently() {
-        state = with(state) {
-            copy(isAudioPermDeclinedPermanently = numberOfAudioPermDeclines == 2)
-        }
-    }
-
-    fun updateNumberOfAudioPermDeclines() {
-        state = with(state) {
-            if (numberOfAudioPermDeclines == 2) {
-                copy(numberOfAudioPermDeclines = numberOfAudioPermDeclines - 1)
-            } else {
-                copy(numberOfAudioPermDeclines = numberOfAudioPermDeclines + 1)
-            }
-        }
-    }
-
-    fun setIsLoaded(loaded: Boolean) {
-        state = state.copy(isLoaded = loaded)
-    }
-
-    fun setHasNoMusic(hasNoMusic: Boolean) {
-        state = state.copy(hasMusic = hasNoMusic)
-    }
-
     fun setIsRefreshing(isRefreshing: Boolean) {
         state = state.copy(isRefreshing = isRefreshing)
     }
@@ -286,8 +257,20 @@ class SongsViewModel @Inject constructor(
         amuzicPlayer.releasePlayer()
     }
 
-    fun releaseMediaControllerFuture() {
-        amuzicPlayer.releaseControllerFuture()
+    fun showPrivacyDialog() {
+        sideEffect = sideEffect.copy(showPrivacyDialog = true)
+    }
+
+    fun hidePrivacyDialog() {
+        sideEffect = sideEffect.copy(showPrivacyDialog = false)
+    }
+
+    fun showAppSettingsRedirect() {
+        sideEffect = sideEffect.copy(showAppSettingsRedirect = true)
+    }
+
+    fun hideAppSettingsRedirect() {
+        sideEffect = sideEffect.copy(showAppSettingsRedirect = false)
     }
 
     private fun showAndDelayHidePlayBar() {
@@ -324,35 +307,6 @@ class SongsViewModel @Inject constructor(
                 delay(10000)
                 boolState.value = false
             }
-        }
-    }
-
-    private fun startProgressMonitor() {
-        val progressHandler = Handler(Looper.getMainLooper())
-        val progressUpdateRunnable = object : Runnable {
-            override fun run() {
-                progressHandler.removeCallbacks(this)
-                if (amuzicPlayer.isActive()) {
-                    val progress = amuzicPlayer.progress().coerceAtLeast(0f)
-                    val duration = amuzicPlayer.duration().coerceAtLeast(0f)
-                    state = state.copy(progress = progress / duration)
-                }
-                val currentSong = amuzicPlayer.currentSong.currentSongById()
-                state = state.copy(
-                    isPlaying = amuzicPlayer.isActive(),
-                    currentSong = if (currentSong == Song.EMPTY) state.currentSong else currentSong
-                )
-                progressHandler.postDelayed(this, 200)
-            }
-        }
-        progressHandler.postDelayed(progressUpdateRunnable, 200)
-    }
-
-    private fun MediaItem.currentSongById(): Song {
-        return try {
-            state.currentPlaylist.fastFirst { this == it.item }
-        } catch (e: Exception) {
-            Song.EMPTY
         }
     }
 
@@ -401,19 +355,7 @@ class SongsViewModel @Inject constructor(
         }
     }
 
-    fun showPrivacyDialog() {
-        sideEffect = sideEffect.copy(showPrivacyDialog = true)
-    }
-
-    fun hidePrivacyDialog() {
-        sideEffect = sideEffect.copy(showPrivacyDialog = false)
-    }
-
-    fun showAppSettingsRedirect() {
-        sideEffect = sideEffect.copy(showAppSettingsRedirect = true)
-    }
-
-    fun hideAppSettingsRedirect() {
-        sideEffect = sideEffect.copy(showAppSettingsRedirect = false)
+    private fun refreshController(context: Context) {
+        amuzicPlayer.initController(context)
     }
 }

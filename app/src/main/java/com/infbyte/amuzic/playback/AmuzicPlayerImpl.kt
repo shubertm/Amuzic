@@ -2,6 +2,7 @@ package com.infbyte.amuzic.playback
 
 import android.content.ComponentName
 import android.content.Context
+import android.icu.util.Calendar
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
@@ -9,9 +10,15 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.util.Timer
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import javax.inject.Inject
+import kotlin.concurrent.timer
 
 class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
 
@@ -24,13 +31,40 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
 
     override var onTransition: (Int, Float) -> Unit = { _, _ -> }
 
+    override var sendIsPlaying: (Boolean) -> Unit = { _ -> }
+
+    override var sendProgress: (Float) -> Unit = { _ -> }
+
+    private var timer: Timer? = null
+
+    private val mediaControllerFutureListener: Runnable = Runnable {
+        try {
+            mediaController = mediaControllerFuture.get()
+            mediaController?.addListener(listener)
+            mediaController?.prepare()
+        } catch (e: CancellationException) {
+            Log.d(LOG_TAG, "Failed to initialize media controller, initialization was cancelled")
+        } catch (e: ExecutionException) {
+            Log.d(LOG_TAG, "Failed to initialize media controller with exception ${e.printStackTrace()}")
+        } catch (e: InterruptedException) {
+            Log.d(LOG_TAG, "Failed to initialize media controller, initialization was interrupted")
+        }
+    }
+
     private val listener: Player.Listener = object : Player.Listener {
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            sendIsPlaying(isPlaying)
+            startTimer()
+        }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
             mediaController?.run {
                 if (mediaItem != null) {
                     onTransition(currentMediaItemIndex, duration.toFloat())
+                    sendProgress(0f)
                 }
             }
         }
@@ -42,27 +76,9 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
         mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
 
         mediaControllerFuture.addListener(
-            {
-                try {
-                    mediaController = mediaControllerFuture.get()
-                    mediaController?.addListener(listener)
-                    mediaController?.prepare()
-                } catch (e: CancellationException) {
-                    Log.d(LOG_TAG, "Failed to initialize media controller, initialization was cancelled")
-                } catch (e: ExecutionException) {
-                    Log.d(LOG_TAG, "Failed to initialize media controller with exception ${e.printStackTrace()}")
-                } catch (e: InterruptedException) {
-                    Log.d(LOG_TAG, "Failed to initialize media controller, initialization was interrupted")
-                }
-            },
+            mediaControllerFutureListener,
             ContextCompat.getMainExecutor(context)
         )
-    }
-
-    override fun releaseControllerFuture() {
-        mediaController?.removeListener(listener)
-        MediaController.releaseFuture(mediaControllerFuture)
-        mediaController = null
     }
 
     override fun createPlayList(songs: List<MediaItem>) {
@@ -136,11 +152,41 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
             release()
             removeListener(listener)
         }
+        releaseControllerFuture()
         mediaController = null
     }
 
     override fun areSongsAvailable(): Boolean {
         return mediaController?.run { mediaItemCount > 0 } ?: false
+    }
+
+    private fun startTimer() {
+        stopTimer()
+        timer = timer(startAt = Calendar.getInstance().time, period = 10L) {
+            runBlocking {
+                launch(Dispatchers.Main) {
+                    val progress = progress().coerceAtLeast(0f) / duration()
+                    if (progress.isNaN()) {
+                        return@launch
+                    }
+                    sendProgress(progress)
+                    if (!isActive()) {
+                        stopTimer()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun stopTimer() {
+        if (timer != null) {
+            timer?.cancel()
+            timer = null
+        }
+    }
+
+    private fun releaseControllerFuture() {
+        MediaController.releaseFuture(mediaControllerFuture)
     }
 
     companion object {

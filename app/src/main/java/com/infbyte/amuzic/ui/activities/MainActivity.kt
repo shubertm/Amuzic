@@ -13,14 +13,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -68,7 +64,7 @@ class MainActivity : ComponentActivity() {
         songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
 
-            songsViewModel.init()
+            songsViewModel.init(this)
             return@registerForActivityResult
         }
     }
@@ -78,7 +74,7 @@ class MainActivity : ComponentActivity() {
     ) { isGranted ->
         songsViewModel.setReadPermGranted(isGranted)
         if (isGranted) {
-            songsViewModel.init()
+            songsViewModel.init(this)
             return@registerForActivityResult
         }
     }
@@ -99,12 +95,6 @@ class MainActivity : ComponentActivity() {
             initMobileAds()
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                songsViewModel.refreshController(this@MainActivity)
-            }
-        }
-
         if (!songsViewModel.state.isLoaded) {
             songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
 
@@ -119,7 +109,9 @@ class MainActivity : ComponentActivity() {
                         songsViewModel.showPrivacyDialog()
                     }
                 }
-            } else { songsViewModel.init() }
+            } else {
+                songsViewModel.init(this)
+            }
         }
 
         setContent {
@@ -203,7 +195,7 @@ class MainActivity : ComponentActivity() {
                                     launchPermRequest()
                                 } else {
                                     songsViewModel.setIsRefreshing(true)
-                                    songsViewModel.init()
+                                    songsViewModel.init(this)
                                 }
                             },
                             onExit = { onExit() },
@@ -281,16 +273,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        songsViewModel.releaseMediaControllerFuture()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         if (isFinishing) {
-            stopService(Intent(this, AmuzicPlayerService::class.java))
             songsViewModel.onExit()
+            stopService(Intent(this, AmuzicPlayerService::class.java))
         }
     }
 

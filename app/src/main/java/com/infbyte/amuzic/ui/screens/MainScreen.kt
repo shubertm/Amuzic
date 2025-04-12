@@ -1,10 +1,8 @@
 package com.infbyte.amuzic.ui.screens
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -60,9 +58,6 @@ fun MainScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val searchFocusRequester = remember {
         FocusRequester()
-    }
-    var paddingValuesFromScaffold by remember {
-        mutableStateOf(PaddingValues())
     }
 
     if (showAbout) {
@@ -275,7 +270,6 @@ fun MainScreen(
                 songsViewModel.onTogglePlayList(false)
                 return@BackHandler
             }
-            Log.d("MainScreen", "${songsViewModel.state.isSearching}")
 
             if (songsViewModel.state.isSearching) {
                 songsViewModel.onToggleSearching()
