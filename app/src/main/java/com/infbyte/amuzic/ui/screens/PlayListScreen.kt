@@ -50,36 +50,6 @@ fun BoxScope.PlayListScreen(
                     onSongClick(song)
                 }
             }
-
-            /* if (songs.size > 9) {
-                val numberOfGroups = songs.size / 9
-                var remainingSongs = songs
-
-                for (group in 0..numberOfGroups) {
-                    items(remainingSongs.take(9)) { song ->
-                        Song(song) {
-                            onSongClick(song)
-                        }
-                    }
-                    if (remainingSongs.isNotEmpty()) {
-                        if (remainingSongs.size >= 9) {
-                            item {
-                                FullBannerAdView()
-                            }
-                        }
-                        remainingSongs = remainingSongs.drop(9)
-                    }
-                }
-                return@LazyColumn
-            }
-            item {
-                FullBannerAdView()
-            }
-            items(songs) { song ->
-                Song(song) {
-                    onSongClick(song)
-                }
-            }*/
         }
     }
 }
