@@ -29,6 +29,7 @@ jobs:
 
             - name: Release APK
               env:
+                  VERSION_NAME: $(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -45,6 +46,7 @@ jobs:
 
             - name: Release AAB
               env:
+                  VERSION_NAME: $(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}

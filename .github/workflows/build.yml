@@ -27,6 +27,7 @@ jobs:
 
             - name: Build Debug APK
               env:
+                  VERSION_NAME: ${{ github.ref_name }}-debug
                   TEST_BANNER_AD_UNIT_ID: ${{ secrets.TEST_BANNER_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
               run: |
@@ -34,6 +35,7 @@ jobs:
 
             - name: Release APK
               env:
+                  VERSION_NAME: ${{ github.ref_name }}-rc
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}

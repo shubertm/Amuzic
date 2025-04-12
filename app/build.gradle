@@ -19,6 +19,7 @@ def admobAppId = properties.getProperty("admob.app.id")
 def amuzicKeyAlias = properties.getProperty("key.alias")
 def signingKeyStorePass = properties.getProperty("key.store.pass")
 def keyPass = properties.getProperty("key.pass")
+def localVersion = properties.getProperty("local.version")
 
 configurations {
     ktlint
@@ -34,7 +35,7 @@ android {
         minSdk 24
         targetSdk 35
         versionCode 1
-        versionName "1.0.0"
+        versionName System.getenv("VERSION_NAME") ?: localVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
