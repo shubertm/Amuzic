@@ -36,8 +36,8 @@ jobs:
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
               run: |
-                  export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
-                 ./gradlew assembleRelease
+                export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
+                ./gradlew assembleRelease
 
             - name: Upload APK
               uses: actions/upload-artifact@v4
@@ -54,8 +54,8 @@ jobs:
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
               run: |
-                  export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
-                  ./gradlew bundleRelease
+                export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
+                ./gradlew bundleRelease
 
             - name: Upload AAB
               uses: actions/upload-artifact@v4
