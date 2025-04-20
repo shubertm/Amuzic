@@ -87,7 +87,7 @@ class SongsViewModel @Inject constructor(
     init {
         amuzicPlayer.onTransition = { index, duration ->
             state = with(state) {
-                copy(currentSong = songs[index], songDuration = duration)
+                copy(currentSong = currentPlaylist[index], songDuration = duration)
             }
         }
         amuzicPlayer.sendIsPlaying = { isPlaying ->

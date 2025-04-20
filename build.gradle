@@ -10,7 +10,3 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose' version '2.1.10' apply false
     id 'com.google.dagger.hilt.android' version '2.55' apply false
 }
-
-tasks.register('clean', Delete) {
-    delete rootProject.buildDir('./')
-}
