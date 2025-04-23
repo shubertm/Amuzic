@@ -61,6 +61,7 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
+
             mediaController?.run {
                 if (mediaItem != null) {
                     onTransition(currentMediaItemIndex, duration.toFloat())
@@ -82,27 +83,13 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
     }
 
     override fun createPlayList(songs: List<MediaItem>) {
-        mediaController?.run { setMediaItems(songs, false) }
-    }
+        mediaController?.run { setMediaItems(songs) }
 
-    override fun updatePlayList(songs: List<MediaItem>) {
-        mediaController?.run {
-            replaceMediaItems(0, mediaItemCount - 1, songs)
-        }
-    }
-
-    override fun updatePlayList(song: MediaItem) {
-        mediaController?.run { replaceMediaItem(currentMediaItemIndex, song) }
+        Log.d(LOG_TAG, mediaController?.mediaItemCount.toString())
     }
 
     override fun addToPlayList(songs: List<MediaItem>) {
         mediaController?.run { addMediaItems(songs) }
-    }
-
-    override fun removeFromPlayList(index: Int) {
-        mediaController?.run {
-            removeMediaItem(index)
-        }
     }
 
     @Player.RepeatMode

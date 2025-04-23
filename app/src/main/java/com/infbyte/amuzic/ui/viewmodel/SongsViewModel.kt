@@ -114,15 +114,17 @@ class SongsViewModel @Inject constructor(
     fun onSongClicked(song: Song) {
         state.apply {
             val actualIndex = songs.indexOf(song)
+            val position = if (currentSong == song) amuzicPlayer.progress().toLong() else 0L
+
+            state = copy(currentSong = song, currentPlaylist = songs)
+            amuzicPlayer.createPlayList(songs.map { it.item })
+            amuzicPlayer.selectSong(actualIndex, position)
+
+            onPlaySong()
+
             if (!showPlayList) {
                 showAndDelayHidePlayBar()
             }
-            if (currentSong != song) {
-                state = copy(currentSong = song, currentPlaylist = songs)
-                amuzicPlayer.createPlayList(currentPlaylist.map { it.item })
-                amuzicPlayer.selectSong(actualIndex, 0)
-            }
-            onPlaySong()
         }
     }
 

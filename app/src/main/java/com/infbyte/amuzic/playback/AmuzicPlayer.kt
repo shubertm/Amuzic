@@ -42,12 +42,6 @@ interface AmuzicPlayer {
 
     fun createPlayList(songs: List<MediaItem>)
 
-    fun updatePlayList(songs: List<MediaItem>)
-
-    fun updatePlayList(song: MediaItem)
-
-    fun removeFromPlayList(index: Int)
-
     @RepeatMode
     fun switchMode(): Int
 
