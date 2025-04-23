@@ -82,11 +82,27 @@ class AmuzicPlayerImpl @Inject constructor() : AmuzicPlayer {
     }
 
     override fun createPlayList(songs: List<MediaItem>) {
-        mediaController?.run { setMediaItems(songs) }
+        mediaController?.run { setMediaItems(songs, false) }
+    }
+
+    override fun updatePlayList(songs: List<MediaItem>) {
+        mediaController?.run {
+            replaceMediaItems(0, mediaItemCount - 1, songs)
+        }
+    }
+
+    override fun updatePlayList(song: MediaItem) {
+        mediaController?.run { replaceMediaItem(currentMediaItemIndex, song) }
     }
 
     override fun addToPlayList(songs: List<MediaItem>) {
         mediaController?.run { addMediaItems(songs) }
+    }
+
+    override fun removeFromPlayList(index: Int) {
+        mediaController?.run {
+            removeMediaItem(index)
+        }
     }
 
     @Player.RepeatMode
