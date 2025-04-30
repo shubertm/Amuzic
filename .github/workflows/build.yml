@@ -22,11 +22,6 @@ jobs:
                   echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_keystore.txt
                   base64 -d base64_keystore.txt > ./app/amuzic_release_keystore.jks
 
-            - name: Counting Releases
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASES: $(gh release ls | wc -l))
-
             - name: Validate Gradle Wrapper
               uses: gradle/actions/wrapper-validation@v3
 
@@ -35,6 +30,8 @@ jobs:
                   VERSION_NAME: ${{ github.ref_name }}-debug
                   TEST_BANNER_AD_UNIT_ID: ${{ secrets.TEST_BANNER_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RELEASES: $(gh release ls | wc -l))
               run: |
                   ./gradlew assembleDebug
 
@@ -47,6 +44,8 @@ jobs:
                   BANNER_AD_UNIT_ID: ${{ secrets.BANNER_AD_UNIT_ID }}
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RELEASES: $(gh release ls | wc -l))
               run: ./gradlew assembleRelease
 
             - name: Release AAB
@@ -57,8 +56,9 @@ jobs:
                   BANNER_AD_UNIT_ID: ${{ secrets.BANNER_AD_UNIT_ID }}
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RELEASES: $(gh release ls | wc -l))
               run: |
-
                   export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
                   ./gradlew bundleRelease
 
