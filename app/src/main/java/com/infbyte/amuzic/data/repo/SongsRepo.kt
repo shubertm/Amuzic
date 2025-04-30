@@ -4,7 +4,6 @@ import android.content.ContentUris
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.infbyte.amuzic.data.model.Album
@@ -111,7 +110,6 @@ class SongsRepo @Inject constructor(
             loadArtists()
             loadAlbums()
             // loadFolders()
-            Log.d("REPO", songs.size.toString())
             onComplete(songs)
         }
     }

@@ -24,6 +24,11 @@ jobs:
                 echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_keystore.txt
                 base64 -d base64_keystore.txt > ./app/amuzic_release_keystore.jks
 
+            - name: Counting Releases
+              run: export RELEASES=$(gh release ls | wc -l)
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v4
 

@@ -20,6 +20,7 @@ def amuzicKeyAlias = properties.getProperty("key.alias")
 def signingKeyStorePass = properties.getProperty("key.store.pass")
 def keyPass = properties.getProperty("key.pass")
 def localVersion = properties.getProperty("local.version")
+def localVersionCode = properties.getProperty("local.version.code")?.toInteger()
 
 configurations {
     ktlint
@@ -34,7 +35,7 @@ android {
         applicationId "com.infbyte.amuzic"
         minSdk 24
         targetSdk 35
-        versionCode 1
+        versionCode System.getenv("RELEASES")?.toInteger() ?: 0 + 1 ?: localVersionCode
         versionName System.getenv("VERSION_NAME") ?: localVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
