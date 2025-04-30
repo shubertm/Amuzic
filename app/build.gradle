@@ -21,7 +21,7 @@ def signingKeyStorePass = properties.getProperty("key.store.pass")
 def keyPass = properties.getProperty("key.pass")
 def localVersion = properties.getProperty("local.version")
 def amuzicVersionCode = properties.getProperty("local.version.code")?.toInteger() ?:
-    System.getenv("RELEASES")?.toInteger()
+    System.getenv("RELEASES")?.toInteger()!
 
 configurations {
     ktlint
