@@ -31,8 +31,8 @@ jobs:
                   TEST_BANNER_AD_UNIT_ID: ${{ secrets.TEST_BANNER_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASES: $(gh release ls | wc -l))
               run: |
+                  export RELEASES=$(gh release ls | wc -l))
                   ./gradlew assembleDebug
 
             - name: Release APK
@@ -45,11 +45,13 @@ jobs:
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASES: $(gh release ls | wc -l))
-              run: ./gradlew assembleRelease
+              run: |
+                  export RELEASES=$(gh release ls | wc -l))
+                  ./gradlew assembleRelease
 
             - name: Release AAB
               env:
+                  VERSION_NAME: ${{ github.ref_name }}-rc
                   SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
                   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -57,9 +59,8 @@ jobs:
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASES: $(gh release ls | wc -l))
               run: |
-                  export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
+                  export RELEASES=$(gh release ls | wc -l))
                   ./gradlew bundleRelease
 
             - name: Upload Debug APK
