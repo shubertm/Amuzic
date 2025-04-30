@@ -32,7 +32,7 @@ jobs:
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  export RELEASES=$(gh release ls | wc -l))
+                  export RELEASES=$(gh release ls | wc -l)
                   ./gradlew assembleDebug
 
             - name: Release APK
@@ -46,7 +46,7 @@ jobs:
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  export RELEASES=$(gh release ls | wc -l))
+                  export RELEASES=$(gh release ls | wc -l)
                   ./gradlew assembleRelease
 
             - name: Release AAB
@@ -60,7 +60,7 @@ jobs:
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  export RELEASES=$(gh release ls | wc -l))
+                  export RELEASES=$(gh release ls | wc -l)
                   ./gradlew bundleRelease
 
             - name: Upload Debug APK
