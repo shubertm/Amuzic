@@ -87,7 +87,7 @@ class SongsViewModel @Inject constructor(
     init {
         amuzicPlayer.onTransition = { index, duration ->
             state = with(state) {
-                copy(currentSong = songs[index], songDuration = duration)
+                copy(currentSong = currentPlaylist[index], songDuration = duration)
             }
         }
         amuzicPlayer.sendIsPlaying = { isPlaying ->
@@ -114,12 +114,14 @@ class SongsViewModel @Inject constructor(
     fun onSongClicked(song: Song) {
         state.apply {
             val actualIndex = songs.indexOf(song)
-            if (currentSong != song) {
-                state = copy(currentSong = song, currentPlaylist = songs)
-                amuzicPlayer.createPlayList(songs.map { it.item })
-                amuzicPlayer.selectSong(actualIndex, 0)
-            }
+            val position = if (currentSong == song) amuzicPlayer.progress().toLong() else 0L
+
+            state = copy(currentSong = song, currentPlaylist = songs)
+            amuzicPlayer.createPlayList(songs.map { it.item })
+            amuzicPlayer.selectSong(actualIndex, position)
+
             onPlaySong()
+
             if (!showPlayList) {
                 showAndDelayHidePlayBar()
             }

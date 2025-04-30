@@ -72,6 +72,10 @@ android {
             minifyEnabled true
             shrinkResources true
 
+            ndk {
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
+
             resValue("string", "admob_app_id", System.getenv("ADMOB_APP_ID") ?: "$admobAppId")
             resValue("string", "banner_ad_unit_id", System.getenv("BANNER_AD_UNIT_ID") ?: "$bannerAdUnitId")
             resValue("string", "banner_1_ad_unit_id", System.getenv("BANNER_1_AD_UNIT_ID") ?: "$banner1AdUnitId")
