@@ -25,8 +25,6 @@ jobs:
             - name: Counting Releases
               run: |
                 export RELEASES=$(gh release ls | wc -l)
-                echo $RELEASES
-
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,6 +60,7 @@ jobs:
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
               run: |
                   export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
+                  echo $RELEASES
                   ./gradlew bundleRelease
 
             - name: Upload Debug APK
