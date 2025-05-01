@@ -22,7 +22,9 @@ fun loadThumbnail(path: String): Bitmap? {
             release()
             bitmap
         }
-    } catch (_: Exception) { null }
+    } catch (_: Exception) {
+        null
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -32,7 +34,7 @@ fun ContentResolver.loadThumbnail(uri: Uri): Bitmap? {
         loadThumbnail(
             uri,
             size,
-            null
+            null,
         )
     } catch (e: FileNotFoundException) {
         null
@@ -42,9 +44,10 @@ fun ContentResolver.loadThumbnail(uri: Uri): Bitmap? {
 fun Uri.decodeImage(): Bitmap? = BitmapFactory.decodeFile(toString())
 
 fun Context.openAppSettings() {
-    val intent = Intent(
-        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-        Uri.fromParts("package", packageName, null)
-    )
+    val intent =
+        Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", packageName, null),
+        )
     startActivity(intent)
 }

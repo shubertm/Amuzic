@@ -45,15 +45,16 @@ import com.infbyte.amuzic.ui.views.BannerAdView
 @Composable
 fun ArtistOrAlbumSongsScreen(
     songsViewModel: SongsViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     var searchQuery by rememberSaveable {
         mutableStateOf("")
     }
 
-    val searchFocusRequester = remember {
-        FocusRequester()
-    }
+    val searchFocusRequester =
+        remember {
+            FocusRequester()
+        }
 
     Column(Modifier.navigationBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally) {
         SearchBar(
@@ -73,7 +74,7 @@ fun ArtistOrAlbumSongsScreen(
             },
             Modifier.fillMaxWidth().padding(
                 start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-                end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp
+                end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
             ).focusRequester(searchFocusRequester),
             leadingIcon = {
                 IconButton(
@@ -84,7 +85,7 @@ fun ArtistOrAlbumSongsScreen(
                             return@IconButton
                         }
                         onNavigateBack()
-                    }
+                    },
                 ) {
                     Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
                 }
@@ -97,7 +98,7 @@ fun ArtistOrAlbumSongsScreen(
                                 songsViewModel.onToggleSearching()
                                 searchFocusRequester.requestFocus()
                             }
-                        }
+                        },
                     ) {
                         Icon(Icons.Outlined.Search, "")
                     }
@@ -109,24 +110,24 @@ fun ArtistOrAlbumSongsScreen(
                                     contentDescription = "",
                                     Modifier
                                         .size(32.dp)
-                                        .clip(CircleShape)
+                                        .clip(CircleShape),
                                 )
                             } ?: Box(
                                 Modifier
                                     .size(32.dp)
                                     .clip(CircleShape),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     songsViewModel.state.artistOrAlbumInitialChar,
-                                    style = MaterialTheme.typography.titleLarge
+                                    style = MaterialTheme.typography.titleLarge,
                                 )
                             }
                         }
                     }
                 }
             },
-            placeholder = { Text(stringResource(R.string.amuzic_search)) }
+            placeholder = { Text(stringResource(R.string.amuzic_search)) },
         ) {
             if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
                 SongsScreen(
@@ -136,7 +137,7 @@ fun ArtistOrAlbumSongsScreen(
                         searchQuery = ""
                         songsViewModel.onSongClicked(song)
                         songsViewModel.onToggleSearching()
-                    }
+                    },
                 )
             } else {
                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
@@ -148,7 +149,7 @@ fun ArtistOrAlbumSongsScreen(
             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
             onSongClick = { song ->
                 songsViewModel.onSongClicked(song)
-            }
+            },
         )
     }
 
@@ -173,14 +174,14 @@ fun PreviewSearchBar() {
     AmuzicTheme {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Row(
                 Modifier
                     .padding(start = 8.dp, end = 8.dp)
                     .fillMaxWidth()
                     .wrapContentHeight(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 SearchBar(
                     query = "",
@@ -191,7 +192,7 @@ fun PreviewSearchBar() {
                     Modifier.fillMaxWidth(0.894f),
                     leadingIcon = {
                         IconButton(
-                            onClick = { /*TODO*/ }
+                            onClick = { /*TODO*/ },
                         ) {
                             Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
                         }
@@ -206,14 +207,14 @@ fun PreviewSearchBar() {
                                     Modifier
                                         .size(32.dp)
                                         .background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Text("Artist".first().toString(), style = MaterialTheme.typography.titleLarge)
                                 }
                             }
                         }
                     },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) }
+                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
                 ) {}
             }
         }

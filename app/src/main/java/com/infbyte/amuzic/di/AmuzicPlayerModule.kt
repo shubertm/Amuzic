@@ -1,7 +1,7 @@
 package com.infbyte.amuzic.di
 
-import com.infbyte.amuzic.playback.AmuzicPlayerImpl
 import com.infbyte.amuzic.playback.AmuzicPlayer
+import com.infbyte.amuzic.playback.AmuzicPlayerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -11,7 +11,5 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 abstract class AmuzicPlayerModule {
     @Binds
-    abstract fun bindPlaybackListener(
-        player: AmuzicPlayerImpl
-    ): AmuzicPlayer
+    abstract fun bindPlaybackListener(player: AmuzicPlayerImpl): AmuzicPlayer
 }

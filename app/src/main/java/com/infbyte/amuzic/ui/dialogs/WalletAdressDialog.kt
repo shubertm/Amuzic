@@ -35,18 +35,18 @@ fun WalletAddressDialog(
     address: String,
     currencyName: String,
     currencyIcon: Painter,
-    onDismiss: (Boolean) -> Unit
+    onDismiss: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
 
     Dialog(
-        onDismissRequest = { onDismiss(false) }
+        onDismissRequest = { onDismiss(false) },
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background, RoundedCornerShape(8.dp))
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(currencyIcon, contentDescription = "", Modifier.size(32.dp))
@@ -60,7 +60,7 @@ fun WalletAddressDialog(
                         .fillMaxWidth(.735f)
                         .padding(end = 8.dp)
                         .horizontalScroll(addressScrollState),
-                    maxLines = 1
+                    maxLines = 1,
                 )
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     TextButton(
@@ -70,10 +70,10 @@ fun WalletAddressDialog(
                             clipboardManager.setPrimaryClip(
                                 ClipData.newPlainText(
                                     context.getString(R.string.amuzic_wallet_address),
-                                    address
-                                )
+                                    address,
+                                ),
                             )
-                        }
+                        },
                     ) {
                         Icon(painterResource(R.drawable.ic_content_copy), contentDescription = "")
                         Text(stringResource(R.string.amuzic_copy))
@@ -91,7 +91,7 @@ fun PreviewWalletAddressDialog() {
         WalletAddressDialog(
             stringResource(R.string.btc_address),
             stringResource(R.string.amuzic_btc),
-            painterResource(R.drawable.ic_btc)
+            painterResource(R.drawable.ic_btc),
         ) {}
     }
 }

@@ -33,8 +33,8 @@ import com.infbyte.amuzic.data.TERMS_ACCEPTED_KEY
 import com.infbyte.amuzic.data.readBoolean
 import com.infbyte.amuzic.data.writeBoolean
 import com.infbyte.amuzic.playback.AmuzicPlayerService
-import com.infbyte.amuzic.ui.dialogs.PrivacyPolicyDialog
 import com.infbyte.amuzic.ui.dialogs.AppSettingsRedirectDialog
+import com.infbyte.amuzic.ui.dialogs.PrivacyPolicyDialog
 import com.infbyte.amuzic.ui.screens.ArtistOrAlbumSongsScreen
 import com.infbyte.amuzic.ui.screens.MainScreen
 import com.infbyte.amuzic.ui.screens.PlayBar
@@ -51,33 +51,34 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     private val isMobileAdsInitialized = AtomicBoolean(false)
 
     private lateinit var googleMobileAdsConsentManager: GoogleMobileAdsConsentManager
 
     private val songsViewModel: SongsViewModel by viewModels()
 
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        songsViewModel.setReadPermGranted(isGranted)
-        if (isGranted) {
+    private val permissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            songsViewModel.setReadPermGranted(isGranted)
+            if (isGranted) {
 
-            songsViewModel.init(this)
-            return@registerForActivityResult
+                songsViewModel.init(this)
+                return@registerForActivityResult
+            }
         }
-    }
 
-    private val appSettingsLauncher = registerForActivityResult(
-        AppSettingsContract()
-    ) { isGranted ->
-        songsViewModel.setReadPermGranted(isGranted)
-        if (isGranted) {
-            songsViewModel.init(this)
-            return@registerForActivityResult
+    private val appSettingsLauncher =
+        registerForActivityResult(
+            AppSettingsContract(),
+        ) { isGranted ->
+            songsViewModel.setReadPermGranted(isGranted)
+            if (isGranted) {
+                songsViewModel.init(this)
+                return@registerForActivityResult
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -118,7 +119,7 @@ class MainActivity : ComponentActivity() {
             AmuzicTheme {
                 Surface(
                     Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     val navController = rememberNavController()
 
@@ -132,7 +133,7 @@ class MainActivity : ComponentActivity() {
                             },
                             onDismiss = {
                                 songsViewModel.hidePrivacyDialog()
-                            }
+                            },
                         )
                         return@Surface
                     }
@@ -143,7 +144,7 @@ class MainActivity : ComponentActivity() {
                                 songsViewModel.hideAppSettingsRedirect()
                                 appSettingsLauncher.launch(packageName)
                             },
-                            onDismiss = { songsViewModel.hideAppSettingsRedirect() }
+                            onDismiss = { songsViewModel.hideAppSettingsRedirect() },
                         )
                     }
 
@@ -179,10 +180,10 @@ class MainActivity : ComponentActivity() {
                                     R.drawable.ic_amuzic_foreground,
                                     R.string.amuzic_privacy_policy_link,
                                     adsConsentManager = googleMobileAdsConsentManager,
-                                    onNavigateBack = { navigateBack() }
+                                    onNavigateBack = { navigateBack() },
                                 )
                             },
-                            onExit = { onExit() }
+                            onExit = { onExit() },
                         )
                         return@Surface
                     }
@@ -206,9 +207,9 @@ class MainActivity : ComponentActivity() {
                                     R.drawable.ic_amuzic_foreground,
                                     R.string.amuzic_privacy_policy_link,
                                     adsConsentManager = googleMobileAdsConsentManager,
-                                    onNavigateBack = { navigateBack() }
+                                    onNavigateBack = { navigateBack() },
                                 )
-                            }
+                            },
                         )
                         return@Surface
                     }
@@ -226,9 +227,9 @@ class MainActivity : ComponentActivity() {
                                         R.drawable.ic_amuzic_foreground,
                                         R.string.amuzic_privacy_policy_link,
                                         adsConsentManager = googleMobileAdsConsentManager,
-                                        onNavigateBack = { navigateBack() }
+                                        onNavigateBack = { navigateBack() },
                                     )
-                                }
+                                },
                             )
                         }
                         composable(Screens.SONGS) {
@@ -236,7 +237,7 @@ class MainActivity : ComponentActivity() {
                                 songsViewModel,
                                 onNavigateBack = {
                                     navController.popBackStack()
-                                }
+                                },
                             )
                         }
                     }
@@ -257,7 +258,7 @@ class MainActivity : ComponentActivity() {
                                 songsViewModel.onTogglePlaybackMode()
                             },
                             onSeekTo = { songsViewModel.onSeekTouch(it) },
-                            onShowPlayListClick = { songsViewModel.onTogglePlayList(true) }
+                            onShowPlayListClick = { songsViewModel.onTogglePlayList(true) },
                         )
 
                         PlayListScreen(
@@ -265,7 +266,7 @@ class MainActivity : ComponentActivity() {
                             songs = songsViewModel.state.currentPlaylist,
                             onSongClick = { song ->
                                 songsViewModel.onSongClicked(song)
-                            }
+                            },
                         )
                     }
                 }
@@ -284,12 +285,12 @@ class MainActivity : ComponentActivity() {
     private fun launchPermRequest() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
             )
             return
         }
         permissionLauncher.launch(
-            Manifest.permission.READ_MEDIA_AUDIO
+            Manifest.permission.READ_MEDIA_AUDIO,
         )
     }
 
@@ -305,7 +306,7 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(
                 this,
                 getString(R.string.amuzic_confirm_exit),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             )
                 .show()
             songsViewModel.confirmExit()
