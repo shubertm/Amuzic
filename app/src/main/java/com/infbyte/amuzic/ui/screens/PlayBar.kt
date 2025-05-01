@@ -59,14 +59,14 @@ fun BoxScope.PlayBar(
     onPrevClick: () -> Unit,
     onTogglePlaybackMode: () -> Unit,
     onSeekTo: (Float) -> Unit,
-    onShowPlayListClick: () -> Unit
+    onShowPlayListClick: () -> Unit,
 ) {
     AnimatedVisibility(
         visible = isVisible.value,
         Modifier
             .align(Alignment.BottomCenter),
         enter = expandVertically(tween(1000), Alignment.Bottom),
-        exit = shrinkVertically(tween(1000), Alignment.Top)
+        exit = shrinkVertically(tween(1000), Alignment.Top),
     ) {
         Column(
             Modifier
@@ -76,16 +76,16 @@ fun BoxScope.PlayBar(
                 .border(0.dp, Color.LightGray)
                 .background(
                     MaterialTheme.colorScheme.surfaceContainerLow,
-                    RoundedCornerShape(20.dp, 20.dp)
+                    RoundedCornerShape(20.dp, 20.dp),
                 ).navigationBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 IconButton(
                     onClick = {
@@ -93,8 +93,7 @@ fun BoxScope.PlayBar(
                     },
                     Modifier
                         .padding(16.dp)
-                        .clip(CircleShape)
-
+                        .clip(CircleShape),
                 ) {
                     Icon(
                         when {
@@ -108,21 +107,22 @@ fun BoxScope.PlayBar(
                         },
                         "",
                         Modifier.size(32.dp),
-                        tint = if (!state.shuffle && state.mode == Player.REPEAT_MODE_OFF) {
-                            Color.LightGray
-                        } else {
-                            Color.Black
-                        }
+                        tint =
+                            if (!state.shuffle && state.mode == Player.REPEAT_MODE_OFF) {
+                                Color.LightGray
+                            } else {
+                                Color.Black
+                            },
                     )
                 }
                 IconButton(
                     onClick = { onPrevClick() },
-                    Modifier.clip(CircleShape)
+                    Modifier.clip(CircleShape),
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_skip_previous),
                         "",
-                        Modifier.size(32.dp)
+                        Modifier.size(32.dp),
                     )
                 }
                 Box(
@@ -130,64 +130,67 @@ fun BoxScope.PlayBar(
                         .clip(CircleShape)
                         .size(58.dp)
                         .clickable { onPlayClick() },
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         if (state.isPlaying) {
                             ImageVector.vectorResource(R.drawable.ic_pause)
-                        } else { Icons.Outlined.PlayArrow },
+                        } else {
+                            Icons.Outlined.PlayArrow
+                        },
                         "",
-                        Modifier.size(52.dp)
+                        Modifier.size(52.dp),
                     )
                 }
                 IconButton(
                     onClick = { onNextClick() },
-                    Modifier.clip(CircleShape)
+                    Modifier.clip(CircleShape),
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_skip_next),
                         "",
-                        Modifier.size(32.dp)
+                        Modifier.size(32.dp),
                     )
                 }
                 IconButton(
                     onClick = { onShowPlayListClick() },
                     Modifier
                         .padding(16.dp)
-                        .clip(CircleShape)
+                        .clip(CircleShape),
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_queue_music),
                         "",
-                        Modifier.size(32.dp)
+                        Modifier.size(32.dp),
                     )
                 }
             }
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Column(
                     Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         state.currentSong.title,
                         textAlign = TextAlign.Center,
-                        maxLines = 1
+                        maxLines = 1,
                     )
                     val interactionSource = remember { MutableInteractionSource() }
                     Slider(
                         value = state.progress,
                         onValueChange = { onSeekTo(it) },
-                        modifier = Modifier
-                            .padding(
-                                start = 32.dp,
-                                end = 32.dp,
-                                top = 8.dp,
-                                bottom = 8.dp
-                            ),
+                        modifier =
+                            Modifier
+                                .padding(
+                                    start = 32.dp,
+                                    end = 32.dp,
+                                    top = 8.dp,
+                                    bottom = 8.dp,
+                                ),
                         track = {
                             SliderDefaults.Track(it, Modifier.height(6.dp))
                         },
@@ -195,9 +198,9 @@ fun BoxScope.PlayBar(
                         thumb = {
                             SliderDefaults.Thumb(
                                 interactionSource,
-                                thumbSize = DpSize(3.dp, 16.dp)
+                                thumbSize = DpSize(3.dp, 16.dp),
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -211,18 +214,20 @@ fun PreviewPlayBar() {
     AmuzicTheme {
         Box {
             PlayBar(
-                isVisible = remember {
-                    mutableStateOf(true)
-                },
-                state = remember {
-                    AmuzicState.INITIAL_STATE
-                },
+                isVisible =
+                    remember {
+                        mutableStateOf(true)
+                    },
+                state =
+                    remember {
+                        AmuzicState.INITIAL_STATE
+                    },
                 onPlayClick = {},
                 onNextClick = {},
                 onPrevClick = {},
                 onTogglePlaybackMode = {},
                 onSeekTo = {},
-                onShowPlayListClick = {}
+                onShowPlayListClick = {},
             )
         }
     }

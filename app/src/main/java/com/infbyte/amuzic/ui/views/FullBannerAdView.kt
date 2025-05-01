@@ -15,7 +15,7 @@ import com.infbyte.amuzic.R
 fun FullBannerAdView() {
     val adRequest = AdRequest.Builder().build()
     Box(
-        Modifier.padding(start = 8.dp, end = 8.dp)
+        Modifier.padding(start = 8.dp, end = 8.dp),
     ) {
         AndroidView(
             factory = { context ->
@@ -26,7 +26,7 @@ fun FullBannerAdView() {
             },
             update = { adView ->
                 adView.loadAd(adRequest)
-            }
+            },
         )
     }
 }

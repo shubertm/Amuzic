@@ -22,7 +22,7 @@ import com.infbyte.amuzic.R
 @Composable
 fun AppSettingsRedirectDialog(
     onAccept: () -> Unit = {},
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Column(Modifier.background(MaterialTheme.colorScheme.background, RoundedCornerShape(10))) {
@@ -30,7 +30,7 @@ fun AppSettingsRedirectDialog(
             Row(
                 Modifier.padding(16.dp).fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 FilledTonalButton(onClick = onDismiss) { Text(stringResource(R.string.amuzic_cancel)) }
                 Button(onClick = onAccept) { Text(stringResource(R.string.amuzic_grant_in_settings)) }

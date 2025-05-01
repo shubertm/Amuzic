@@ -26,24 +26,25 @@ import com.infbyte.amuzic.utils.accommodateFullBannerAds
 fun BoxScope.PlayListScreen(
     show: Boolean,
     songs: List<Song>,
-    onSongClick: (Song) -> Unit
+    onSongClick: (Song) -> Unit,
 ) {
     AnimatedVisibility(
         visible = show,
         Modifier.align(Alignment.BottomCenter),
-        enter = expandHorizontally(
-            tween(durationMillis = 1000, delayMillis = 200),
-            expandFrom = Alignment.Start
-        ),
-        exit = shrinkHorizontally(tween(durationMillis = 1000), shrinkTowards = Alignment.End)
+        enter =
+            expandHorizontally(
+                tween(durationMillis = 1000, delayMillis = 200),
+                expandFrom = Alignment.Start,
+            ),
+        exit = shrinkHorizontally(tween(durationMillis = 1000), shrinkTowards = Alignment.End),
     ) {
         LazyColumn(
             Modifier
                 .fillMaxSize().navigationBarsPadding().statusBarsPadding()
                 .background(
                     MaterialTheme.colorScheme.background,
-                    RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                )
+                    RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                ),
         ) {
             accommodateFullBannerAds(songs) { song ->
                 Song(song) {

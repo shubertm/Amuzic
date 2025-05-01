@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import java.util.Properties
 
 plugins {
@@ -6,6 +7,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 val properties = Properties()
@@ -22,12 +24,9 @@ val amuzicKeyAlias: String? = properties.getProperty("key.alias")
 val signingKeyStorePass: String? = properties.getProperty("key.store.pass")
 val keyPass: String? = properties.getProperty("key.pass")
 val localVersion: String? = properties.getProperty("local.version")
-val amuzicVersionCode: Int = properties.getProperty("local.version.code")?.toInt()
-    ?: System.getenv("RELEASES")?.toInt() ?: 0
-
-//configurations {
-    //ktlint
-//}
+val amuzicVersionCode: Int =
+    properties.getProperty("local.version.code")?.toInt()
+        ?: System.getenv("RELEASES")?.toInt() ?: 0
 
 android {
     compileSdk = 35
@@ -66,10 +65,10 @@ android {
 
             manifestPlaceholders.putAll(
                 arrayOf(
-                "appIcon" to "@mipmap/ic_amuzic_debug",
-                "appRoundIcon" to "@mipmap/ic_amuzic_debug_round",
-                "appName" to "@string/app_name_debug"
-            )
+                    "appIcon" to "@mipmap/ic_amuzic_debug",
+                    "appRoundIcon" to "@mipmap/ic_amuzic_debug_round",
+                    "appName" to "@string/app_name_debug",
+                ),
             )
         }
         release {
@@ -86,15 +85,15 @@ android {
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
 
             manifestPlaceholders.putAll(
                 arrayOf(
-                "appIcon" to "@mipmap/ic_amuzic",
-                "appRoundIcon" to "@mipmap/ic_amuzic_round",
-                "appName" to "@string/app_name"
-            )
+                    "appIcon" to "@mipmap/ic_amuzic",
+                    "appRoundIcon" to "@mipmap/ic_amuzic_round",
+                    "appName" to "@string/app_name",
+                ),
             )
             signingConfig = signingConfigs.getByName("release")
         }
@@ -151,8 +150,6 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.55")
     kapt("com.google.dagger:hilt-compiler:2.55")
 
-    // ktlint("com.pinterest:ktlint:0.47.1")
-
     implementation("com.google.android.gms:play-services-ads:24.2.0")
 
     implementation("androidx.datastore:datastore-preferences:1.1.4")
@@ -170,27 +167,6 @@ kapt {
     correctErrorTypes = true
 }
 
-/* tasks.register('ktlintFormat', JavaExec) {
-    mainClass = "com.pinterest.ktlint.Main"
-    classpath = configurations.ktlint
-    args("$rootDir/**/*.kt", "!$rootDir/**/build/**")
-    jmArgs += "--add-opens=java.base/java.lang=ALL-UNNAMED"
+tasks.preBuild.dependsOn("ktlintCheck")
 
-    if (project.hasProperty("autoCorrect") && project.property("autoCorrect") == "0") {
-        logger.quiet("(KTLINT): auto correction is disabled")
-    } else {
-        logger.quiet("(KTLINT): auto correction is enabled")
-        args += "-F"
-    }
-}*/
-
-/* tasks.register('ktlintCheck', JavaExec) {
-    classpath = configurations.ktlint
-    mainClass = "com.pinterest.ktlint.Main"
-    args.addAll(arrayOf("src/**/*.kt", "**.kts", "!**/build/**"))
-}*/
-
-// tasks.preBuild.dependsOn("ktlintCheck")
-
-// tasks.ktlintCheck.dependsOn("ktlintFormat")
-
+tasks.ktlintCheck.dependsOn("ktlintFormat")

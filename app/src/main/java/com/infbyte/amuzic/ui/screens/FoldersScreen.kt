@@ -42,27 +42,28 @@ fun FoldersScreen(
     showPopup: MutableState<Boolean>,
     folders: List<Folder>,
     onScroll: (Int) -> Unit,
-    onFolderClicked: (Int) -> Unit
+    onFolderClicked: (Int) -> Unit,
 ) {
     AnimatedVisibility(
         isVisible,
         enter = fadeIn(tween(1000)),
-        exit = fadeOut(tween(1000))
+        exit = fadeOut(tween(1000)),
     ) {
         val state = rememberLazyListState()
-        val modifier = if (showPopup.value) {
-            Modifier
-                .fillMaxSize()
-                .pointerInteropFilter {
-                    if (it.action == MotionEvent.ACTION_DOWN) {
-                        showPopup.value = false
+        val modifier =
+            if (showPopup.value) {
+                Modifier
+                    .fillMaxSize()
+                    .pointerInteropFilter {
+                        if (it.action == MotionEvent.ACTION_DOWN) {
+                            showPopup.value = false
+                        }
+                        true
                     }
-                    true
-                }
-        } else {
-            Modifier
-                .fillMaxSize()
-        }
+            } else {
+                Modifier
+                    .fillMaxSize()
+            }
         LazyColumn(modifier, state) {
             itemsIndexed(folders) { index, folder ->
                 Folder(folder) {
@@ -77,7 +78,10 @@ fun FoldersScreen(
 }
 
 @Composable
-fun Folder(folder: Folder, onClick: () -> Unit) {
+fun Folder(
+    folder: Folder,
+    onClick: () -> Unit,
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -87,24 +91,24 @@ fun Folder(folder: Folder, onClick: () -> Unit) {
             .clickable {
                 onClick()
             },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.padding(8.dp)) {
             Image(
                 ImageVector.vectorResource(R.drawable.ic_folder),
                 "",
-                Modifier.size(48.dp)
+                Modifier.size(48.dp),
             )
         }
         Column(
-            Modifier.padding(start = 12.dp, end = 12.dp)
+            Modifier.padding(start = 12.dp, end = 12.dp),
         ) {
             Text(
-                folder.name
+                folder.name,
             )
             Text(
                 folder.numberOfSongs.toString(),
-                Modifier.padding(start = 5.dp)
+                Modifier.padding(start = 5.dp),
             )
         }
     }

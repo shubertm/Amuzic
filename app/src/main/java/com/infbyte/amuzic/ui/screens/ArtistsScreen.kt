@@ -31,7 +31,7 @@ import com.infbyte.amuzic.utils.getInitialChar
 fun ArtistsScreen(
     artists: List<Artist>,
     onScroll: (Int) -> Unit,
-    onArtistClick: (Artist) -> Unit
+    onArtistClick: (Artist) -> Unit,
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
@@ -49,7 +49,7 @@ fun ArtistsScreen(
 @Composable
 fun Artist(
     artist: Artist,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
         Modifier
@@ -60,26 +60,26 @@ fun Artist(
             .clickable {
                 onClick()
             },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             Modifier
                 .padding(8.dp)
                 .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                 .size(48.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(artist.name.getInitialChar(), style = MaterialTheme.typography.headlineLarge)
         }
         Column(
-            Modifier.padding(start = 12.dp, end = 12.dp)
+            Modifier.padding(start = 12.dp, end = 12.dp),
         ) {
             Text(
-                artist.name
+                artist.name,
             )
             Text(
                 artist.numberOfSongs.toString(),
-                Modifier.padding(start = 5.dp)
+                Modifier.padding(start = 5.dp),
             )
         }
     }
@@ -100,9 +100,9 @@ fun PreviewArtistsScreen() {
                 Artist("artist"),
                 Artist("artist"),
                 Artist("artist"),
-                Artist("artist")
+                Artist("artist"),
             ),
-            {}
+            {},
         ) { }
     }
 }
