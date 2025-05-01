@@ -2,12 +2,12 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.gradle.ktlint)
 }
 
 val properties = Properties()
@@ -109,9 +109,6 @@ android {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -120,8 +117,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.material3:material3-android:1.3.1")
-    val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
+    implementation(libs.android.material3)
+    val composeBom = platform(libs.android.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation("androidx.core:core-ktx:1.15.0")
