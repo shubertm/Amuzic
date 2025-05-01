@@ -5,7 +5,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.RepeatMode
 
 interface AmuzicPlayer {
-
     val shuffleMode: Boolean
 
     val currentSong: MediaItem
@@ -16,7 +15,10 @@ interface AmuzicPlayer {
 
     fun initController(context: Context)
 
-    fun selectSong(index: Int, position: Long)
+    fun selectSong(
+        index: Int,
+        position: Long,
+    )
 
     fun playSong()
 

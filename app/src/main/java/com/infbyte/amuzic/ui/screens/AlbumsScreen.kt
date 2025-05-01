@@ -31,7 +31,7 @@ import com.infbyte.amuzic.utils.getInitialChar
 fun AlbumsScreen(
     albums: List<Album>,
     onScroll: (Int) -> Unit,
-    onAlbumClicked: (Album) -> Unit
+    onAlbumClicked: (Album) -> Unit,
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
@@ -47,7 +47,10 @@ fun AlbumsScreen(
 }
 
 @Composable
-fun Album(album: Album, onClick: () -> Unit) {
+fun Album(
+    album: Album,
+    onClick: () -> Unit,
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -57,25 +60,25 @@ fun Album(album: Album, onClick: () -> Unit) {
             .clickable {
                 onClick()
             },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             Modifier.padding(8.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape).size(
-                48.dp
+                48.dp,
             ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(album.name.getInitialChar(), style = MaterialTheme.typography.headlineLarge)
         }
         Column(
-            Modifier.padding(start = 12.dp, end = 12.dp)
+            Modifier.padding(start = 12.dp, end = 12.dp),
         ) {
             Text(
-                album.name
+                album.name,
             )
             Text(
                 album.numberOfSongs.toString(),
-                Modifier.padding(start = 5.dp)
+                Modifier.padding(start = 5.dp),
             )
         }
     }

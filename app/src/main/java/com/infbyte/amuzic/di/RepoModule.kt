@@ -11,7 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 @Module
 @InstallIn(ViewModelComponent::class)
 object RepoModule {
-
     @Provides
-    fun provideSongsRepo(@ApplicationContext context: Context) = SongsRepo(context)
+    fun provideSongsRepo(
+        @ApplicationContext context: Context,
+    ) = SongsRepo(context)
 }

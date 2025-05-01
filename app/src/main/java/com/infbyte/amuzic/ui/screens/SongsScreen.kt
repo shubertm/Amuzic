@@ -37,7 +37,7 @@ import com.infbyte.amuzic.utils.getInitialChar
 fun SongsScreen(
     songs: List<Song>,
     onScroll: (Int) -> Unit,
-    onSongClick: (Song) -> Unit
+    onSongClick: (Song) -> Unit,
 ) {
     val state = rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize(), state) {
@@ -53,7 +53,10 @@ fun SongsScreen(
 }
 
 @Composable
-fun Song(song: Song, onClick: () -> Unit) {
+fun Song(
+    song: Song,
+    onClick: () -> Unit,
+) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -63,28 +66,29 @@ fun Song(song: Song, onClick: () -> Unit) {
             .clickable {
                 onClick()
             },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (song.thumbnail != null) {
             Box(Modifier.padding(8.dp)) {
                 Image(
                     bitmap = song.thumbnail.asImageBitmap(),
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(48.dp),
-                    contentDescription = ""
+                    modifier =
+                        Modifier
+                            .clip(CircleShape)
+                            .size(48.dp),
+                    contentDescription = "",
                 )
             }
         } else {
             Box(
                 Modifier.padding(8.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                     .size(48.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     song.title.getInitialChar(),
-                    style = MaterialTheme.typography.headlineLarge
+                    style = MaterialTheme.typography.headlineLarge,
                 )
             }
         }
@@ -92,17 +96,17 @@ fun Song(song: Song, onClick: () -> Unit) {
             Modifier
                 .wrapContentSize()
                 .padding(start = 12.dp, end = 12.dp),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 song.title,
-                maxLines = 1
+                maxLines = 1,
             )
             Text(
                 song.artist,
                 Modifier.padding(5.dp),
                 fontSize = 12.sp,
-                maxLines = 1
+                maxLines = 1,
             )
         }
     }

@@ -48,7 +48,7 @@ fun MainScreen(
     songsViewModel: SongsViewModel,
     onNavigate: (String) -> Unit,
     onExit: () -> Unit,
-    about: @Composable (() -> Unit) -> Unit
+    about: @Composable (() -> Unit) -> Unit,
 ) {
     var showAbout by rememberSaveable {
         mutableStateOf(false)
@@ -56,9 +56,10 @@ fun MainScreen(
     val pagerState = rememberPagerState(0) { 3 }
     val scope = rememberCoroutineScope()
     var searchQuery by rememberSaveable { mutableStateOf("") }
-    val searchFocusRequester = remember {
-        FocusRequester()
-    }
+    val searchFocusRequester =
+        remember {
+            FocusRequester()
+        }
 
     if (showAbout) {
         about { showAbout = false }
@@ -79,7 +80,7 @@ fun MainScreen(
                         }
                     },
                     icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
-                    label = { Text(stringResource(R.string.amuzic_songs)) }
+                    label = { Text(stringResource(R.string.amuzic_songs)) },
                 )
                 NavigationBarItem(
                     selected = pagerState.currentPage == 1,
@@ -92,7 +93,7 @@ fun MainScreen(
                         }
                     },
                     icon = { Icon(painterResource(R.drawable.ic_artist), "") },
-                    label = { Text(stringResource(R.string.amuzic_artists)) }
+                    label = { Text(stringResource(R.string.amuzic_artists)) },
                 )
                 NavigationBarItem(
                     selected = pagerState.currentPage == 2,
@@ -105,13 +106,13 @@ fun MainScreen(
                         }
                     },
                     icon = { Icon(painterResource(R.drawable.ic_album), "") },
-                    label = { Text(stringResource(R.string.amuzic_albums)) }
+                    label = { Text(stringResource(R.string.amuzic_albums)) },
                 )
             }
         },
         topBar = {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 SearchBar(
                     query = searchQuery,
@@ -140,7 +141,7 @@ fun MainScreen(
                         .fillMaxWidth()
                         .padding(
                             start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-                            end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp
+                            end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
                         )
                         .navigationBarsPadding(songsViewModel.state.isSearching)
                         .focusRequester(searchFocusRequester),
@@ -152,7 +153,7 @@ fun MainScreen(
                                         songsViewModel.onToggleSearching()
                                         searchFocusRequester.requestFocus()
                                     }
-                                }
+                                },
                             ) {
                                 Icon(Icons.Outlined.Search, "")
                             }
@@ -161,74 +162,77 @@ fun MainScreen(
                                     onClick = {
                                         songsViewModel.hidePlayBar()
                                         showAbout = true
-                                    }
+                                    },
                                 ) {
                                     Icon(Icons.Outlined.Info, contentDescription = "")
                                 }
                             }
                         }
                     },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) }
+                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
                 ) {
                     when (pagerState.currentPage) {
-                        0 -> if (songsViewModel.state.songsSearchResult.isEmpty()) {
-                            com.infbyte.amuze.ui.screens.NoSearchResultScreen()
-                        } else {
-                            SongsScreen(
-                                songs = songsViewModel.state.songsSearchResult,
-                                onScroll = { scrollValue ->
-                                    songsViewModel.togglePlayBarByScroll(scrollValue)
-                                },
-                                onSongClick = { song ->
-                                    searchQuery = ""
-                                    songsViewModel.onSongClicked(song)
-                                    songsViewModel.onToggleSearching()
-                                }
-                            )
-                        }
+                        0 ->
+                            if (songsViewModel.state.songsSearchResult.isEmpty()) {
+                                com.infbyte.amuze.ui.screens.NoSearchResultScreen()
+                            } else {
+                                SongsScreen(
+                                    songs = songsViewModel.state.songsSearchResult,
+                                    onScroll = { scrollValue ->
+                                        songsViewModel.togglePlayBarByScroll(scrollValue)
+                                    },
+                                    onSongClick = { song ->
+                                        searchQuery = ""
+                                        songsViewModel.onSongClicked(song)
+                                        songsViewModel.onToggleSearching()
+                                    },
+                                )
+                            }
 
-                        1 -> if (songsViewModel.state.artistsSearchResult.isEmpty()) {
-                            com.infbyte.amuze.ui.screens.NoSearchResultScreen()
-                        } else {
-                            ArtistsScreen(
-                                artists = songsViewModel.state.artistsSearchResult,
-                                onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                                onArtistClick = { artist ->
-                                    searchQuery = ""
-                                    songsViewModel.onToggleSearching()
-                                    songsViewModel.onArtistClicked(artist)
-                                    onNavigate(Screens.SONGS)
-                                }
-                            )
-                        }
+                        1 ->
+                            if (songsViewModel.state.artistsSearchResult.isEmpty()) {
+                                com.infbyte.amuze.ui.screens.NoSearchResultScreen()
+                            } else {
+                                ArtistsScreen(
+                                    artists = songsViewModel.state.artistsSearchResult,
+                                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                                    onArtistClick = { artist ->
+                                        searchQuery = ""
+                                        songsViewModel.onToggleSearching()
+                                        songsViewModel.onArtistClicked(artist)
+                                        onNavigate(Screens.SONGS)
+                                    },
+                                )
+                            }
 
-                        2 -> if (songsViewModel.state.albumsSearchResult.isEmpty()) {
-                            com.infbyte.amuze.ui.screens.NoSearchResultScreen()
-                        } else {
-                            AlbumsScreen(
-                                albums = songsViewModel.state.albumsSearchResult,
-                                onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                                onAlbumClicked = { album ->
-                                    searchQuery = ""
-                                    songsViewModel.onToggleSearching()
-                                    songsViewModel.onAlbumClicked(album)
-                                    onNavigate(Screens.SONGS)
-                                }
-                            )
-                        }
+                        2 ->
+                            if (songsViewModel.state.albumsSearchResult.isEmpty()) {
+                                com.infbyte.amuze.ui.screens.NoSearchResultScreen()
+                            } else {
+                                AlbumsScreen(
+                                    albums = songsViewModel.state.albumsSearchResult,
+                                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                                    onAlbumClicked = { album ->
+                                        searchQuery = ""
+                                        songsViewModel.onToggleSearching()
+                                        songsViewModel.onAlbumClicked(album)
+                                        onNavigate(Screens.SONGS)
+                                    },
+                                )
+                            }
                     }
                 }
                 BannerAdView()
             }
-        }
+        },
     ) { paddingValues ->
         HorizontalPager(
             state = pagerState,
             Modifier
                 .padding(
                     top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding()
-                )
+                    bottom = paddingValues.calculateBottomPadding(),
+                ),
         ) { page ->
             when (page) {
                 0 -> {
@@ -242,27 +246,29 @@ fun MainScreen(
                         },
                         onSongClick = { song ->
                             songsViewModel.onSongClicked(song)
-                        }
+                        },
                     )
                 }
 
-                1 -> ArtistsScreen(
-                    artists = songsViewModel.state.artists,
-                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                    onArtistClick = { artist ->
-                        songsViewModel.onArtistClicked(artist)
-                        onNavigate(Screens.SONGS)
-                    }
-                )
+                1 ->
+                    ArtistsScreen(
+                        artists = songsViewModel.state.artists,
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                        onArtistClick = { artist ->
+                            songsViewModel.onArtistClicked(artist)
+                            onNavigate(Screens.SONGS)
+                        },
+                    )
 
-                2 -> AlbumsScreen(
-                    albums = songsViewModel.state.albums,
-                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                    onAlbumClicked = { album ->
-                        songsViewModel.onAlbumClicked(album)
-                        onNavigate(Screens.SONGS)
-                    }
-                )
+                2 ->
+                    AlbumsScreen(
+                        albums = songsViewModel.state.albums,
+                        onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
+                        onAlbumClicked = { album ->
+                            songsViewModel.onAlbumClicked(album)
+                            onNavigate(Screens.SONGS)
+                        },
+                    )
             }
         }
         BackHandler {
@@ -305,24 +311,24 @@ fun NavBar() {
                             }
                         }
                     },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) }
+                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
                 ) {}
             }
             NavigationBar(Modifier.fillMaxWidth()) {
                 NavigationBarItem(
                     selected = true,
                     onClick = { /*TODO*/ },
-                    icon = { Icon(painterResource(R.drawable.ic_library_music), "") }
+                    icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = { /*TODO*/ },
-                    icon = { Icon(painterResource(R.drawable.ic_artist), "") }
+                    icon = { Icon(painterResource(R.drawable.ic_artist), "") },
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = { /*TODO*/ },
-                    icon = { Icon(painterResource(R.drawable.ic_album), "") }
+                    icon = { Icon(painterResource(R.drawable.ic_album), "") },
                 )
             }
         }

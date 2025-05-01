@@ -36,19 +36,21 @@ fun PreviewPrivacyPolicyDialog() {
 @Composable
 fun PrivacyPolicyDialog(
     onAccept: () -> Unit = {},
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
 ) {
     val string = stringResource(R.string.amuzic_agree_rationale)
     val privacyPolicyLink = stringResource(R.string.amuzic_privacy_policy_link)
 
-    val annotatedString = buildAnnotatedString {
-        append(string)
-        val link = LinkAnnotation.Url(
-            privacyPolicyLink,
-            styles = TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.primary))
-        )
-        addLink(link, string.lastIndex - 14, string.lastIndex + 1)
-    }
+    val annotatedString =
+        buildAnnotatedString {
+            append(string)
+            val link =
+                LinkAnnotation.Url(
+                    privacyPolicyLink,
+                    styles = TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.primary)),
+                )
+            addLink(link, string.lastIndex - 14, string.lastIndex + 1)
+        }
 
     Dialog(onDismissRequest = onDismiss) {
         Column(Modifier.background(MaterialTheme.colorScheme.background, RoundedCornerShape(10))) {
@@ -56,7 +58,7 @@ fun PrivacyPolicyDialog(
             Row(
                 Modifier.padding(16.dp).fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 FilledTonalButton(onClick = onDismiss) { Text(stringResource(R.string.amuzic_cancel)) }
                 Button(onClick = onAccept) { Text(stringResource(R.string.amuzic_agree)) }
@@ -64,7 +66,7 @@ fun PrivacyPolicyDialog(
             Text(
                 annotatedString,
                 Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
         }
     }
