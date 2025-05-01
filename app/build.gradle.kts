@@ -21,7 +21,7 @@ val admobAppId: String? = properties.getProperty("admob.app.id")
 val amuzicKeyAlias: String? = properties.getProperty("key.alias")
 val signingKeyStorePass: String? = properties.getProperty("key.store.pass")
 val keyPass: String? = properties.getProperty("key.pass")
-val localVersion: String = properties.getProperty("local.version")
+val localVersion: String? = properties.getProperty("local.version")
 val amuzicVersionCode: Int = properties.getProperty("local.version.code")?.toInt()
     ?: System.getenv("RELEASES")?.toInt() ?: 0
 
