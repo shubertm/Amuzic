@@ -16,3 +16,4 @@ local.properties
 misc.xml
 *.jks
 /app/libs
+/app/release/release

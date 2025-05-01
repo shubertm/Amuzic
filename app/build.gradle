@@ -100,7 +100,7 @@ android {
         buildConfig true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion "1.4.6"
     }
     packagingOptions {
         resources {
