@@ -35,7 +35,9 @@ jobs:
                   BANNER_AD_UNIT_ID: ${{ secrets.BANNER_AD_UNIT_ID }}
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
+                export RELEASES=$(gh release ls | wc -l)
                 export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
                 ./gradlew assembleRelease
 
@@ -53,7 +55,9 @@ jobs:
                   BANNER_AD_UNIT_ID: ${{ secrets.BANNER_AD_UNIT_ID }}
                   BANNER_1_AD_UNIT_ID: ${{ secrets.BANNER_1_AD_UNIT_ID }}
                   ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
+                export RELEASES=$(gh release ls | wc -l)
                 export VERSION_NAME=$(echo ${{ github.ref_name }} | rev | cut -d 'v' -f 1 | rev)
                 ./gradlew bundleRelease
 
