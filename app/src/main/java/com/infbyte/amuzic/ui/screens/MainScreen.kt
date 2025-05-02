@@ -178,6 +178,7 @@ fun MainScreen(
                             } else {
                                 SongsScreen(
                                     songs = songsViewModel.state.songsSearchResult,
+                                    songsViewModel.state.currentSong,
                                     onScroll = { scrollValue ->
                                         songsViewModel.togglePlayBarByScroll(scrollValue)
                                     },
@@ -241,6 +242,7 @@ fun MainScreen(
                     }
                     SongsScreen(
                         songs = songsViewModel.state.songs,
+                        songsViewModel.state.currentSong,
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },

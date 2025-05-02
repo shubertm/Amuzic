@@ -15,6 +15,12 @@ data class Song(
     val album = item.mediaMetadata.albumTitle.toString()
     val uri = item.requestMetadata.mediaUri
     val id = item.mediaId
+    var isPlaying: Boolean = false
+        private set
+
+    fun updateIsPlaying(value: Boolean) {
+        isPlaying = value
+    }
 
     companion object {
         val EMPTY = Song()

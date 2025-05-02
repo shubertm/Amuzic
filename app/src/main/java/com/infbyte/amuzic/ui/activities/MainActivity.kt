@@ -265,6 +265,7 @@ class MainActivity : ComponentActivity() {
                         PlayListScreen(
                             show = songsViewModel.state.showPlayList,
                             songs = songsViewModel.state.currentPlaylist,
+                            songsViewModel.state.currentSong,
                             onSongClick = { song ->
                                 songsViewModel.onSongClicked(song)
                             },

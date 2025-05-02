@@ -26,6 +26,7 @@ import com.infbyte.amuzic.utils.accommodateFullBannerAds
 fun BoxScope.PlayListScreen(
     show: Boolean,
     songs: List<Song>,
+    currentSong: Song,
     onSongClick: (Song) -> Unit,
 ) {
     AnimatedVisibility(
@@ -47,7 +48,7 @@ fun BoxScope.PlayListScreen(
                 ),
         ) {
             accommodateFullBannerAds(songs) { song ->
-                Song(song) {
+                Song(song, currentSong == song) {
                     onSongClick(song)
                 }
             }
@@ -60,7 +61,7 @@ fun BoxScope.PlayListScreen(
 fun PreviewPlayListScreen() {
     AmuzicTheme {
         Box {
-            PlayListScreen(true, listOf(Song(), Song(), Song()), onSongClick = {})
+            PlayListScreen(true, listOf(Song(), Song(), Song()), Song(), onSongClick = {})
         }
     }
 }

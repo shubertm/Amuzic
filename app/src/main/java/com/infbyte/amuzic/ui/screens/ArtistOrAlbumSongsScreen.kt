@@ -132,6 +132,7 @@ fun ArtistOrAlbumSongsScreen(
             if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
                 SongsScreen(
                     songs = songsViewModel.state.songsSearchResult,
+                    songsViewModel.state.currentSong,
                     onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                     onSongClick = { song ->
                         searchQuery = ""
@@ -146,6 +147,7 @@ fun ArtistOrAlbumSongsScreen(
         BannerAdView()
         SongsScreen(
             songs = songsViewModel.state.songs,
+            songsViewModel.state.currentSong,
             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
             onSongClick = { song ->
                 songsViewModel.onSongClicked(song)
