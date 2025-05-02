@@ -5,9 +5,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    id("kotlin-kapt")
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.gradle.ktlint)
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 val properties = Properties()
@@ -145,7 +145,7 @@ dependencies {
     implementation(libs.infbyte.amuze)
 
     implementation(libs.google.dagger.hilt)
-    kapt(libs.google.dagger.hilt.compiler)
+    ksp(libs.google.dagger.hilt.compiler)
 
     implementation(libs.google.mobile.ads)
 
@@ -158,10 +158,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 tasks.preBuild.dependsOn("ktlintCheck")
