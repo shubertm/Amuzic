@@ -88,6 +88,7 @@ class MainActivity : ComponentActivity() {
 
         googleMobileAdsConsentManager.checkConsent(this) {
             if (googleMobileAdsConsentManager.canRequestAds) {
+                googleMobileAdsConsentManager.canRequestAds
                 initMobileAds()
             }
         }
