@@ -117,47 +117,47 @@ android {
 }
 
 dependencies {
-    implementation(libs.android.material3)
-    val composeBom = platform(libs.android.compose.bom)
+    implementation(libs.androidx.material3)
+    val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
-    implementation("androidx.core:core-ktx:1.15.0")
+    implementation(libs.androidx.core.ktx)
 
-    implementation("androidx.compose.ui:ui")
+    implementation(libs.androidx.compose.ui)
 
-    implementation("androidx.compose.foundation:foundation")
+    implementation(libs.androidx.compose.foundation)
 
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.ui:ui-tooling")
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.ui.tooling)
 
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.androidx.core.splashscreen)
 
-    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation(libs.androidx.compose.navigation)
 
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
-    implementation("androidx.activity:activity-compose:1.10.1")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.compose.activity)
 
-    implementation("androidx.media3:media3-exoplayer:1.3.1")
-    implementation("androidx.media3:media3-ui:1.3.1")
-    implementation("androidx.media3:media3-common:1.3.1")
-    implementation("androidx.media3:media3-session:1.3.1")
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.common)
+    implementation(libs.androidx.media3.session)
 
-    implementation("com.infbyte:amuze:0.2.3")
+    implementation(libs.infbyte.amuze)
 
-    implementation("com.google.dagger:hilt-android:2.55")
-    kapt("com.google.dagger:hilt-compiler:2.55")
+    implementation(libs.google.dagger.hilt)
+    kapt(libs.google.dagger.hilt.compiler)
 
-    implementation("com.google.android.gms:play-services-ads:24.2.0")
+    implementation(libs.google.mobile.ads)
 
-    implementation("androidx.datastore:datastore-preferences:1.1.4")
+    implementation(libs.androidx.datastore)
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.junit.ext)
+    androidTestImplementation(libs.androidx.test.espresso.core)
 
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 kapt {
