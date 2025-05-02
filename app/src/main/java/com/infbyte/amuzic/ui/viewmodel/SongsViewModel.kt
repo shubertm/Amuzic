@@ -94,6 +94,7 @@ class SongsViewModel
             }
             amuzicPlayer.sendIsPlaying = { isPlaying ->
                 state = state.copy(isPlaying = isPlaying)
+                state.currentSong.updateIsPlaying(isPlaying)
             }
             amuzicPlayer.sendProgress = { progress ->
                 state = state.copy(progress = progress)
