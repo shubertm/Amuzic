@@ -23,8 +23,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,21 +62,41 @@ fun SongsScreen(
     onScroll: (Int) -> Unit,
     onSongClick: (Song) -> Unit,
     onSongLongClick: (Song) -> Unit = {},
+    onSelectionDone: () -> Unit = {},
 ) {
     val state = rememberLazyListState()
-    LazyColumn(Modifier.fillMaxSize(), state) {
-        accommodateFullBannerAds(songs, showOnTopWithFewItems = false) { song ->
-            Song(
-                song,
-                currentSong == song,
-                isSelecting,
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(Modifier, state) {
+            accommodateFullBannerAds(songs, showOnTopWithFewItems = false) { song ->
+                Song(
+                    song,
+                    currentSong == song,
+                    isSelecting,
+                    onClick = {
+                        onSongClick(song)
+                    },
+                    onLongClick = {
+                        onSongLongClick(song)
+                    },
+                )
+            }
+        }
+        if (isSelecting) {
+            ElevatedButton(
                 onClick = {
-                    onSongClick(song)
+                    onSelectionDone()
                 },
-                onLongClick = {
-                    onSongLongClick(song)
-                },
-            )
+                Modifier.align(Alignment.BottomCenter).padding(
+                    bottom = 16.dp,
+                ),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Outlined.Check, "")
+                    Text(stringResource(R.string.amuzic_done), Modifier.padding(start = 2.dp))
+                }
+            }
         }
     }
     if (state.isScrollInProgress) {
@@ -121,7 +144,6 @@ fun Song(
                 onClick = {
                     if (isSelecting) {
                         isSelected = !isSelected
-                        return@combinedClickable
                     }
                     onClick()
                 },
@@ -193,6 +215,7 @@ fun Song(
             Checkbox(
                 isSelected,
                 onCheckedChange = { checked ->
+                    onClick()
                     isSelected = checked
                 },
             )

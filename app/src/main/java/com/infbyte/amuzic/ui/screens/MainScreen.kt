@@ -204,8 +204,11 @@ fun MainScreen(
                                         songsViewModel.onSongClicked(song)
                                         songsViewModel.onToggleSearching()
                                     },
-                                    onSongLongClick = {
-                                        songsViewModel.enableSelecting()
+                                    onSongLongClick = { song ->
+                                        songsViewModel.onSongLongClicked(song)
+                                    },
+                                    onSelectionDone = {
+                                        songsViewModel.disableSelecting()
                                     },
                                 )
                             }
@@ -270,8 +273,11 @@ fun MainScreen(
                         onSongClick = { song ->
                             songsViewModel.onSongClicked(song)
                         },
-                        onSongLongClick = {
-                            songsViewModel.enableSelecting()
+                        onSongLongClick = { song ->
+                            songsViewModel.onSongLongClicked(song)
+                        },
+                        onSelectionDone = {
+                            songsViewModel.disableSelecting()
                         },
                     )
                 }
@@ -298,7 +304,7 @@ fun MainScreen(
             }
         }
         Box(Modifier.fillMaxSize()) {
-            if (!showPlaylists) {
+            if (!showPlaylists && !songsViewModel.state.isSelecting) {
                 FloatingActionButton(
                     onClick = { showPlaylists = true },
                     Modifier.align(Alignment.BottomEnd).padding(

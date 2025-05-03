@@ -140,8 +140,11 @@ fun ArtistOrAlbumSongsScreen(
                         songsViewModel.onSongClicked(song)
                         songsViewModel.onToggleSearching()
                     },
-                    onSongLongClick = {
-                        songsViewModel.enableSelecting()
+                    onSongLongClick = { song ->
+                        songsViewModel.onSongLongClicked(song)
+                    },
+                    onSelectionDone = {
+                        songsViewModel.disableSelecting()
                     },
                 )
             } else {
@@ -157,8 +160,11 @@ fun ArtistOrAlbumSongsScreen(
             onSongClick = { song ->
                 songsViewModel.onSongClicked(song)
             },
-            onSongLongClick = {
-                songsViewModel.enableSelecting()
+            onSongLongClick = { song ->
+                songsViewModel.onSongLongClicked(song)
+            },
+            onSelectionDone = {
+                songsViewModel.disableSelecting()
             },
         )
     }

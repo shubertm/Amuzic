@@ -1,6 +1,7 @@
 package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ data class AmuzicState(
     val currentAlbum: Album = Album(),
     val songs: List<Song> = listOf(),
     val currentPlaylist: List<Song> = listOf(),
+    val selectedSongs: List<Song> = listOf(),
     val artists: List<Artist> = listOf(),
     val albums: List<Album> = listOf(),
     val songsSearchResult: List<Song> = listOf(),
@@ -116,6 +118,17 @@ class SongsViewModel
         }
 
         fun onSongClicked(song: Song) {
+            if (state.isSelecting) {
+                if (state.selectedSongs.contains(song)) {
+                    removeFromSelected(song)
+                    if (state.selectedSongs.isEmpty()) {
+                        disableSelecting()
+                    }
+                    return
+                }
+                addToSelected(song)
+                return
+            }
             state.apply {
                 val actualIndex = songs.indexOf(song)
                 val position = if (currentSong == song) amuzicPlayer.progress().toLong() else 0L
@@ -129,6 +142,21 @@ class SongsViewModel
                 if (!showPlayList) {
                     showAndDelayHidePlayBar()
                 }
+            }
+        }
+
+        fun onSongLongClicked(song: Song) {
+            if (!state.isSelecting) enableSelecting()
+            if (state.isSelecting) {
+                if (state.selectedSongs.contains(song)) {
+                    removeFromSelected(song)
+                    if (state.selectedSongs.isEmpty()) {
+                        disableSelecting()
+                    }
+                    return
+                }
+                addToSelected(song)
+                return
             }
         }
 
@@ -273,6 +301,24 @@ class SongsViewModel
 
         fun setIsRefreshing(isRefreshing: Boolean) {
             state = state.copy(isRefreshing = isRefreshing)
+        }
+
+        fun addToSelected(song: Song) {
+            viewModelScope.launch {
+                val songs = state.selectedSongs.toMutableList()
+                songs.add(song)
+                state = state.copy(selectedSongs = songs)
+                Log.d("ViewModel", "selected ${state.selectedSongs.size} songs")
+            }
+        }
+
+        fun removeFromSelected(song: Song) {
+            viewModelScope.launch {
+                val songs = state.selectedSongs.toMutableList()
+                songs.remove(song)
+                state = state.copy(selectedSongs = songs)
+                Log.d("ViewModel", "selected ${state.selectedSongs.size} songs")
+            }
         }
 
         fun onExit() {
