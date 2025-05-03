@@ -241,7 +241,7 @@ class SongsViewModel
 
         fun disableSelecting() {
             viewModelScope.launch {
-                state = state.copy(isSelecting = false)
+                state = state.copy(isSelecting = false, selectedSongs = emptyList())
             }
         }
 
