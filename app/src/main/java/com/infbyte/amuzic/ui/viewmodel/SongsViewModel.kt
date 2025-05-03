@@ -51,6 +51,7 @@ data class AmuzicState(
     val hasMusic: Boolean = false,
     val isLoaded: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isSelecting: Boolean = false,
 ) {
     companion object {
         val INITIAL_STATE = AmuzicState()
@@ -201,6 +202,18 @@ class SongsViewModel
         fun onToggleSearching() {
             viewModelScope.launch {
                 state = state.copy(isSearching = !state.isSearching)
+            }
+        }
+
+        fun enableSelecting() {
+            viewModelScope.launch {
+                state = state.copy(isSelecting = true)
+            }
+        }
+
+        fun disableSelecting() {
+            viewModelScope.launch {
+                state = state.copy(isSelecting = false)
             }
         }
 

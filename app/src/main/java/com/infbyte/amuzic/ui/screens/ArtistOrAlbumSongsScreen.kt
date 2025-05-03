@@ -133,11 +133,15 @@ fun ArtistOrAlbumSongsScreen(
                 SongsScreen(
                     songs = songsViewModel.state.songsSearchResult,
                     songsViewModel.state.currentSong,
+                    songsViewModel.state.isSelecting,
                     onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                     onSongClick = { song ->
                         searchQuery = ""
                         songsViewModel.onSongClicked(song)
                         songsViewModel.onToggleSearching()
+                    },
+                    onSongLongClick = {
+                        songsViewModel.enableSelecting()
                     },
                 )
             } else {
@@ -148,14 +152,22 @@ fun ArtistOrAlbumSongsScreen(
         SongsScreen(
             songs = songsViewModel.state.songs,
             songsViewModel.state.currentSong,
+            songsViewModel.state.isSelecting,
             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
             onSongClick = { song ->
                 songsViewModel.onSongClicked(song)
+            },
+            onSongLongClick = {
+                songsViewModel.enableSelecting()
             },
         )
     }
 
     BackHandler {
+        if (songsViewModel.state.isSelecting) {
+            songsViewModel.disableSelecting()
+            return@BackHandler
+        }
         if (songsViewModel.state.showPlayList) {
             songsViewModel.onTogglePlayList(false)
             return@BackHandler

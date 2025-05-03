@@ -195,6 +195,7 @@ fun MainScreen(
                                 SongsScreen(
                                     songs = songsViewModel.state.songsSearchResult,
                                     songsViewModel.state.currentSong,
+                                    songsViewModel.state.isSelecting,
                                     onScroll = { scrollValue ->
                                         songsViewModel.togglePlayBarByScroll(scrollValue)
                                     },
@@ -202,6 +203,9 @@ fun MainScreen(
                                         searchQuery = ""
                                         songsViewModel.onSongClicked(song)
                                         songsViewModel.onToggleSearching()
+                                    },
+                                    onSongLongClick = {
+                                        songsViewModel.enableSelecting()
                                     },
                                 )
                             }
@@ -259,11 +263,15 @@ fun MainScreen(
                     SongsScreen(
                         songs = songsViewModel.state.songs,
                         songsViewModel.state.currentSong,
+                        songsViewModel.state.isSelecting,
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },
                         onSongClick = { song ->
                             songsViewModel.onSongClicked(song)
+                        },
+                        onSongLongClick = {
+                            songsViewModel.enableSelecting()
                         },
                     )
                 }
@@ -313,6 +321,11 @@ fun MainScreen(
             }
         }
         BackHandler {
+            if (songsViewModel.state.isSelecting) {
+                songsViewModel.disableSelecting()
+                return@BackHandler
+            }
+
             if (songsViewModel.state.showPlayList) {
                 songsViewModel.onTogglePlayList(false)
                 return@BackHandler

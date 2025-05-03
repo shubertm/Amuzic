@@ -48,9 +48,14 @@ fun BoxScope.PlayListScreen(
                 ),
         ) {
             accommodateFullBannerAds(songs) { song ->
-                Song(song, currentSong == song) {
-                    onSongClick(song)
-                }
+                Song(
+                    song,
+                    currentSong == song,
+                    isSelecting = false,
+                    onClick = {
+                        onSongClick(song)
+                    },
+                )
             }
         }
     }
