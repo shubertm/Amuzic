@@ -1,9 +1,13 @@
 package com.infbyte.amuzic.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -12,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -22,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,15 +37,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
+import com.infbyte.amuzic.data.model.Playlist
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
+import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
 import com.infbyte.amuzic.utils.navigationBarsPadding
+import com.infbyte.amuzic.utils.toDp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +70,8 @@ fun MainScreen(
         remember {
             FocusRequester()
         }
+    var heightPadding by rememberSaveable { mutableIntStateOf(0) }
+    var showPlaylists by rememberSaveable { mutableStateOf(false) }
 
     if (showAbout) {
         about { showAbout = false }
@@ -68,7 +80,11 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            NavigationBar(Modifier.fillMaxWidth()) {
+            NavigationBar(
+                Modifier.fillMaxWidth().onSizeChanged {
+                    heightPadding = it.height
+                },
+            ) {
                 NavigationBarItem(
                     selected = pagerState.currentPage == 0,
                     onClick = {
@@ -271,6 +287,29 @@ fun MainScreen(
                             onNavigate(Screens.SONGS)
                         },
                     )
+            }
+        }
+        Box(Modifier.fillMaxSize()) {
+            if (!showPlaylists) {
+                FloatingActionButton(
+                    onClick = { showPlaylists = true },
+                    Modifier.align(Alignment.BottomEnd).padding(
+                        bottom = heightPadding.toDp() + 16.dp,
+                        end = 16.dp,
+                    ),
+                ) {
+                    Icon(painterResource(R.drawable.ic_queue_music), "")
+                }
+            }
+
+            AnimatedVisibility(
+                showPlaylists,
+                Modifier.align(Alignment.BottomCenter),
+                enter = expandVertically(expandFrom = Alignment.Bottom),
+            ) {
+                PlaylistsBottomSheet(
+                    listOf(Playlist(), Playlist(), Playlist()),
+                ) { showPlaylists = false }
             }
         }
         BackHandler {
