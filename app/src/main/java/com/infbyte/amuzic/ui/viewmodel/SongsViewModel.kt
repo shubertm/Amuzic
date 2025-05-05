@@ -15,7 +15,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.RepeatMode
 import com.infbyte.amuzic.data.model.Album
 import com.infbyte.amuzic.data.model.Artist
+import com.infbyte.amuzic.data.model.Playlist
 import com.infbyte.amuzic.data.model.Song
+import com.infbyte.amuzic.data.repo.PlaylistsRepo
 import com.infbyte.amuzic.data.repo.SongsRepo
 import com.infbyte.amuzic.playback.AmuzicPlayer
 import com.infbyte.amuzic.ui.viewmodel.AmuzicState.Companion.INITIAL_STATE
@@ -31,14 +33,15 @@ data class AmuzicState(
     val currentSong: Song = Song(),
     val currentArtist: Artist = Artist(),
     val currentAlbum: Album = Album(),
-    val songs: List<Song> = listOf(),
-    val currentPlaylist: List<Song> = listOf(),
-    val selectedSongs: List<Song> = listOf(),
-    val artists: List<Artist> = listOf(),
-    val albums: List<Album> = listOf(),
-    val songsSearchResult: List<Song> = listOf(),
-    val artistsSearchResult: List<Artist> = listOf(),
-    val albumsSearchResult: List<Album> = listOf(),
+    val songs: List<Song> = emptyList(),
+    val currentPlaylist: List<Song> = emptyList(),
+    val selectedSongs: List<Song> = emptyList(),
+    val artists: List<Artist> = emptyList(),
+    val albums: List<Album> = emptyList(),
+    val playlists: List<Playlist> = emptyList(),
+    val songsSearchResult: List<Song> = emptyList(),
+    val artistsSearchResult: List<Artist> = emptyList(),
+    val albumsSearchResult: List<Album> = emptyList(),
     val icon: ImageBitmap? = null,
     val artistOrAlbumInitialChar: String = "",
     val isPlaying: Boolean = false,
@@ -72,6 +75,7 @@ class SongsViewModel
     constructor(
         private val repo: SongsRepo,
         private val amuzicPlayer: AmuzicPlayer,
+        private val playlistsRepo: PlaylistsRepo,
     ) : ViewModel() {
         var state by mutableStateOf(INITIAL_STATE)
             private set
@@ -107,6 +111,7 @@ class SongsViewModel
         fun init(context: Context) {
             refreshController(context)
             loadSongs()
+            loadPlaylists()
         }
 
         fun confirmExit() {
@@ -230,6 +235,14 @@ class SongsViewModel
         fun onToggleSearching() {
             viewModelScope.launch {
                 state = state.copy(isSearching = !state.isSearching)
+            }
+        }
+
+        fun onCreatePlaylist(name: String) {
+            viewModelScope.launch {
+                val playlist = Playlist(name, state.selectedSongs.map { it.id })
+                playlistsRepo.add(playlist)
+                state = state.copy(selectedSongs = emptyList())
             }
         }
 
@@ -422,6 +435,13 @@ class SongsViewModel
                         }
                     },
                 )
+            }
+        }
+
+        private fun loadPlaylists() {
+            viewModelScope.launch {
+                val playlists = playlistsRepo.getAll()
+                state = state.copy(playlists = playlists)
             }
         }
 
