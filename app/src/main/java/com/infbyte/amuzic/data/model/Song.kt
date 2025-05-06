@@ -17,9 +17,15 @@ data class Song(
     val id = item.mediaId
     var isPlaying: Boolean = false
         private set
+    var isSelected: Boolean = false
+        private set
 
     fun updateIsPlaying(value: Boolean) {
         isPlaying = value
+    }
+
+    fun updateIsSelected(value: Boolean) {
+        isSelected = value
     }
 
     companion object {

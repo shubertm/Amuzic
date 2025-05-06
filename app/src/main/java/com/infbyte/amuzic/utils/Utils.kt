@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.core.net.toUri
 import com.infbyte.amuzic.ui.views.FullBannerAdView
 
@@ -73,5 +75,12 @@ fun <T> LazyListScope.accommodateFullBannerAds(
     }
     items(items) { item ->
         itemView(item)
+    }
+}
+
+@Composable
+fun Int.toDp(): Dp {
+    return with(LocalDensity.current) {
+        toDp()
     }
 }
