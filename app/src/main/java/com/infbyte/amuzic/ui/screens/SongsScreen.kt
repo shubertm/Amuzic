@@ -59,6 +59,7 @@ fun SongsScreen(
     songs: List<Song>,
     currentSong: Song,
     isSelecting: Boolean,
+    isCreatingPlaylist: Boolean,
     onScroll: (Int) -> Unit,
     onSongClick: (Song) -> Unit,
     onSongLongClick: (Song) -> Unit = {},
@@ -81,7 +82,7 @@ fun SongsScreen(
                 )
             }
         }
-        if (isSelecting) {
+        if (isCreatingPlaylist) {
             Button(
                 onClick = {
                     onSelectionDone()
@@ -111,7 +112,7 @@ fun Song(
     isCurrent: Boolean,
     isSelecting: Boolean,
     onClick: () -> Unit,
-    onLongClick: (Boolean) -> Unit = {},
+    onLongClick: () -> Unit = {},
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 
@@ -149,7 +150,7 @@ fun Song(
                 },
                 onLongClick = {
                     isSelected = true
-                    onLongClick(true)
+                    onLongClick()
                 },
             ),
         verticalAlignment = Alignment.CenterVertically,

@@ -33,6 +33,9 @@ import com.infbyte.amuzic.ui.theme.AmuzicTheme
 @Composable
 fun PlaylistsBottomSheet(
     list: List<Playlist> = emptyList(),
+    onClickPlaylist: (Playlist) -> Unit,
+    onDeletePlaylist: (Playlist) -> Unit,
+    onAddPlaylist: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var showNewPlaylist by rememberSaveable { mutableStateOf(false) }
@@ -43,14 +46,22 @@ fun PlaylistsBottomSheet(
     ) {
         androidx.compose.animation.AnimatedVisibility(showNewPlaylist) {
             NewPlaylist(
-                onSave = {},
+                onSave = { name -> onAddPlaylist(name) },
                 onDismiss = { showNewPlaylist = false },
             )
         }
 
         LazyColumn(Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)) {
             items(list) { playlist ->
-                Playlist(playlist)
+                Playlist(
+                    playlist,
+                    onClick = {
+                        onClickPlaylist(playlist)
+                    },
+                    onDelete = {
+                        onDeletePlaylist(playlist)
+                    },
+                )
             }
         }
 
@@ -74,6 +85,6 @@ fun PlaylistsBottomSheet(
 @Composable
 fun PreviewPlaylists() {
     AmuzicTheme {
-        PlaylistsBottomSheet(listOf(Playlist(), Playlist(), Playlist()), {})
+        PlaylistsBottomSheet(listOf(Playlist(), Playlist(), Playlist()), {}, {}, {}, {})
     }
 }

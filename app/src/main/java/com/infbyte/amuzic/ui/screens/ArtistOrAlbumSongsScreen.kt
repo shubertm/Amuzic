@@ -134,6 +134,7 @@ fun ArtistOrAlbumSongsScreen(
                     songs = songsViewModel.state.songsSearchResult,
                     songsViewModel.state.currentSong,
                     songsViewModel.state.isSelecting,
+                    songsViewModel.state.isCreatingPlaylist,
                     onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
                     onSongClick = { song ->
                         searchQuery = ""
@@ -156,6 +157,7 @@ fun ArtistOrAlbumSongsScreen(
             songs = songsViewModel.state.songs,
             songsViewModel.state.currentSong,
             songsViewModel.state.isSelecting,
+            songsViewModel.state.isCreatingPlaylist,
             onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
             onSongClick = { song ->
                 songsViewModel.onSongClicked(song)

@@ -43,7 +43,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.infbyte.amuzic.R
-import com.infbyte.amuzic.data.model.Playlist
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
@@ -76,6 +75,10 @@ fun MainScreen(
     if (showAbout) {
         about { showAbout = false }
         return
+    }
+
+    LaunchedEffect(pagerState.currentPage == 0) {
+        songsViewModel.onNavigateToAllSongs()
     }
 
     Scaffold(
@@ -196,6 +199,7 @@ fun MainScreen(
                                     songs = songsViewModel.state.songsSearchResult,
                                     songsViewModel.state.currentSong,
                                     songsViewModel.state.isSelecting,
+                                    songsViewModel.state.isCreatingPlaylist,
                                     onScroll = { scrollValue ->
                                         songsViewModel.togglePlayBarByScroll(scrollValue)
                                     },
@@ -260,13 +264,11 @@ fun MainScreen(
         ) { page ->
             when (page) {
                 0 -> {
-                    LaunchedEffect(key1 = "") {
-                        songsViewModel.onNavigateToAllSongs()
-                    }
                     SongsScreen(
                         songs = songsViewModel.state.songs,
                         songsViewModel.state.currentSong,
                         songsViewModel.state.isSelecting,
+                        songsViewModel.state.isCreatingPlaylist,
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },
@@ -277,6 +279,7 @@ fun MainScreen(
                             songsViewModel.onSongLongClicked(song)
                         },
                         onSelectionDone = {
+                            songsViewModel.onCreatePlaylist()
                             songsViewModel.disableSelecting()
                         },
                     )
@@ -322,7 +325,19 @@ fun MainScreen(
                 enter = expandVertically(expandFrom = Alignment.Bottom),
             ) {
                 PlaylistsBottomSheet(
-                    listOf(Playlist(), Playlist(), Playlist()),
+                    songsViewModel.state.playlists,
+                    onAddPlaylist = { name ->
+                        if (name.isNotEmpty()) {
+                            songsViewModel.enableSelecting()
+                            songsViewModel.updateNewPlaylist(name)
+                            showPlaylists = false
+                        }
+                    },
+                    onClickPlaylist = { list ->
+                        songsViewModel.onPlaylistClicked(list)
+                    },
+                    onDeletePlaylist = {
+                    },
                 ) { showPlaylists = false }
             }
         }

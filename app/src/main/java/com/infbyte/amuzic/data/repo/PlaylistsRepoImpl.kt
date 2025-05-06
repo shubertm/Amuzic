@@ -42,11 +42,11 @@ class PlaylistsRepoImpl
         }
 
         override suspend fun get(name: String): Playlist {
-            return Playlist(name, playlists[name] ?: emptyList())
+            return Playlist(name = name, songs = playlists[name] ?: emptyList())
         }
 
         override suspend fun getAll(): List<Playlist> {
-            return playlists.map { Playlist(it.key, it.value) }
+            return playlists.map { Playlist(name = it.key, songs = it.value) }
         }
 
         private fun write() {

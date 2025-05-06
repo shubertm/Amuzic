@@ -28,6 +28,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.io.path.Path
 
 data class AmuzicState(
     val currentSong: Song = Song(),
@@ -35,10 +36,13 @@ data class AmuzicState(
     val currentAlbum: Album = Album(),
     val songs: List<Song> = emptyList(),
     val currentPlaylist: List<Song> = emptyList(),
+    val playlist: List<Song> = emptyList(),
     val selectedSongs: List<Song> = emptyList(),
     val artists: List<Artist> = emptyList(),
     val albums: List<Album> = emptyList(),
     val playlists: List<Playlist> = emptyList(),
+    val newPlaylist: Playlist = Playlist(),
+    val isCreatingPlaylist: Boolean = false,
     val songsSearchResult: List<Song> = emptyList(),
     val artistsSearchResult: List<Artist> = emptyList(),
     val albumsSearchResult: List<Album> = emptyList(),
@@ -109,6 +113,7 @@ class SongsViewModel
         }
 
         fun init(context: Context) {
+            viewModelScope.launch { playlistsRepo.init(Path(context.filesDir.path)) }
             refreshController(context)
             loadSongs()
             loadPlaylists()
@@ -136,6 +141,7 @@ class SongsViewModel
             }
             state.apply {
                 val actualIndex = songs.indexOf(song)
+
                 val position = if (currentSong == song) amuzicPlayer.progress().toLong() else 0L
 
                 state = copy(currentSong = song, currentPlaylist = songs)
@@ -209,6 +215,16 @@ class SongsViewModel
             }
         }
 
+        fun onPlaylistClicked(list: Playlist) {
+            viewModelScope.launch {
+                val songs =
+                    repo.songs.filter { song ->
+                        list.songs.contains(song.id)
+                    }
+                state = state.copy(songs = songs)
+            }
+        }
+
         fun togglePlayBarByScroll(value: Int) {
             if (value != 0) {
                 calcScrollDelta(value) { delta ->
@@ -238,11 +254,28 @@ class SongsViewModel
             }
         }
 
-        fun onCreatePlaylist(name: String) {
+        fun onCreatePlaylist() {
+            if (state.selectedSongs.isNotEmpty() && state.isCreatingPlaylist) {
+                viewModelScope.launch {
+                    val playlist =
+                        state.newPlaylist.copy(
+                            songs = state.selectedSongs.map { it.id },
+                        )
+                    playlistsRepo.add(playlist)
+                    state =
+                        state.copy(
+                            selectedSongs = emptyList(),
+                            newPlaylist = Playlist(),
+                            playlists = playlistsRepo.getAll(),
+                            isCreatingPlaylist = false,
+                        )
+                }
+            }
+        }
+
+        fun updateNewPlaylist(name: String) {
             viewModelScope.launch {
-                val playlist = Playlist(name, state.selectedSongs.map { it.id })
-                playlistsRepo.add(playlist)
-                state = state.copy(selectedSongs = emptyList())
+                state = state.copy(newPlaylist = Playlist(name = name), isCreatingPlaylist = true)
             }
         }
 
@@ -440,8 +473,7 @@ class SongsViewModel
 
         private fun loadPlaylists() {
             viewModelScope.launch {
-                val playlists = playlistsRepo.getAll()
-                state = state.copy(playlists = playlists)
+                state = state.copy(playlists = playlistsRepo.getAll())
             }
         }
 
