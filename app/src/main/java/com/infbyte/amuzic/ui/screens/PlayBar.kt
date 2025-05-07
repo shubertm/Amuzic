@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -73,7 +71,6 @@ fun BoxScope.PlayBar(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp, 20.dp))
                 .clickable {}
-                .border(0.dp, Color.LightGray)
                 .background(
                     MaterialTheme.colorScheme.surfaceContainerLow,
                     RoundedCornerShape(20.dp, 20.dp),
@@ -109,9 +106,9 @@ fun BoxScope.PlayBar(
                         Modifier.size(32.dp),
                         tint =
                             if (!state.shuffle && state.mode == Player.REPEAT_MODE_OFF) {
-                                Color.LightGray
+                                MaterialTheme.colorScheme.outline
                             } else {
-                                Color.Black
+                                MaterialTheme.colorScheme.onSurface
                             },
                     )
                 }
