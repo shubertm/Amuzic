@@ -45,7 +45,10 @@ fun Playlist(
                 .size(48.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(item.name.getInitialChar(), style = MaterialTheme.typography.headlineLarge)
+            Text(
+                item.name.getInitialChar(),
+                style = MaterialTheme.typography.headlineMedium,
+            )
         }
         Text(
             item.name,
