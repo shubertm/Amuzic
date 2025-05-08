@@ -5,9 +5,10 @@ import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,18 +23,26 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,14 +58,45 @@ import com.infbyte.amuzic.utils.getInitialChar
 fun SongsScreen(
     songs: List<Song>,
     currentSong: Song,
+    isSelecting: Boolean,
+    isCreatingPlaylist: Boolean,
     onScroll: (Int) -> Unit,
     onSongClick: (Song) -> Unit,
+    onSongLongClick: (Song) -> Unit = {},
+    onSelectionDone: () -> Unit = {},
 ) {
     val state = rememberLazyListState()
-    LazyColumn(Modifier.fillMaxSize(), state) {
-        accommodateFullBannerAds(songs, showOnTopWithFewItems = false) { song ->
-            Song(song, currentSong == song) {
-                onSongClick(song)
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(Modifier, state) {
+            accommodateFullBannerAds(songs, showOnTopWithFewItems = false) { song ->
+                Song(
+                    song,
+                    currentSong == song,
+                    isSelecting,
+                    onClick = {
+                        onSongClick(song)
+                    },
+                    onLongClick = {
+                        onSongLongClick(song)
+                    },
+                )
+            }
+        }
+        if (isCreatingPlaylist) {
+            Button(
+                onClick = {
+                    onSelectionDone()
+                },
+                Modifier.align(Alignment.BottomCenter).padding(
+                    bottom = 16.dp,
+                ),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Outlined.Check, "")
+                    Text(stringResource(R.string.amuzic_done), Modifier.padding(start = 2.dp))
+                }
             }
         }
     }
@@ -65,11 +105,14 @@ fun SongsScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Song(
     song: Song,
     isCurrent: Boolean,
+    isSelecting: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit = {},
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 
@@ -82,6 +125,15 @@ fun Song(
                 repeatMode = RepeatMode.Reverse,
             ),
         )
+    var isSelected by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    SideEffect {
+        if (!isSelecting) {
+            isSelected = false
+        }
+    }
 
     Row(
         Modifier
@@ -89,9 +141,18 @@ fun Song(
             .padding(8.dp)
             .clip(RoundedCornerShape(10))
             .background(MaterialTheme.colorScheme.surface)
-            .clickable {
-                onClick()
-            },
+            .combinedClickable(
+                onClick = {
+                    if (isSelecting) {
+                        isSelected = !isSelected
+                    }
+                    onClick()
+                },
+                onLongClick = {
+                    isSelected = true
+                    onLongClick()
+                },
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (song.thumbnail != null) {
@@ -138,6 +199,7 @@ fun Song(
                 maxLines = 1,
             )
         }
+
         if (isCurrent) {
             Icon(
                 if (song.isPlaying) {
@@ -150,6 +212,15 @@ fun Song(
                 tint = color.value,
             )
         }
+        if (isSelecting) {
+            Checkbox(
+                isSelected,
+                onCheckedChange = { checked ->
+                    onClick()
+                    isSelected = checked
+                },
+            )
+        }
     }
 }
 
@@ -157,6 +228,6 @@ fun Song(
 @Composable
 fun PreviewSong() {
     AmuzicTheme {
-        Song(song = Song(), true) {}
+        Song(song = Song(), true, true, {}, {})
     }
 }

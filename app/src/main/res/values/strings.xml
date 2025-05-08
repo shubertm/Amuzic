@@ -36,5 +36,11 @@
     <string name="amuzic_service_explain">To play audio, Amuzic requires Audio permisson.</string>
     <string name="amuzic_grant">Grant</string>
     <string name="amuzic_grant_in_settings">Grant in settings</string>
+    <string name="amuzic_new">New</string>
+    <string name="amuzic_playlist">Playlist</string>
+    <string name="amuzic_done">Done</string>
+    <string name="amuzic_playlists">Your playlists</string>
+    <string name="amuzic_new_playlist">New playlist</string>
+    <string name="amuzic_preparing">Preparing your songs...</string>
     <string name="amuzic_quick_playlist">Quick playlist</string>
 </resources>

@@ -1,9 +1,13 @@
 package com.infbyte.amuzic.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -12,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -22,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +46,9 @@ import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
+import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
 import com.infbyte.amuzic.utils.navigationBarsPadding
+import com.infbyte.amuzic.utils.toDp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,15 +69,25 @@ fun MainScreen(
         remember {
             FocusRequester()
         }
+    var heightPadding by rememberSaveable { mutableIntStateOf(0) }
+    var showPlaylists by rememberSaveable { mutableStateOf(false) }
 
     if (showAbout) {
         about { showAbout = false }
         return
     }
 
+    LaunchedEffect(pagerState.currentPage == 0) {
+        songsViewModel.onNavigateToAllSongs()
+    }
+
     Scaffold(
         bottomBar = {
-            NavigationBar(Modifier.fillMaxWidth()) {
+            NavigationBar(
+                Modifier.fillMaxWidth().onSizeChanged {
+                    heightPadding = it.height
+                },
+            ) {
                 NavigationBarItem(
                     selected = pagerState.currentPage == 0,
                     onClick = {
@@ -179,6 +198,8 @@ fun MainScreen(
                                 SongsScreen(
                                     songs = songsViewModel.state.songsSearchResult,
                                     songsViewModel.state.currentSong,
+                                    songsViewModel.state.isSelecting,
+                                    songsViewModel.state.isCreatingPlaylist,
                                     onScroll = { scrollValue ->
                                         songsViewModel.togglePlayBarByScroll(scrollValue)
                                     },
@@ -186,6 +207,12 @@ fun MainScreen(
                                         searchQuery = ""
                                         songsViewModel.onSongClicked(song)
                                         songsViewModel.onToggleSearching()
+                                    },
+                                    onSongLongClick = { song ->
+                                        songsViewModel.onSongLongClicked(song)
+                                    },
+                                    onSelectionDone = {
+                                        songsViewModel.disableSelecting()
                                     },
                                 )
                             }
@@ -237,17 +264,23 @@ fun MainScreen(
         ) { page ->
             when (page) {
                 0 -> {
-                    LaunchedEffect(key1 = "") {
-                        songsViewModel.onNavigateToAllSongs()
-                    }
                     SongsScreen(
                         songs = songsViewModel.state.songs,
                         songsViewModel.state.currentSong,
+                        songsViewModel.state.isSelecting,
+                        songsViewModel.state.isCreatingPlaylist,
                         onScroll = { scrollValue ->
                             songsViewModel.togglePlayBarByScroll(scrollValue)
                         },
                         onSongClick = { song ->
                             songsViewModel.onSongClicked(song)
+                        },
+                        onSongLongClick = { song ->
+                            songsViewModel.onSongLongClicked(song)
+                        },
+                        onSelectionDone = {
+                            songsViewModel.onCreatePlaylist()
+                            songsViewModel.disableSelecting()
                         },
                     )
                 }
@@ -273,7 +306,47 @@ fun MainScreen(
                     )
             }
         }
+        Box(Modifier.fillMaxSize()) {
+            if (!showPlaylists && !songsViewModel.state.isSelecting) {
+                FloatingActionButton(
+                    onClick = { showPlaylists = true },
+                    Modifier.align(Alignment.BottomEnd).padding(
+                        bottom = heightPadding.toDp() + 16.dp,
+                        end = 16.dp,
+                    ),
+                ) {
+                    Icon(painterResource(R.drawable.ic_queue_music), "")
+                }
+            }
+
+            AnimatedVisibility(
+                showPlaylists,
+                Modifier.align(Alignment.BottomCenter),
+                enter = expandVertically(expandFrom = Alignment.Bottom),
+            ) {
+                PlaylistsBottomSheet(
+                    songsViewModel.state.playlists,
+                    onAddPlaylist = { name ->
+                        if (name.isNotEmpty()) {
+                            songsViewModel.enableSelecting()
+                            songsViewModel.updateNewPlaylist(name)
+                            showPlaylists = false
+                        }
+                    },
+                    onClickPlaylist = { list ->
+                        songsViewModel.onPlaylistClicked(list)
+                    },
+                    onDeletePlaylist = {
+                    },
+                ) { showPlaylists = false }
+            }
+        }
         BackHandler {
+            if (songsViewModel.state.isSelecting) {
+                songsViewModel.disableSelecting()
+                return@BackHandler
+            }
+
             if (songsViewModel.state.showPlayList) {
                 songsViewModel.onTogglePlayList(false)
                 return@BackHandler

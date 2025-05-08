@@ -20,6 +20,7 @@
         android:supportsRtl="true">
         <activity
             android:name=".ui.activities.MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,5 +43,4 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id"/>
     </application>
-
 </manifest>

@@ -1,6 +1,7 @@
 package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -14,7 +15,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.RepeatMode
 import com.infbyte.amuzic.data.model.Album
 import com.infbyte.amuzic.data.model.Artist
+import com.infbyte.amuzic.data.model.Playlist
 import com.infbyte.amuzic.data.model.Song
+import com.infbyte.amuzic.data.repo.PlaylistsRepo
 import com.infbyte.amuzic.data.repo.SongsRepo
 import com.infbyte.amuzic.playback.AmuzicPlayer
 import com.infbyte.amuzic.ui.viewmodel.AmuzicState.Companion.INITIAL_STATE
@@ -25,18 +28,24 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.io.path.Path
 
 data class AmuzicState(
     val currentSong: Song = Song(),
     val currentArtist: Artist = Artist(),
     val currentAlbum: Album = Album(),
-    val songs: List<Song> = listOf(),
-    val currentPlaylist: List<Song> = listOf(),
-    val artists: List<Artist> = listOf(),
-    val albums: List<Album> = listOf(),
-    val songsSearchResult: List<Song> = listOf(),
-    val artistsSearchResult: List<Artist> = listOf(),
-    val albumsSearchResult: List<Album> = listOf(),
+    val songs: List<Song> = emptyList(),
+    val currentPlaylist: List<Song> = emptyList(),
+    val playlist: List<Song> = emptyList(),
+    val selectedSongs: List<Song> = emptyList(),
+    val artists: List<Artist> = emptyList(),
+    val albums: List<Album> = emptyList(),
+    val playlists: List<Playlist> = emptyList(),
+    val newPlaylist: Playlist = Playlist(),
+    val isCreatingPlaylist: Boolean = false,
+    val songsSearchResult: List<Song> = emptyList(),
+    val artistsSearchResult: List<Artist> = emptyList(),
+    val albumsSearchResult: List<Album> = emptyList(),
     val icon: ImageBitmap? = null,
     val artistOrAlbumInitialChar: String = "",
     val isPlaying: Boolean = false,
@@ -51,6 +60,7 @@ data class AmuzicState(
     val hasMusic: Boolean = false,
     val isLoaded: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isSelecting: Boolean = false,
 ) {
     companion object {
         val INITIAL_STATE = AmuzicState()
@@ -69,6 +79,7 @@ class SongsViewModel
     constructor(
         private val repo: SongsRepo,
         private val amuzicPlayer: AmuzicPlayer,
+        private val playlistsRepo: PlaylistsRepo,
     ) : ViewModel() {
         var state by mutableStateOf(INITIAL_STATE)
             private set
@@ -102,8 +113,10 @@ class SongsViewModel
         }
 
         fun init(context: Context) {
+            viewModelScope.launch { playlistsRepo.init(Path(context.filesDir.path)) }
             refreshController(context)
             loadSongs()
+            loadPlaylists()
         }
 
         fun confirmExit() {
@@ -115,8 +128,20 @@ class SongsViewModel
         }
 
         fun onSongClicked(song: Song) {
+            if (state.isSelecting) {
+                if (state.selectedSongs.contains(song)) {
+                    removeFromSelected(song)
+                    if (state.selectedSongs.isEmpty()) {
+                        disableSelecting()
+                    }
+                    return
+                }
+                addToSelected(song)
+                return
+            }
             state.apply {
                 val actualIndex = songs.indexOf(song)
+
                 val position = if (currentSong == song) amuzicPlayer.progress().toLong() else 0L
 
                 state = copy(currentSong = song, currentPlaylist = songs)
@@ -128,6 +153,21 @@ class SongsViewModel
                 if (!showPlayList) {
                     showAndDelayHidePlayBar()
                 }
+            }
+        }
+
+        fun onSongLongClicked(song: Song) {
+            if (!state.isSelecting) enableSelecting()
+            if (state.isSelecting) {
+                if (state.selectedSongs.contains(song)) {
+                    removeFromSelected(song)
+                    if (state.selectedSongs.isEmpty()) {
+                        disableSelecting()
+                    }
+                    return
+                }
+                addToSelected(song)
+                return
             }
         }
 
@@ -175,6 +215,16 @@ class SongsViewModel
             }
         }
 
+        fun onPlaylistClicked(list: Playlist) {
+            viewModelScope.launch {
+                val songs =
+                    repo.songs.filter { song ->
+                        list.songs.contains(song.id)
+                    }
+                state = state.copy(songs = songs)
+            }
+        }
+
         fun togglePlayBarByScroll(value: Int) {
             if (value != 0) {
                 calcScrollDelta(value) { delta ->
@@ -201,6 +251,43 @@ class SongsViewModel
         fun onToggleSearching() {
             viewModelScope.launch {
                 state = state.copy(isSearching = !state.isSearching)
+            }
+        }
+
+        fun onCreatePlaylist() {
+            if (state.selectedSongs.isNotEmpty() && state.isCreatingPlaylist) {
+                viewModelScope.launch {
+                    val playlist =
+                        state.newPlaylist.copy(
+                            songs = state.selectedSongs.map { it.id },
+                        )
+                    playlistsRepo.add(playlist)
+                    state =
+                        state.copy(
+                            selectedSongs = emptyList(),
+                            newPlaylist = Playlist(),
+                            playlists = playlistsRepo.getAll(),
+                            isCreatingPlaylist = false,
+                        )
+                }
+            }
+        }
+
+        fun updateNewPlaylist(name: String) {
+            viewModelScope.launch {
+                state = state.copy(newPlaylist = Playlist(name = name), isCreatingPlaylist = true)
+            }
+        }
+
+        fun enableSelecting() {
+            viewModelScope.launch {
+                state = state.copy(isSelecting = true)
+            }
+        }
+
+        fun disableSelecting() {
+            viewModelScope.launch {
+                state = state.copy(isSelecting = false, selectedSongs = emptyList())
             }
         }
 
@@ -260,6 +347,24 @@ class SongsViewModel
 
         fun setIsRefreshing(isRefreshing: Boolean) {
             state = state.copy(isRefreshing = isRefreshing)
+        }
+
+        fun addToSelected(song: Song) {
+            viewModelScope.launch {
+                val songs = state.selectedSongs.toMutableList()
+                songs.add(song)
+                state = state.copy(selectedSongs = songs)
+                Log.d("ViewModel", "selected ${state.selectedSongs.size} songs")
+            }
+        }
+
+        fun removeFromSelected(song: Song) {
+            viewModelScope.launch {
+                val songs = state.selectedSongs.toMutableList()
+                songs.remove(song)
+                state = state.copy(selectedSongs = songs)
+                Log.d("ViewModel", "selected ${state.selectedSongs.size} songs")
+            }
         }
 
         fun onExit() {
@@ -363,6 +468,12 @@ class SongsViewModel
                         }
                     },
                 )
+            }
+        }
+
+        private fun loadPlaylists() {
+            viewModelScope.launch {
+                state = state.copy(playlists = playlistsRepo.getAll())
             }
         }
 

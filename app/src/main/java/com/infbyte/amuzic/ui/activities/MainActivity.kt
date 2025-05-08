@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -63,7 +64,6 @@ class MainActivity : ComponentActivity() {
         ) { isGranted ->
             songsViewModel.setReadPermGranted(isGranted)
             if (isGranted) {
-
                 songsViewModel.init(this)
                 return@registerForActivityResult
             }
@@ -83,41 +83,38 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        googleMobileAdsConsentManager = GoogleMobileAdsConsentManager(this)
-
-        googleMobileAdsConsentManager.checkConsent(this) {
-            if (googleMobileAdsConsentManager.canRequestAds) {
-                googleMobileAdsConsentManager.canRequestAds
-                initMobileAds()
-            }
-        }
-
-        if (googleMobileAdsConsentManager.canRequestAds) {
-            initMobileAds()
-        }
-
-        if (!songsViewModel.state.isLoaded) {
-            songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
-
-            if (!songsViewModel.state.isReadPermGranted) {
-                lifecycleScope.launch {
-                    readBoolean(TERMS_ACCEPTED_KEY) { accepted ->
-                        songsViewModel.setTermsAccepted(accepted)
-                        if (accepted) {
-                            launchPermRequest()
-                            return@readBoolean
-                        }
-                        songsViewModel.showPrivacyDialog()
-                    }
-                }
-            } else {
-                songsViewModel.init(this)
-            }
-        }
-
         setContent {
             AmuzicTheme {
+                LaunchedEffect("") {
+                    googleMobileAdsConsentManager = GoogleMobileAdsConsentManager(this@MainActivity)
+
+                    googleMobileAdsConsentManager.checkConsent(this@MainActivity) {
+                        if (googleMobileAdsConsentManager.canRequestAds) {
+                            initMobileAds()
+                        }
+                    }
+
+                    if (googleMobileAdsConsentManager.canRequestAds) {
+                        initMobileAds()
+                    }
+
+                    if (!songsViewModel.state.isLoaded) {
+                        songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
+                        if (!songsViewModel.state.isReadPermGranted) {
+                            readBoolean(TERMS_ACCEPTED_KEY) { accepted ->
+                                songsViewModel.setTermsAccepted(accepted)
+                                if (accepted) {
+                                    launchPermRequest()
+                                    return@readBoolean
+                                }
+                                songsViewModel.showPrivacyDialog()
+                            }
+                        } else {
+                            songsViewModel.init(this@MainActivity)
+                        }
+                    }
+                }
+
                 Surface(
                     Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -153,7 +150,7 @@ class MainActivity : ComponentActivity() {
                         (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
                         songsViewModel.state.isRefreshing
                     ) {
-                        LoadingScreen()
+                        LoadingScreen(stringResource(R.string.amuzic_preparing))
                         return@Surface
                     }
 
@@ -197,7 +194,7 @@ class MainActivity : ComponentActivity() {
                                     launchPermRequest()
                                 } else {
                                     songsViewModel.setIsRefreshing(true)
-                                    songsViewModel.init(this)
+                                    songsViewModel.init(this@MainActivity)
                                 }
                             },
                             onExit = { onExit() },
@@ -242,6 +239,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
                     Box(Modifier.fillMaxSize()) {
                         PlayBar(
                             songsViewModel.showPlayBar,
