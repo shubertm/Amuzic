@@ -89,13 +89,18 @@ fun PlaylistsBottomSheet(
                                     dragHandleTopPadding
                             )
                                 .coerceAtLeast(0.dp),
+                        bottom = if (list.isEmpty()) 16.dp else 0.dp,
                         start = 8.dp,
                         end = 8.dp,
                     ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    stringResource(R.string.amuzic_playlists),
+                    if (list.isNotEmpty()) {
+                        stringResource(R.string.amuzic_playlists)
+                    } else {
+                        stringResource(R.string.amuzic_new_playlist)
+                    },
                     Modifier.fillMaxWidth().weight(1f).padding(start = 8.dp, end = 8.dp),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 )

@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,11 +50,11 @@ fun Playlist(
             item.name,
             Modifier.fillMaxWidth().weight(1f),
         )
-        IconButton(
+        /* IconButton(
             onClick = { onDelete() },
         ) {
             Icon(Icons.Outlined.Delete, "")
-        }
+        }*/
     }
 }
 
