@@ -40,4 +40,5 @@
     <string name="amuzic_playlist">Playlist</string>
     <string name="amuzic_done">Done</string>
     <string name="amuzic_playlists">Your playlists</string>
+    <string name="amuzic_new_playlist">New playlist</string>
 </resources>
