@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
                         (songsViewModel.state.isReadPermGranted && !songsViewModel.state.isLoaded) ||
                         songsViewModel.state.isRefreshing
                     ) {
-                        LoadingScreen()
+                        LoadingScreen(stringResource(R.string.amuzic_preparing))
                         return@Surface
                     }
 
