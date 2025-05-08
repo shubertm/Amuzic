@@ -8,6 +8,8 @@ interface PlaylistsRepo {
 
     suspend fun add(list: Playlist)
 
+    suspend fun remove(list: Playlist)
+
     suspend fun get(name: String): Playlist
 
     suspend fun getAll(): List<Playlist>
