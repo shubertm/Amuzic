@@ -279,8 +279,11 @@ fun MainScreen(
                             songsViewModel.onSongLongClicked(song)
                         },
                         onSelectionDone = {
-                            songsViewModel.onCreatePlaylist()
-                            songsViewModel.disableSelecting()
+                            if (songsViewModel.state.isCreatingPlaylist) {
+                                showPlaylists = true
+                                songsViewModel.onCreatePlaylist()
+                                songsViewModel.disableSelecting()
+                            }
                         },
                     )
                 }
