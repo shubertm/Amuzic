@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,76 +59,93 @@ fun ArtistOrAlbumSongsScreen(
 
     Column(Modifier.navigationBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally) {
         SearchBar(
-            query = searchQuery,
-            onQueryChange = {
-                searchQuery = it
-                songsViewModel.onSearchSongs(it)
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = searchQuery,
+                    onQueryChange = {
+                        searchQuery = it
+                        songsViewModel.onSearchSongs(it)
+                    },
+                    onSearch = {},
+                    expanded = songsViewModel.state.isSearching,
+                    onExpandedChange = {
+                        if (!songsViewModel.state.isSearching) {
+                            searchQuery = ""
+                            songsViewModel.onToggleSearching()
+                        }
+                        songsViewModel.onSearchSongs(searchQuery)
+                    },
+                    Modifier.fillMaxWidth().padding(
+                        start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                        end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                    ).focusRequester(searchFocusRequester),
+                    leadingIcon = {
+                        IconButton(
+                            onClick = {
+                                if (songsViewModel.state.isSearching) {
+                                    searchQuery = ""
+                                    songsViewModel.onToggleSearching()
+                                    return@IconButton
+                                }
+                                onNavigateBack()
+                            },
+                        ) {
+                            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                        }
+                    },
+                    trailingIcon = {
+                        Row {
+                            IconButton(
+                                onClick = {
+                                    if (!songsViewModel.state.isSearching) {
+                                        songsViewModel.onToggleSearching()
+                                        searchFocusRequester.requestFocus()
+                                    }
+                                },
+                            ) {
+                                Icon(Icons.Outlined.Search, "")
+                            }
+                            if (!songsViewModel.state.isSearching) {
+                                IconButton(onClick = {}) {
+                                    songsViewModel.state.icon?.let { thumbnail ->
+                                        Image(
+                                            thumbnail,
+                                            contentDescription = "",
+                                            Modifier
+                                                .size(32.dp)
+                                                .clip(CircleShape),
+                                        )
+                                    } ?: Box(
+                                        Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            songsViewModel.state.artistOrAlbumInitialChar,
+                                            style = MaterialTheme.typography.titleLarge,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                )
             },
-            onSearch = {},
-            active = songsViewModel.state.isSearching,
-            onActiveChange = {
+            expanded = songsViewModel.state.isSearching,
+            onExpandedChange = {
                 if (!songsViewModel.state.isSearching) {
                     searchQuery = ""
                     songsViewModel.onToggleSearching()
                 }
                 songsViewModel.onSearchSongs(searchQuery)
             },
-            Modifier.fillMaxWidth().padding(
-                start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-                end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-            ).focusRequester(searchFocusRequester),
-            leadingIcon = {
-                IconButton(
-                    onClick = {
-                        if (songsViewModel.state.isSearching) {
-                            searchQuery = ""
-                            songsViewModel.onToggleSearching()
-                            return@IconButton
-                        }
-                        onNavigateBack()
-                    },
-                ) {
-                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
-                }
-            },
-            trailingIcon = {
-                Row {
-                    IconButton(
-                        onClick = {
-                            if (!songsViewModel.state.isSearching) {
-                                songsViewModel.onToggleSearching()
-                                searchFocusRequester.requestFocus()
-                            }
-                        },
-                    ) {
-                        Icon(Icons.Outlined.Search, "")
-                    }
-                    if (!songsViewModel.state.isSearching) {
-                        IconButton(onClick = {}) {
-                            songsViewModel.state.icon?.let { thumbnail ->
-                                Image(
-                                    thumbnail,
-                                    contentDescription = "",
-                                    Modifier
-                                        .size(32.dp)
-                                        .clip(CircleShape),
-                                )
-                            } ?: Box(
-                                Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    songsViewModel.state.artistOrAlbumInitialChar,
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
-                            }
-                        }
-                    }
-                }
-            },
-            placeholder = { Text(stringResource(R.string.amuzic_search)) },
+            modifier =
+                Modifier.fillMaxWidth().padding(
+                    start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                    end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                ).focusRequester(searchFocusRequester),
         ) {
             if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
                 SongsScreen(
@@ -206,37 +224,49 @@ fun PreviewSearchBar() {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SearchBar(
-                    query = "",
-                    onQueryChange = {},
-                    onSearch = {},
-                    active = false,
-                    onActiveChange = {},
-                    Modifier.fillMaxWidth(0.894f),
-                    leadingIcon = {
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                        ) {
-                            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
-                        }
-                    },
-                    trailingIcon = {
-                        Row {
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Icon(Icons.Outlined.Search, "")
-                            }
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Box(
-                                    Modifier
-                                        .size(32.dp)
-                                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, CircleShape),
-                                    contentAlignment = Alignment.Center,
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = "",
+                            onQueryChange = {},
+                            onSearch = {},
+                            expanded = false,
+                            onExpandedChange = {},
+                            Modifier.fillMaxWidth(0.894f),
+                            leadingIcon = {
+                                IconButton(
+                                    onClick = { /*TODO*/ },
                                 ) {
-                                    Text("Artist".first().toString(), style = MaterialTheme.typography.titleLarge)
+                                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
                                 }
-                            }
-                        }
+                            },
+                            trailingIcon = {
+                                Row {
+                                    IconButton(onClick = { /*TODO*/ }) {
+                                        Icon(Icons.Outlined.Search, "")
+                                    }
+                                    IconButton(onClick = { /*TODO*/ }) {
+                                        Box(
+                                            Modifier
+                                                .size(32.dp)
+                                                .background(
+                                                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                                                    CircleShape,
+                                                ),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            Text(
+                                                "Artist".first().toString(),
+                                                style = MaterialTheme.typography.titleLarge,
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                        )
                     },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                    expanded = false,
+                    onExpandedChange = {},
                 ) {}
             }
         }
