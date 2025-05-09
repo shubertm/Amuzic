@@ -36,6 +36,7 @@ fun NewPlaylist(
     onDismiss: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
+    var name by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect("") {
         focusRequester.requestFocus()
@@ -44,15 +45,13 @@ fun NewPlaylist(
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        var name by rememberSaveable { mutableStateOf("") }
-
         OutlinedTextField(
             name,
             onValueChange = { name = it },
             Modifier.fillMaxWidth().weight(1f)
                 .focusRequester(focusRequester)
                 .padding(start = 8.dp, end = 8.dp, bottom = 16.dp).imePadding(),
-            label = { Text(stringResource(R.string.amuzic_playlist)) },
+            label = { Text(stringResource(R.string.amuzic_name)) },
             leadingIcon = {
                 IconButton(
                     onClick = {
