@@ -44,4 +44,5 @@
     <string name="amuzic_preparing">Preparing your songs...</string>
     <string name="amuzic_delete">Delete?</string>
     <string name="amuzic_no">No</string>
+    <string name="amuzic_name">Name</string>
 </resources>
