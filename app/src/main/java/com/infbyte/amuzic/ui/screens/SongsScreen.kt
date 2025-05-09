@@ -140,7 +140,6 @@ fun Song(
             .fillMaxWidth()
             .padding(8.dp)
             .clip(RoundedCornerShape(10))
-            .background(MaterialTheme.colorScheme.surface)
             .combinedClickable(
                 onClick = {
                     if (isSelecting) {
