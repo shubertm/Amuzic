@@ -35,13 +35,12 @@ data class AmuzicState(
     val currentArtist: Artist = Artist(),
     val currentAlbum: Album = Album(),
     val songs: List<Song> = emptyList(),
-    val currentPlaylist: List<Song> = emptyList(),
-    val playlist: List<Song> = emptyList(),
+    val currentSongs: List<Song> = emptyList(),
     val selectedSongs: List<Song> = emptyList(),
     val artists: List<Artist> = emptyList(),
     val albums: List<Album> = emptyList(),
     val playlists: List<Playlist> = emptyList(),
-    val newPlaylist: Playlist = Playlist(),
+    val currentPlaylist: Playlist = Playlist(),
     val isCreatingPlaylist: Boolean = false,
     val songsSearchResult: List<Song> = emptyList(),
     val artistsSearchResult: List<Artist> = emptyList(),
@@ -77,9 +76,9 @@ data class SideEffect(
 class SongsViewModel
     @Inject
     constructor(
-        private val repo: SongsRepo,
-        private val amuzicPlayer: AmuzicPlayer,
+        private val songsRepo: SongsRepo,
         private val playlistsRepo: PlaylistsRepo,
+        private val amuzicPlayer: AmuzicPlayer,
     ) : ViewModel() {
         var state by mutableStateOf(INITIAL_STATE)
             private set
@@ -100,7 +99,7 @@ class SongsViewModel
             amuzicPlayer.onTransition = { index, duration ->
                 state =
                     with(state) {
-                        copy(currentSong = currentPlaylist[index], songDuration = duration)
+                        copy(currentSong = currentSongs[index], songDuration = duration)
                     }
             }
             amuzicPlayer.sendIsPlaying = { isPlaying ->
@@ -144,7 +143,7 @@ class SongsViewModel
 
                 val position = if (currentSong == song) amuzicPlayer.progress().toLong() else 0L
 
-                state = copy(currentSong = song, currentPlaylist = songs)
+                state = copy(currentSong = song, currentSongs = songs)
                 amuzicPlayer.createPlayList(songs.map { it.item })
                 amuzicPlayer.selectSong(actualIndex, position)
 
@@ -189,7 +188,7 @@ class SongsViewModel
 
         fun onArtistClicked(artist: Artist) {
             viewModelScope.launch {
-                val songs = repo.songs.filter { song -> song.artist == artist.name }
+                val songs = songsRepo.songs.filter { song -> song.artist == artist.name }
                 val icon = songs.firstNotNullOfOrNull { it.thumbnail }?.asImageBitmap()
                 state =
                     state.copy(
@@ -203,7 +202,7 @@ class SongsViewModel
 
         fun onAlbumClicked(album: Album) {
             viewModelScope.launch {
-                val songs = repo.songs.filter { song -> song.album == album.name }
+                val songs = songsRepo.songs.filter { song -> song.album == album.name }
                 val icon = songs.firstNotNullOfOrNull { it.thumbnail }?.asImageBitmap()
                 state =
                     state.copy(
@@ -218,7 +217,7 @@ class SongsViewModel
         fun onPlaylistClicked(list: Playlist) {
             viewModelScope.launch {
                 val songs =
-                    repo.songs.filter { song ->
+                    songsRepo.songs.filter { song ->
                         list.songs.contains(song.id)
                     }
                 state = state.copy(songs = songs)
@@ -258,14 +257,14 @@ class SongsViewModel
             if (state.selectedSongs.isNotEmpty() && state.isCreatingPlaylist) {
                 viewModelScope.launch {
                     val playlist =
-                        state.newPlaylist.copy(
+                        state.currentPlaylist.copy(
                             songs = state.selectedSongs.map { it.id },
                         )
                     playlistsRepo.add(playlist)
                     state =
                         state.copy(
                             selectedSongs = emptyList(),
-                            newPlaylist = Playlist(),
+                            currentPlaylist = Playlist(),
                             playlists = playlistsRepo.getAll(),
                             isCreatingPlaylist = false,
                         )
@@ -273,9 +272,16 @@ class SongsViewModel
             }
         }
 
+        fun onDeletePlaylist() {
+            viewModelScope.launch {
+                playlistsRepo.remove(state.currentPlaylist)
+                state = state.copy(playlists = playlistsRepo.getAll())
+            }
+        }
+
         fun updateNewPlaylist(name: String) {
             viewModelScope.launch {
-                state = state.copy(newPlaylist = Playlist(name = name), isCreatingPlaylist = true)
+                state = state.copy(currentPlaylist = Playlist(name = name), isCreatingPlaylist = true)
             }
         }
 
@@ -329,7 +335,7 @@ class SongsViewModel
 
         fun onNavigateToAllSongs() {
             viewModelScope.launch {
-                state = state.copy(songs = repo.songs)
+                state = state.copy(songs = songsRepo.songs)
             }
         }
 
@@ -427,8 +433,8 @@ class SongsViewModel
 
         private fun onPlaySong() {
             if (!amuzicPlayer.areSongsAvailable()) {
-                amuzicPlayer.createPlayList(state.currentPlaylist.map { it.item })
-                val index = state.currentPlaylist.indexOf(state.currentSong)
+                amuzicPlayer.createPlayList(state.currentSongs.map { it.item })
+                val index = state.currentSongs.indexOf(state.currentSong)
                 val position = (state.progress * state.currentSong.duration).toLong()
                 amuzicPlayer.selectSong(index, position)
             }
@@ -441,7 +447,7 @@ class SongsViewModel
 
         private fun loadSongs() {
             viewModelScope.launch {
-                repo.loadSongs(
+                songsRepo.loadSongs(
                     onComplete = { songs ->
                         viewModelScope.launch {
                             if (state.isRefreshing && songs.isEmpty()) {
@@ -451,12 +457,12 @@ class SongsViewModel
                                 state.copy(
                                     currentSong = songs.tryGetFirst { state.currentSong },
                                     songs = songs,
-                                    currentPlaylist = songs,
-                                    artists = repo.artists,
-                                    albums = repo.albums,
+                                    currentSongs = songs,
+                                    artists = songsRepo.artists,
+                                    albums = songsRepo.albums,
                                     songsSearchResult = songs,
-                                    artistsSearchResult = repo.artists,
-                                    albumsSearchResult = repo.albums,
+                                    artistsSearchResult = songsRepo.artists,
+                                    albumsSearchResult = songsRepo.albums,
                                     isLoaded = true,
                                     hasMusic = songs.isNotEmpty(),
                                     isRefreshing = false,

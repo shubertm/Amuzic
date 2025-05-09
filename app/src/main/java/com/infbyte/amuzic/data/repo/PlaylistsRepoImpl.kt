@@ -41,6 +41,11 @@ class PlaylistsRepoImpl
             write()
         }
 
+        override suspend fun remove(list: Playlist) {
+            playlists.remove(list.name)
+            write()
+        }
+
         override suspend fun get(name: String): Playlist {
             return Playlist(name = name, songs = playlists[name] ?: emptyList())
         }

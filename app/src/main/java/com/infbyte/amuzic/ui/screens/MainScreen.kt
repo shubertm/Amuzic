@@ -339,7 +339,9 @@ fun MainScreen(
                     onClickPlaylist = { list ->
                         songsViewModel.onPlaylistClicked(list)
                     },
-                    onDeletePlaylist = {
+                    onDeletePlaylist = { list ->
+                        songsViewModel.updateNewPlaylist(list.name)
+                        songsViewModel.onDeletePlaylist()
                     },
                 ) { showPlaylists = false }
             }
