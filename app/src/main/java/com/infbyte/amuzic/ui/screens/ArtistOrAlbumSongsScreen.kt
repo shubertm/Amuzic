@@ -41,6 +41,7 @@ import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
+import com.infbyte.amuzic.ui.views.SelectionCount
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -170,7 +171,17 @@ fun ArtistOrAlbumSongsScreen(
                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
             }
         }
-        BannerAdView()
+        if (songsViewModel.state.isSelecting) {
+            SelectionCount(songsViewModel.state.selectedSongs.size) {
+                songsViewModel.disableSelecting()
+                if (songsViewModel.state.isCreatingPlaylist) {
+                    songsViewModel.stopCreatingPlaylist()
+                }
+            }
+        }
+        if (!songsViewModel.state.isSelecting) {
+            BannerAdView()
+        }
         SongsScreen(
             songs = songsViewModel.state.songs,
             songsViewModel.state.currentSong,
@@ -192,6 +203,9 @@ fun ArtistOrAlbumSongsScreen(
     BackHandler {
         if (songsViewModel.state.isSelecting) {
             songsViewModel.disableSelecting()
+            if (songsViewModel.state.isCreatingPlaylist) {
+                songsViewModel.stopCreatingPlaylist()
+            }
             return@BackHandler
         }
         if (songsViewModel.state.showPlayList) {
