@@ -5,4 +5,8 @@ import com.infbyte.amuzic.data.repo.MediaItemId
 data class Playlist(
     val name: String = "",
     val songs: List<MediaItemId> = emptyList(),
-)
+) {
+    companion object {
+        val EMPTY = Playlist()
+    }
+}

@@ -53,6 +53,7 @@ import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
 import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
+import com.infbyte.amuzic.ui.views.SelectionCount
 import com.infbyte.amuzic.utils.navigationBarsPadding
 import com.infbyte.amuzic.utils.toDp
 import kotlinx.coroutines.launch
@@ -273,6 +274,15 @@ fun MainScreen(
                             }
                     }
                 }
+                if (songsViewModel.state.isSelecting) {
+                    SelectionCount(songsViewModel.state.selectedSongs.size) {
+                        songsViewModel.disableSelecting()
+                        if (songsViewModel.state.isCreatingPlaylist) {
+                            songsViewModel.stopCreatingPlaylist()
+                        }
+                    }
+                    return@Column
+                }
                 BannerAdView()
             }
         },
@@ -369,6 +379,9 @@ fun MainScreen(
         BackHandler {
             if (songsViewModel.state.isSelecting) {
                 songsViewModel.disableSelecting()
+                if (songsViewModel.state.isCreatingPlaylist) {
+                    songsViewModel.stopCreatingPlaylist()
+                }
                 return@BackHandler
             }
 

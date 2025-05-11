@@ -132,6 +132,9 @@ class SongsViewModel
                     removeFromSelected(song)
                     if (state.selectedSongs.isEmpty()) {
                         disableSelecting()
+                        if (state.isCreatingPlaylist) {
+                            stopCreatingPlaylist()
+                        }
                     }
                     return
                 }
@@ -282,6 +285,12 @@ class SongsViewModel
         fun updateNewPlaylist(name: String) {
             viewModelScope.launch {
                 state = state.copy(currentPlaylist = Playlist(name = name), isCreatingPlaylist = true)
+            }
+        }
+
+        fun stopCreatingPlaylist() {
+            viewModelScope.launch {
+                state = state.copy(isCreatingPlaylist = false, currentPlaylist = Playlist.EMPTY)
             }
         }
 
