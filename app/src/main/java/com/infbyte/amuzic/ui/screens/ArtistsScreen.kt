@@ -56,7 +56,6 @@ fun Artist(
             .fillMaxWidth()
             .padding(8.dp)
             .clip(RoundedCornerShape(10))
-            .background(MaterialTheme.colorScheme.surface)
             .clickable {
                 onClick()
             },

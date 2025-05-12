@@ -4,25 +4,31 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +53,7 @@ import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
 import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
+import com.infbyte.amuzic.ui.views.SelectionCount
 import com.infbyte.amuzic.utils.navigationBarsPadding
 import com.infbyte.amuzic.utils.toDp
 import kotlinx.coroutines.launch
@@ -135,18 +142,59 @@ fun MainScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 SearchBar(
-                    query = searchQuery,
-                    onQueryChange = {
-                        searchQuery = it
-                        when (pagerState.currentPage) {
-                            0 -> songsViewModel.onSearchSongs(it)
-                            1 -> songsViewModel.onSearchArtists(it)
-                            2 -> songsViewModel.onSearchAlbums(it)
-                        }
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = searchQuery,
+                            onQueryChange = {
+                                searchQuery = it
+                                when (pagerState.currentPage) {
+                                    0 -> songsViewModel.onSearchSongs(it)
+                                    1 -> songsViewModel.onSearchArtists(it)
+                                    2 -> songsViewModel.onSearchAlbums(it)
+                                }
+                            },
+                            onSearch = {},
+                            expanded = songsViewModel.state.isSearching,
+                            onExpandedChange = {
+                                if (!songsViewModel.state.isSearching) {
+                                    searchQuery = ""
+                                    songsViewModel.onToggleSearching()
+                                }
+                                when (pagerState.currentPage) {
+                                    0 -> songsViewModel.onSearchSongs(searchQuery)
+                                    1 -> songsViewModel.onSearchArtists(searchQuery)
+                                    2 -> songsViewModel.onSearchAlbums(searchQuery)
+                                }
+                            },
+                            placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                            trailingIcon = {
+                                Row {
+                                    IconButton(
+                                        onClick = {
+                                            if (!songsViewModel.state.isSearching) {
+                                                songsViewModel.onToggleSearching()
+                                                searchFocusRequester.requestFocus()
+                                            }
+                                        },
+                                    ) {
+                                        Icon(Icons.Outlined.Search, "")
+                                    }
+                                    if (!songsViewModel.state.isSearching) {
+                                        IconButton(
+                                            onClick = {
+                                                songsViewModel.hidePlayBar()
+                                                showAbout = true
+                                            },
+                                        ) {
+                                            Icon(Icons.Outlined.Info, contentDescription = "")
+                                        }
+                                    }
+                                }
+                            },
+                        )
                     },
-                    onSearch = {},
-                    active = songsViewModel.state.isSearching,
-                    onActiveChange = {
+                    expanded = songsViewModel.state.isSearching,
+                    onExpandedChange = {
                         if (!songsViewModel.state.isSearching) {
                             searchQuery = ""
                             songsViewModel.onToggleSearching()
@@ -157,39 +205,15 @@ fun MainScreen(
                             2 -> songsViewModel.onSearchAlbums(searchQuery)
                         }
                     },
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-                            end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
-                        )
-                        .navigationBarsPadding(songsViewModel.state.isSearching)
-                        .focusRequester(searchFocusRequester),
-                    trailingIcon = {
-                        Row {
-                            IconButton(
-                                onClick = {
-                                    if (!songsViewModel.state.isSearching) {
-                                        songsViewModel.onToggleSearching()
-                                        searchFocusRequester.requestFocus()
-                                    }
-                                },
-                            ) {
-                                Icon(Icons.Outlined.Search, "")
-                            }
-                            if (!songsViewModel.state.isSearching) {
-                                IconButton(
-                                    onClick = {
-                                        songsViewModel.hidePlayBar()
-                                        showAbout = true
-                                    },
-                                ) {
-                                    Icon(Icons.Outlined.Info, contentDescription = "")
-                                }
-                            }
-                        }
-                    },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                                end = if (!songsViewModel.state.isSearching) 8.dp else 0.dp,
+                            )
+                            .navigationBarsPadding(songsViewModel.state.isSearching)
+                            .focusRequester(searchFocusRequester),
                 ) {
                     when (pagerState.currentPage) {
                         0 ->
@@ -260,6 +284,15 @@ fun MainScreen(
                                 )
                             }
                     }
+                }
+                if (songsViewModel.state.isSelecting) {
+                    SelectionCount(songsViewModel.state.selectedSongs.size) {
+                        songsViewModel.disableSelecting()
+                        if (songsViewModel.state.isCreatingPlaylist) {
+                            songsViewModel.stopCreatingPlaylist()
+                        }
+                    }
+                    return@Column
                 }
                 BannerAdView()
             }
@@ -380,6 +413,9 @@ fun MainScreen(
         BackHandler {
             if (songsViewModel.state.isSelecting) {
                 songsViewModel.disableSelecting()
+                if (songsViewModel.state.isCreatingPlaylist) {
+                    songsViewModel.stopCreatingPlaylist()
+                }
                 return@BackHandler
             }
 
@@ -406,23 +442,49 @@ fun NavBar() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 SearchBar(
-                    query = "",
-                    onQueryChange = {},
-                    onSearch = {},
-                    active = false,
-                    onActiveChange = {},
-                    Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        Row {
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Icon(Icons.Outlined.Search, "")
-                            }
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Icon(Icons.Outlined.Info, "")
-                            }
-                        }
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = "",
+                            onQueryChange = {},
+                            onSearch = {},
+                            expanded = false,
+                            onExpandedChange = {},
+                            Modifier.fillMaxWidth(),
+                            leadingIcon = {
+                                IconButton(
+                                    onClick = { /*TODO*/ },
+                                ) {
+                                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                                }
+                            },
+                            trailingIcon = {
+                                Row {
+                                    IconButton(onClick = { /*TODO*/ }) {
+                                        Icon(Icons.Outlined.Search, "")
+                                    }
+                                    IconButton(onClick = { /*TODO*/ }) {
+                                        Box(
+                                            Modifier
+                                                .size(32.dp)
+                                                .background(
+                                                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                                                    CircleShape,
+                                                ),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            Text(
+                                                "Artist".first().toString(),
+                                                style = MaterialTheme.typography.titleLarge,
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                        )
                     },
-                    placeholder = { Text(stringResource(R.string.amuzic_search)) },
+                    expanded = false,
+                    onExpandedChange = {},
                 ) {}
             }
             NavigationBar(Modifier.fillMaxWidth()) {
