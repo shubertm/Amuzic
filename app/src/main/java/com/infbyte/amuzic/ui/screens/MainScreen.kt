@@ -77,7 +77,6 @@ fun MainScreen(
             FocusRequester()
         }
     var heightPadding by rememberSaveable { mutableIntStateOf(0) }
-    var showPlaylists by rememberSaveable { mutableStateOf(false) }
 
     if (showAbout) {
         about { showAbout = false }
@@ -91,9 +90,11 @@ fun MainScreen(
     Scaffold(
         bottomBar = {
             NavigationBar(
-                Modifier.fillMaxWidth().onSizeChanged {
-                    heightPadding = it.height
-                },
+                Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged {
+                        heightPadding = it.height
+                    },
             ) {
                 NavigationBarItem(
                     selected = pagerState.currentPage == 0,
@@ -238,6 +239,16 @@ fun MainScreen(
                                     onSelectionDone = {
                                         songsViewModel.disableSelecting()
                                     },
+                                    onSaveQuickPlaylist = { name ->
+                                        if (songsViewModel.state.isCreatingPlaylist) {
+                                            songsViewModel.showPlaylists()
+                                            songsViewModel.onCreatePlaylist()
+                                            songsViewModel.disableSelecting()
+                                        }
+                                    },
+                                    onDismissQuickPlaylist = {
+                                        songsViewModel.disableSelecting()
+                                    },
                                 )
                             }
 
@@ -292,7 +303,14 @@ fun MainScreen(
             Modifier
                 .padding(
                     top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding(),
+                    bottom =
+                        if (
+                            songsViewModel.state.isSelecting && !songsViewModel.state.isCreatingPlaylist
+                        ) {
+                            0.dp
+                        } else {
+                            paddingValues.calculateBottomPadding()
+                        },
                 ),
         ) { page ->
             when (page) {
@@ -312,7 +330,21 @@ fun MainScreen(
                             songsViewModel.onSongLongClicked(song)
                         },
                         onSelectionDone = {
-                            songsViewModel.onCreatePlaylist()
+                            if (songsViewModel.state.isCreatingPlaylist) {
+                                songsViewModel.showPlaylists()
+                                songsViewModel.onCreatePlaylist()
+                                songsViewModel.disableSelecting()
+                            }
+                        },
+                        onSaveQuickPlaylist = { name ->
+                            if (name.isNotEmpty()) {
+                                songsViewModel.showPlaylists()
+                                songsViewModel.updateNewPlaylist(name)
+                                songsViewModel.onCreatePlaylist()
+                                songsViewModel.disableSelecting()
+                            }
+                        },
+                        onDismissQuickPlaylist = {
                             songsViewModel.disableSelecting()
                         },
                     )
@@ -340,20 +372,22 @@ fun MainScreen(
             }
         }
         Box(Modifier.fillMaxSize()) {
-            if (!showPlaylists && !songsViewModel.state.isSelecting) {
+            if (!songsViewModel.sideEffect.showPlaylists && !songsViewModel.state.isSelecting) {
                 FloatingActionButton(
-                    onClick = { showPlaylists = true },
-                    Modifier.align(Alignment.BottomEnd).padding(
-                        bottom = heightPadding.toDp() + 16.dp,
-                        end = 16.dp,
-                    ),
+                    onClick = { songsViewModel.showPlaylists() },
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            bottom = heightPadding.toDp() + 16.dp,
+                            end = 16.dp,
+                        ),
                 ) {
                     Icon(painterResource(R.drawable.ic_queue_music), "")
                 }
             }
 
             AnimatedVisibility(
-                showPlaylists,
+                songsViewModel.sideEffect.showPlaylists,
                 Modifier.align(Alignment.BottomCenter),
                 enter = expandVertically(expandFrom = Alignment.Bottom),
             ) {
@@ -363,7 +397,7 @@ fun MainScreen(
                         if (name.isNotEmpty()) {
                             songsViewModel.enableSelecting()
                             songsViewModel.updateNewPlaylist(name)
-                            showPlaylists = false
+                            songsViewModel.hidePlaylists()
                         }
                     },
                     onClickPlaylist = { list ->
@@ -373,7 +407,7 @@ fun MainScreen(
                         songsViewModel.updateNewPlaylist(list.name)
                         songsViewModel.onDeletePlaylist()
                     },
-                ) { showPlaylists = false }
+                ) { songsViewModel.hidePlaylists() }
             }
         }
         BackHandler {

@@ -166,6 +166,17 @@ fun ArtistOrAlbumSongsScreen(
                     onSelectionDone = {
                         songsViewModel.disableSelecting()
                     },
+                    onSaveQuickPlaylist = { name ->
+                        if (name.isNotEmpty()) {
+                            songsViewModel.showPlaylists()
+                            songsViewModel.updateNewPlaylist(name)
+                            songsViewModel.onCreatePlaylist()
+                            songsViewModel.disableSelecting()
+                        }
+                    },
+                    onDismissQuickPlaylist = {
+                        songsViewModel.disableSelecting()
+                    },
                 )
             } else {
                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
@@ -195,6 +206,17 @@ fun ArtistOrAlbumSongsScreen(
                 songsViewModel.onSongLongClicked(song)
             },
             onSelectionDone = {
+                songsViewModel.disableSelecting()
+            },
+            onSaveQuickPlaylist = { name ->
+                if (name.isNotEmpty()) {
+                    songsViewModel.showPlaylists()
+                    songsViewModel.updateNewPlaylist(name)
+                    songsViewModel.onCreatePlaylist()
+                    songsViewModel.disableSelecting()
+                }
+            },
+            onDismissQuickPlaylist = {
                 songsViewModel.disableSelecting()
             },
         )
