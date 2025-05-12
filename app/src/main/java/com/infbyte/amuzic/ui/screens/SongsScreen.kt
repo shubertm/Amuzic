@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.ui.views.NewQuickPlaylist
 import com.infbyte.amuzic.utils.accommodateFullBannerAds
 import com.infbyte.amuzic.utils.calcScroll
 import com.infbyte.amuzic.utils.getInitialChar
@@ -64,6 +65,8 @@ fun SongsScreen(
     onSongClick: (Song) -> Unit,
     onSongLongClick: (Song) -> Unit = {},
     onSelectionDone: () -> Unit = {},
+    onSaveQuickPlaylist: (String) -> Unit = { _ -> },
+    onDismissQuickPlaylist: () -> Unit = {},
 ) {
     val state = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
@@ -81,6 +84,13 @@ fun SongsScreen(
                     },
                 )
             }
+        }
+        if (isSelecting && !isCreatingPlaylist) {
+            NewQuickPlaylist(
+                Modifier.align(Alignment.BottomCenter),
+                onSave = onSaveQuickPlaylist,
+                onDismiss = onDismissQuickPlaylist,
+            )
         }
         if (isCreatingPlaylist) {
             Button(

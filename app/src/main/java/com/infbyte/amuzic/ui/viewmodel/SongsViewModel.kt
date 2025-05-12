@@ -70,6 +70,7 @@ data class SideEffect(
     val showSplash: Boolean = true,
     val showPrivacyDialog: Boolean = false,
     val showAppSettingsRedirect: Boolean = false,
+    val showPlaylists: Boolean = false,
 )
 
 @HiltViewModel
@@ -391,6 +392,18 @@ class SongsViewModel
 
         fun hideAppSettingsRedirect() {
             sideEffect = sideEffect.copy(showAppSettingsRedirect = false)
+        }
+
+        fun showPlaylists() {
+            viewModelScope.launch {
+                sideEffect = sideEffect.copy(showPlaylists = true)
+            }
+        }
+
+        fun hidePlaylists() {
+            viewModelScope.launch {
+                sideEffect = sideEffect.copy(showPlaylists = false)
+            }
         }
 
         private fun showAndDelayHidePlayBar() {
