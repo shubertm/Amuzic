@@ -1,9 +1,7 @@
 package com.infbyte.amuzic.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,7 +50,6 @@ import com.infbyte.amuzic.R
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
-import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
 import com.infbyte.amuzic.ui.views.SelectionCount
 import com.infbyte.amuzic.utils.navigationBarsPadding
 import com.infbyte.amuzic.utils.toDp
@@ -384,30 +381,6 @@ fun MainScreen(
                 ) {
                     Icon(painterResource(R.drawable.ic_queue_music), "")
                 }
-            }
-
-            AnimatedVisibility(
-                songsViewModel.sideEffect.showPlaylists,
-                Modifier.align(Alignment.BottomCenter),
-                enter = expandVertically(expandFrom = Alignment.Bottom),
-            ) {
-                PlaylistsBottomSheet(
-                    songsViewModel.state.playlists,
-                    onAddPlaylist = { name ->
-                        if (name.isNotEmpty()) {
-                            songsViewModel.enableSelecting()
-                            songsViewModel.updateNewPlaylist(name)
-                            songsViewModel.hidePlaylists()
-                        }
-                    },
-                    onClickPlaylist = { list ->
-                        songsViewModel.onPlaylistClicked(list)
-                    },
-                    onDeletePlaylist = { list ->
-                        songsViewModel.updateNewPlaylist(list.name)
-                        songsViewModel.onDeletePlaylist()
-                    },
-                ) { songsViewModel.hidePlaylists() }
             }
         }
         BackHandler {
