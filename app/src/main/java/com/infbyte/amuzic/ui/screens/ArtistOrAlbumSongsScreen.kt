@@ -164,7 +164,11 @@ fun ArtistOrAlbumSongsScreen(
                         songsViewModel.onSongLongClicked(song)
                     },
                     onSelectionDone = {
-                        songsViewModel.disableSelecting()
+                        if (songsViewModel.state.isCreatingPlaylist) {
+                            songsViewModel.showPlaylists()
+                            songsViewModel.onCreatePlaylist()
+                            songsViewModel.disableSelecting()
+                        }
                     },
                     onSaveQuickPlaylist = { name ->
                         if (name.isNotEmpty()) {
@@ -206,7 +210,11 @@ fun ArtistOrAlbumSongsScreen(
                 songsViewModel.onSongLongClicked(song)
             },
             onSelectionDone = {
-                songsViewModel.disableSelecting()
+                if (songsViewModel.state.isCreatingPlaylist) {
+                    songsViewModel.showPlaylists()
+                    songsViewModel.onCreatePlaylist()
+                    songsViewModel.disableSelecting()
+                }
             },
             onSaveQuickPlaylist = { name ->
                 if (name.isNotEmpty()) {

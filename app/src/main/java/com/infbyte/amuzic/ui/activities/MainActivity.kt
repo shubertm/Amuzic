@@ -10,11 +10,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -44,6 +47,7 @@ import com.infbyte.amuzic.ui.screens.PlayListScreen
 import com.infbyte.amuzic.ui.screens.Screens
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
+import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
 import com.infbyte.amuzic.utils.AmuzicPermissions.showReqPermRationale
 import dagger.hilt.android.AndroidEntryPoint
@@ -270,6 +274,30 @@ class MainActivity : ComponentActivity() {
                                 songsViewModel.onSongClicked(song)
                             },
                         )
+
+                        AnimatedVisibility(
+                            songsViewModel.sideEffect.showPlaylists,
+                            Modifier.align(Alignment.BottomCenter),
+                            enter = expandVertically(expandFrom = Alignment.Bottom),
+                        ) {
+                            PlaylistsBottomSheet(
+                                songsViewModel.state.playlists,
+                                onAddPlaylist = { name ->
+                                    if (name.isNotEmpty()) {
+                                        songsViewModel.enableSelecting()
+                                        songsViewModel.updateNewPlaylist(name)
+                                        songsViewModel.hidePlaylists()
+                                    }
+                                },
+                                onClickPlaylist = { list ->
+                                    songsViewModel.onPlaylistClicked(list)
+                                },
+                                onDeletePlaylist = { list ->
+                                    songsViewModel.updateNewPlaylist(list.name)
+                                    songsViewModel.onDeletePlaylist()
+                                },
+                            ) { songsViewModel.hidePlaylists() }
+                        }
                     }
                 }
             }
