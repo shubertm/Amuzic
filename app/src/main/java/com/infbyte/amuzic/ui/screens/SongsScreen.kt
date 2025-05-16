@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.NewQuickPlaylist
 import com.infbyte.amuzic.utils.accommodateFullBannerAds
 import com.infbyte.amuzic.utils.calcScroll
@@ -57,6 +60,7 @@ import com.infbyte.amuzic.utils.getInitialChar
 
 @Composable
 fun SongsScreen(
+    songsViewModel: SongsViewModel,
     songs: List<Song>,
     currentSong: Song,
     isSelecting: Boolean,
@@ -107,6 +111,19 @@ fun SongsScreen(
                     Icon(Icons.Outlined.Check, "")
                     Text(stringResource(R.string.amuzic_done), Modifier.padding(start = 2.dp))
                 }
+            }
+        }
+        if (!songsViewModel.sideEffect.showPlaylists && !songsViewModel.state.isSelecting) {
+            FloatingActionButton(
+                onClick = { songsViewModel.showPlaylists() },
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        bottom = 16.dp,
+                        end = 16.dp,
+                    ),
+            ) {
+                Icon(painterResource(R.drawable.ic_queue_music), "")
             }
         }
     }

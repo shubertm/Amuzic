@@ -150,6 +150,7 @@ fun ArtistOrAlbumSongsScreen(
         ) {
             if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
                 SongsScreen(
+                    songsViewModel,
                     songs = songsViewModel.state.songsSearchResult,
                     songsViewModel.state.currentSong,
                     songsViewModel.state.isSelecting,
@@ -198,6 +199,7 @@ fun ArtistOrAlbumSongsScreen(
             BannerAdView()
         }
         SongsScreen(
+            songsViewModel,
             songs = songsViewModel.state.songs,
             songsViewModel.state.currentSong,
             songsViewModel.state.isSelecting,

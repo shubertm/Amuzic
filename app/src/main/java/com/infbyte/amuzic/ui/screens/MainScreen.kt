@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,7 +50,6 @@ import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.BannerAdView
 import com.infbyte.amuzic.ui.views.SelectionCount
 import com.infbyte.amuzic.utils.navigationBarsPadding
-import com.infbyte.amuzic.utils.toDp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -218,6 +215,7 @@ fun MainScreen(
                                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
                             } else {
                                 SongsScreen(
+                                    songsViewModel,
                                     songs = songsViewModel.state.songsSearchResult,
                                     songsViewModel.state.currentSong,
                                     songsViewModel.state.isSelecting,
@@ -313,6 +311,7 @@ fun MainScreen(
             when (page) {
                 0 -> {
                     SongsScreen(
+                        songsViewModel,
                         songs = songsViewModel.state.songs,
                         songsViewModel.state.currentSong,
                         songsViewModel.state.isSelecting,
@@ -366,21 +365,6 @@ fun MainScreen(
                             onNavigate(Screens.SONGS)
                         },
                     )
-            }
-        }
-        Box(Modifier.fillMaxSize()) {
-            if (!songsViewModel.sideEffect.showPlaylists && !songsViewModel.state.isSelecting) {
-                FloatingActionButton(
-                    onClick = { songsViewModel.showPlaylists() },
-                    Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(
-                            bottom = heightPadding.toDp() + 16.dp,
-                            end = 16.dp,
-                        ),
-                ) {
-                    Icon(painterResource(R.drawable.ic_queue_music), "")
-                }
             }
         }
         BackHandler {
