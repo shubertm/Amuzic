@@ -214,37 +214,7 @@ fun MainScreen(
                             if (songsViewModel.state.songsSearchResult.isEmpty()) {
                                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
                             } else {
-                                SongsScreen(
-                                    songsViewModel,
-                                    songs = songsViewModel.state.songsSearchResult,
-                                    songsViewModel.state.currentSong,
-                                    songsViewModel.state.isSelecting,
-                                    songsViewModel.state.isCreatingPlaylist,
-                                    onScroll = { scrollValue ->
-                                        songsViewModel.togglePlayBarByScroll(scrollValue)
-                                    },
-                                    onSongClick = { song ->
-                                        searchQuery = ""
-                                        songsViewModel.onSongClicked(song)
-                                        songsViewModel.onToggleSearching()
-                                    },
-                                    onSongLongClick = { song ->
-                                        songsViewModel.onSongLongClicked(song)
-                                    },
-                                    onSelectionDone = {
-                                        songsViewModel.disableSelecting()
-                                    },
-                                    onSaveQuickPlaylist = { name ->
-                                        if (songsViewModel.state.isCreatingPlaylist) {
-                                            songsViewModel.showPlaylists()
-                                            songsViewModel.onCreatePlaylist()
-                                            songsViewModel.disableSelecting()
-                                        }
-                                    },
-                                    onDismissQuickPlaylist = {
-                                        songsViewModel.disableSelecting()
-                                    },
-                                )
+                                SongsScreen(songsViewModel)
                             }
 
                         1 ->
@@ -310,40 +280,7 @@ fun MainScreen(
         ) { page ->
             when (page) {
                 0 -> {
-                    SongsScreen(
-                        songsViewModel,
-                        songs = songsViewModel.state.songs,
-                        songsViewModel.state.currentSong,
-                        songsViewModel.state.isSelecting,
-                        songsViewModel.state.isCreatingPlaylist,
-                        onScroll = { scrollValue ->
-                            songsViewModel.togglePlayBarByScroll(scrollValue)
-                        },
-                        onSongClick = { song ->
-                            songsViewModel.onSongClicked(song)
-                        },
-                        onSongLongClick = { song ->
-                            songsViewModel.onSongLongClicked(song)
-                        },
-                        onSelectionDone = {
-                            if (songsViewModel.state.isCreatingPlaylist) {
-                                songsViewModel.showPlaylists()
-                                songsViewModel.onCreatePlaylist()
-                                songsViewModel.disableSelecting()
-                            }
-                        },
-                        onSaveQuickPlaylist = { name ->
-                            if (name.isNotEmpty()) {
-                                songsViewModel.showPlaylists()
-                                songsViewModel.updateNewPlaylist(name)
-                                songsViewModel.onCreatePlaylist()
-                                songsViewModel.disableSelecting()
-                            }
-                        },
-                        onDismissQuickPlaylist = {
-                            songsViewModel.disableSelecting()
-                        },
-                    )
+                    SongsScreen(songsViewModel)
                 }
 
                 1 ->
