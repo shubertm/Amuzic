@@ -149,39 +149,7 @@ fun ArtistOrAlbumSongsScreen(
                 ).focusRequester(searchFocusRequester),
         ) {
             if (songsViewModel.state.songsSearchResult.isNotEmpty()) {
-                SongsScreen(
-                    songs = songsViewModel.state.songsSearchResult,
-                    songsViewModel.state.currentSong,
-                    songsViewModel.state.isSelecting,
-                    songsViewModel.state.isCreatingPlaylist,
-                    onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-                    onSongClick = { song ->
-                        searchQuery = ""
-                        songsViewModel.onSongClicked(song)
-                        songsViewModel.onToggleSearching()
-                    },
-                    onSongLongClick = { song ->
-                        songsViewModel.onSongLongClicked(song)
-                    },
-                    onSelectionDone = {
-                        if (songsViewModel.state.isCreatingPlaylist) {
-                            songsViewModel.showPlaylists()
-                            songsViewModel.onCreatePlaylist()
-                            songsViewModel.disableSelecting()
-                        }
-                    },
-                    onSaveQuickPlaylist = { name ->
-                        if (name.isNotEmpty()) {
-                            songsViewModel.showPlaylists()
-                            songsViewModel.updateNewPlaylist(name)
-                            songsViewModel.onCreatePlaylist()
-                            songsViewModel.disableSelecting()
-                        }
-                    },
-                    onDismissQuickPlaylist = {
-                        songsViewModel.disableSelecting()
-                    },
-                )
+                SongsScreen(songsViewModel)
             } else {
                 com.infbyte.amuze.ui.screens.NoSearchResultScreen()
             }
@@ -197,37 +165,7 @@ fun ArtistOrAlbumSongsScreen(
         if (!songsViewModel.state.isSelecting) {
             BannerAdView()
         }
-        SongsScreen(
-            songs = songsViewModel.state.songs,
-            songsViewModel.state.currentSong,
-            songsViewModel.state.isSelecting,
-            songsViewModel.state.isCreatingPlaylist,
-            onScroll = { scrollValue -> songsViewModel.togglePlayBarByScroll(scrollValue) },
-            onSongClick = { song ->
-                songsViewModel.onSongClicked(song)
-            },
-            onSongLongClick = { song ->
-                songsViewModel.onSongLongClicked(song)
-            },
-            onSelectionDone = {
-                if (songsViewModel.state.isCreatingPlaylist) {
-                    songsViewModel.showPlaylists()
-                    songsViewModel.onCreatePlaylist()
-                    songsViewModel.disableSelecting()
-                }
-            },
-            onSaveQuickPlaylist = { name ->
-                if (name.isNotEmpty()) {
-                    songsViewModel.showPlaylists()
-                    songsViewModel.updateNewPlaylist(name)
-                    songsViewModel.onCreatePlaylist()
-                    songsViewModel.disableSelecting()
-                }
-            },
-            onDismissQuickPlaylist = {
-                songsViewModel.disableSelecting()
-            },
-        )
+        SongsScreen(songsViewModel)
     }
 
     BackHandler {

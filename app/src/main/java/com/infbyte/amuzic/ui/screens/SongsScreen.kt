@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,56 +52,68 @@ import androidx.compose.ui.unit.sp
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
+import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
 import com.infbyte.amuzic.ui.views.NewQuickPlaylist
 import com.infbyte.amuzic.utils.accommodateFullBannerAds
 import com.infbyte.amuzic.utils.calcScroll
 import com.infbyte.amuzic.utils.getInitialChar
 
 @Composable
-fun SongsScreen(
-    songs: List<Song>,
-    currentSong: Song,
-    isSelecting: Boolean,
-    isCreatingPlaylist: Boolean,
-    onScroll: (Int) -> Unit,
-    onSongClick: (Song) -> Unit,
-    onSongLongClick: (Song) -> Unit = {},
-    onSelectionDone: () -> Unit = {},
-    onSaveQuickPlaylist: (String) -> Unit = { _ -> },
-    onDismissQuickPlaylist: () -> Unit = {},
-) {
+fun SongsScreen(songsViewModel: SongsViewModel) {
     val state = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
         LazyColumn(Modifier, state) {
-            accommodateFullBannerAds(songs, showOnTopWithFewItems = false) { song ->
+            accommodateFullBannerAds(
+                if (songsViewModel.state.isSearching) {
+                    songsViewModel.state.songsSearchResult
+                } else {
+                    songsViewModel.state.songs
+                },
+                showOnTopWithFewItems = false,
+            ) { song ->
                 Song(
                     song,
-                    currentSong == song,
-                    isSelecting,
+                    song == songsViewModel.state.currentSong,
+                    songsViewModel.state.isSelecting,
                     onClick = {
-                        onSongClick(song)
+                        songsViewModel.onSongClicked(song)
                     },
                     onLongClick = {
-                        onSongLongClick(song)
+                        songsViewModel.onSongLongClicked(song)
                     },
                 )
             }
         }
-        if (isSelecting && !isCreatingPlaylist) {
+        if (songsViewModel.state.isSelecting && !songsViewModel.state.isCreatingPlaylist) {
             NewQuickPlaylist(
                 Modifier.align(Alignment.BottomCenter),
-                onSave = onSaveQuickPlaylist,
-                onDismiss = onDismissQuickPlaylist,
+                onSave = { name ->
+                    if (name.isNotEmpty()) {
+                        songsViewModel.showPlaylists()
+                        songsViewModel.updateNewPlaylist(name)
+                        songsViewModel.onCreatePlaylist()
+                        songsViewModel.disableSelecting()
+                    }
+                },
+                onDismiss = {
+                    songsViewModel.disableSelecting()
+                },
             )
         }
-        if (isCreatingPlaylist) {
+        if (songsViewModel.state.isCreatingPlaylist) {
             Button(
                 onClick = {
-                    onSelectionDone()
+                    if (songsViewModel.state.isCreatingPlaylist) {
+                        songsViewModel.showPlaylists()
+                        songsViewModel.onCreatePlaylist()
+                        songsViewModel.disableSelecting()
+                    }
                 },
-                Modifier.align(Alignment.BottomCenter).padding(
-                    bottom = 16.dp,
-                ),
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        bottom = 16.dp,
+                    ),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -109,9 +123,22 @@ fun SongsScreen(
                 }
             }
         }
+        if (!songsViewModel.sideEffect.showPlaylists && !songsViewModel.state.isSelecting) {
+            FloatingActionButton(
+                onClick = { songsViewModel.showPlaylists() },
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        bottom = 16.dp,
+                        end = 16.dp,
+                    ),
+            ) {
+                Icon(painterResource(R.drawable.ic_queue_music), "")
+            }
+        }
     }
     if (state.isScrollInProgress) {
-        onScroll(calcScroll(state))
+        songsViewModel.togglePlayBarByScroll(calcScroll(state))
     }
 }
 
@@ -178,7 +205,9 @@ fun Song(
             }
         } else {
             Box(
-                Modifier.padding(8.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                Modifier
+                    .padding(8.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                     .size(48.dp),
                 contentAlignment = Alignment.Center,
             ) {
