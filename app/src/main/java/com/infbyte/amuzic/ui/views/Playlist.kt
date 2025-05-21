@@ -75,7 +75,10 @@ fun Playlist(
                 )
             }
             TextButton(
-                onClick = { onDelete() },
+                onClick = {
+                    onDelete()
+                    isDeleting = false
+                },
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
                 Text(
