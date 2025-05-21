@@ -1,7 +1,6 @@
 package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -15,6 +14,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Player.RepeatMode
 import com.infbyte.amuzic.data.model.Album
 import com.infbyte.amuzic.data.model.Artist
+import com.infbyte.amuzic.data.model.NotificationMessage
 import com.infbyte.amuzic.data.model.Playlist
 import com.infbyte.amuzic.data.model.Song
 import com.infbyte.amuzic.data.repo.PlaylistsRepo
@@ -71,6 +71,7 @@ data class SideEffect(
     val showPrivacyDialog: Boolean = false,
     val showAppSettingsRedirect: Boolean = false,
     val showPlaylists: Boolean = false,
+    val notificationMessage: NotificationMessage = NotificationMessage.Success(),
 )
 
 @HiltViewModel
@@ -124,6 +125,14 @@ class SongsViewModel
                 confirmExit = true
                 delay(2000)
                 confirmExit = false
+            }
+        }
+
+        fun onNotify(message: NotificationMessage) {
+            viewModelScope.launch {
+                sideEffect = sideEffect.copy(notificationMessage = message)
+                delay(2_000)
+                sideEffect = sideEffect.copy(notificationMessage = NotificationMessage.Success())
             }
         }
 
@@ -370,7 +379,6 @@ class SongsViewModel
                 val songs = state.selectedSongs.toMutableList()
                 songs.add(song)
                 state = state.copy(selectedSongs = songs)
-                Log.d("ViewModel", "selected ${state.selectedSongs.size} songs")
             }
         }
 
@@ -379,7 +387,6 @@ class SongsViewModel
                 val songs = state.selectedSongs.toMutableList()
                 songs.remove(song)
                 state = state.copy(selectedSongs = songs)
-                Log.d("ViewModel", "selected ${state.selectedSongs.size} songs")
             }
         }
 

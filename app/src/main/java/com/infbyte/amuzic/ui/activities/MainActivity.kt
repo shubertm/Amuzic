@@ -47,6 +47,7 @@ import com.infbyte.amuzic.ui.screens.PlayListScreen
 import com.infbyte.amuzic.ui.screens.Screens
 import com.infbyte.amuzic.ui.theme.AmuzicTheme
 import com.infbyte.amuzic.ui.viewmodel.SongsViewModel
+import com.infbyte.amuzic.ui.views.NotificationBar
 import com.infbyte.amuzic.ui.views.PlaylistsBottomSheet
 import com.infbyte.amuzic.utils.AmuzicPermissions.isReadPermissionGranted
 import com.infbyte.amuzic.utils.AmuzicPermissions.showReqPermRationale
@@ -299,6 +300,8 @@ class MainActivity : ComponentActivity() {
                             ) { songsViewModel.hidePlaylists() }
                         }
                     }
+
+                    NotificationBar(songsViewModel.sideEffect.notificationMessage)
                 }
             }
         }
