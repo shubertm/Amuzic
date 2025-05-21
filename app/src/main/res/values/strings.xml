@@ -46,4 +46,5 @@
     <string name="amuzic_no">No</string>
     <string name="amuzic_name">Name</string>
     <string name="amuzic_quick_playlist">Quick playlist</string>
+    <string name="amuzic_deleted">Deleted</string>
 </resources>

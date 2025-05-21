@@ -1,5 +1,7 @@
 package com.infbyte.amuzic.ui.views
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,10 +42,28 @@ fun Playlist(
     onDelete: () -> Unit = {},
 ) {
     var isDeleting by rememberSaveable { mutableStateOf(false) }
+    var isDeleteConfirmed by rememberSaveable { mutableStateOf(false) }
+    val backgroundColor by animateColorAsState(
+        if (isDeleteConfirmed) {
+            MaterialTheme.colorScheme.surfaceVariant
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        },
+        animationSpec = tween(durationMillis = 2_500),
+        finishedListener = {
+            if (isDeleteConfirmed) {
+                onDelete()
+                isDeleteConfirmed = false
+            }
+        },
+    )
 
     Row(
         Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainerLow, RoundedCornerShape(10))
+            .background(
+                if (isDeleteConfirmed) backgroundColor else MaterialTheme.colorScheme.surfaceContainerLow,
+                RoundedCornerShape(10),
+            )
             .clip(RoundedCornerShape(10))
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
@@ -76,7 +96,7 @@ fun Playlist(
             }
             TextButton(
                 onClick = {
-                    onDelete()
+                    isDeleteConfirmed = true
                     isDeleting = false
                 },
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
@@ -86,6 +106,15 @@ fun Playlist(
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
+            return@Row
+        }
+        if (isDeleteConfirmed) {
+            Text(
+                stringResource(R.string.amuzic_deleted),
+                Modifier.padding(end = 8.dp),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
             return@Row
         }
         IconButton(
