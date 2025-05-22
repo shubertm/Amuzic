@@ -285,9 +285,9 @@ class SongsViewModel
             }
         }
 
-        fun onDeletePlaylist() {
+        fun onDeletePlaylist(list: Playlist) {
             viewModelScope.launch {
-                playlistsRepo.remove(state.currentPlaylist)
+                playlistsRepo.remove(list)
                 state = state.copy(playlists = playlistsRepo.getAll())
             }
         }
