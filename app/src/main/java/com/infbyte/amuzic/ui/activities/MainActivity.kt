@@ -294,8 +294,7 @@ class MainActivity : ComponentActivity() {
                                     songsViewModel.onPlaylistClicked(list)
                                 },
                                 onDeletePlaylist = { list ->
-                                    songsViewModel.updateNewPlaylist(list.name)
-                                    songsViewModel.onDeletePlaylist()
+                                    songsViewModel.onDeletePlaylist(list)
                                 },
                             ) { songsViewModel.hidePlaylists() }
                         }
