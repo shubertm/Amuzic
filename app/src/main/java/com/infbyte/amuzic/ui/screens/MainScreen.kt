@@ -60,9 +60,6 @@ fun MainScreen(
     onExit: () -> Unit,
     about: @Composable (() -> Unit) -> Unit,
 ) {
-    var showAbout by rememberSaveable {
-        mutableStateOf(false)
-    }
     val pagerState = rememberPagerState(0) { 3 }
     val scope = rememberCoroutineScope()
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -71,11 +68,6 @@ fun MainScreen(
             FocusRequester()
         }
     var heightPadding by rememberSaveable { mutableIntStateOf(0) }
-
-    if (showAbout) {
-        about { showAbout = false }
-        return
-    }
 
     LaunchedEffect(pagerState.currentPage == 0) {
         songsViewModel.onNavigateToAllSongs()
@@ -177,7 +169,7 @@ fun MainScreen(
                                         IconButton(
                                             onClick = {
                                                 songsViewModel.hidePlayBar()
-                                                showAbout = true
+                                                onNavigate(Screens.ABOUT)
                                             },
                                         ) {
                                             Icon(Icons.Outlined.Info, contentDescription = "")
