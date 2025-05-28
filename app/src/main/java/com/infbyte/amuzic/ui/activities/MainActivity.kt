@@ -17,6 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,11 +30,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
+import com.infbyte.amuze.ads.GoogleMobileAdsConsentManager
 import com.infbyte.amuze.ui.screens.AboutScreen
 import com.infbyte.amuze.ui.screens.LoadingScreen
 import com.infbyte.amuze.ui.screens.NoMediaAvailableScreen
 import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
-import com.infbyte.amuze.utils.GoogleMobileAdsConsentManager
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AppSettingsContract
@@ -126,6 +130,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
+                    var initialScreen by rememberSaveable { mutableStateOf(Screens.MAIN) }
                     val navController = rememberNavController()
 
                     if (songsViewModel.sideEffect.showPrivacyDialog) {
@@ -161,65 +166,16 @@ class MainActivity : ComponentActivity() {
                         return@Surface
                     }
 
-                    if (!songsViewModel.state.isReadPermGranted) {
-                        NoMediaPermissionScreen(
-                            R.drawable.ic_amuzic_intro,
-                            R.string.amuzic_listen,
-                            onStartAction = {
-                                if (!songsViewModel.state.isTermsAccepted) {
-                                    songsViewModel.showPrivacyDialog()
-                                    return@NoMediaPermissionScreen
-                                }
-
-                                if (!showReqPermRationale()) {
-                                    songsViewModel.showAppSettingsRedirect()
-                                    return@NoMediaPermissionScreen
-                                }
-
-                                launchPermRequest()
-                            },
-                            aboutApp = { navigateBack ->
-                                AboutScreen(
-                                    stringResource(R.string.app_name),
-                                    BuildConfig.VERSION_NAME,
-                                    R.drawable.ic_amuzic_foreground,
-                                    R.string.amuzic_privacy_policy_link,
-                                    adsConsentManager = googleMobileAdsConsentManager,
-                                    onNavigateBack = { navigateBack() },
-                                )
-                            },
-                            onExit = { onExit() },
-                        )
-                        return@Surface
+                    when {
+                        !songsViewModel.state.isReadPermGranted -> {
+                            initialScreen = Screens.NO_PERMISSION
+                        }
+                        !songsViewModel.state.hasMusic -> {
+                            initialScreen = Screens.NO_MEDIA
+                        }
                     }
 
-                    if (!songsViewModel.state.hasMusic) {
-                        NoMediaAvailableScreen(
-                            R.string.amuzic_no_muzic,
-                            onRefresh = {
-                                if (!songsViewModel.state.isReadPermGranted) {
-                                    launchPermRequest()
-                                } else {
-                                    songsViewModel.setIsRefreshing(true)
-                                    songsViewModel.init(this@MainActivity)
-                                }
-                            },
-                            onExit = { onExit() },
-                            aboutApp = { navigateBack ->
-                                AboutScreen(
-                                    stringResource(R.string.app_name),
-                                    BuildConfig.VERSION_NAME,
-                                    R.drawable.ic_amuzic_foreground,
-                                    R.string.amuzic_privacy_policy_link,
-                                    adsConsentManager = googleMobileAdsConsentManager,
-                                    onNavigateBack = { navigateBack() },
-                                )
-                            },
-                        )
-                        return@Surface
-                    }
-
-                    NavHost(navController, startDestination = Screens.MAIN) {
+                    NavHost(navController, startDestination = initialScreen) {
                         composable(Screens.MAIN) {
                             MainScreen(
                                 songsViewModel,
@@ -232,7 +188,6 @@ class MainActivity : ComponentActivity() {
                                         R.drawable.ic_amuzic_foreground,
                                         R.string.amuzic_privacy_policy_link,
                                         adsConsentManager = googleMobileAdsConsentManager,
-                                        onNavigateBack = { navigateBack() },
                                     )
                                 },
                             )
@@ -243,6 +198,51 @@ class MainActivity : ComponentActivity() {
                                 onNavigateBack = {
                                     navController.popBackStack()
                                 },
+                            )
+                        }
+                        composable(Screens.ABOUT) {
+                            AboutScreen(
+                                stringResource(R.string.app_name),
+                                BuildConfig.VERSION_NAME,
+                                R.drawable.ic_amuzic_foreground,
+                                R.string.amuzic_privacy_policy_link,
+                                adsConsentManager = googleMobileAdsConsentManager,
+                            )
+                        }
+                        composable(Screens.NO_MEDIA) {
+                            NoMediaAvailableScreen(
+                                R.string.amuzic_no_muzic,
+                                onRefresh = {
+                                    if (!songsViewModel.state.isReadPermGranted) {
+                                        launchPermRequest()
+                                    } else {
+                                        songsViewModel.setIsRefreshing(true)
+                                        songsViewModel.init(this@MainActivity)
+                                    }
+                                },
+                                onExit = { onExit() },
+                                aboutApp = { navController.navigate(Screens.ABOUT) },
+                            )
+                        }
+                        composable(Screens.NO_PERMISSION) {
+                            NoMediaPermissionScreen(
+                                R.drawable.ic_amuzic_intro,
+                                R.string.amuzic_listen,
+                                onStartAction = {
+                                    if (!songsViewModel.state.isTermsAccepted) {
+                                        songsViewModel.showPrivacyDialog()
+                                        return@NoMediaPermissionScreen
+                                    }
+
+                                    if (!showReqPermRationale()) {
+                                        songsViewModel.showAppSettingsRedirect()
+                                        return@NoMediaPermissionScreen
+                                    }
+
+                                    launchPermRequest()
+                                },
+                                aboutApp = { navController.navigate(Screens.ABOUT) },
+                                onExit = { onExit() },
                             )
                         }
                     }

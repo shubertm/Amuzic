@@ -117,6 +117,7 @@ android {
 }
 
 dependencies {
+    // implementation(fileTree("dir" to "./libs", "include" to arrayOf("*.aar")))
     implementation(libs.androidx.material3)
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

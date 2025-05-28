@@ -81,7 +81,6 @@ jobs:
                     name: amuzic-bundle
                     path: ./app/build/outputs/bundle/release/*.aab
 
-
     lint:
         environment: Development
         runs-on: ubuntu-latest
