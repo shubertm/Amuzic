@@ -166,14 +166,17 @@ class MainActivity : ComponentActivity() {
                         return@Surface
                     }
 
-                    when {
-                        !songsViewModel.state.isReadPermGranted -> {
-                            initialScreen = Screens.NO_PERMISSION
+                    initialScreen =
+                        when {
+                            !songsViewModel.state.isReadPermGranted -> {
+                                Screens.NO_PERMISSION
+                            }
+
+                            !songsViewModel.state.hasMusic -> {
+                                Screens.NO_MEDIA
+                            }
+                            else -> Screens.MAIN
                         }
-                        !songsViewModel.state.hasMusic -> {
-                            initialScreen = Screens.NO_MEDIA
-                        }
-                    }
 
                     NavHost(navController, startDestination = initialScreen) {
                         composable(Screens.MAIN) {
