@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
-val properties = Properties()
+val properties: Properties = Properties()
 val propertiesFile: File = rootProject.file("local.properties")
 if (propertiesFile.exists()) {
     properties.load(propertiesFile.inputStream())
