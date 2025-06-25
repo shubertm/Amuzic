@@ -62,7 +62,7 @@ import com.infbyte.amuzic.utils.getInitialChar
 fun SongsScreen(songsViewModel: SongsViewModel) {
     val state = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
-        LazyColumn(Modifier, state) {
+        LazyColumn(Modifier.fillMaxSize(), state) {
             accommodateFullBannerAds(
                 if (songsViewModel.state.isSearching) {
                     songsViewModel.state.songsSearchResult

@@ -2,7 +2,6 @@ package com.infbyte.amuzic.ui.viewmodel
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -71,6 +70,7 @@ data class SideEffect(
     val showPrivacyDialog: Boolean = false,
     val showAppSettingsRedirect: Boolean = false,
     val showPlaylists: Boolean = false,
+    val showPlayBar: Boolean = false,
     val notificationMessage: NotificationMessage = NotificationMessage.Success(),
 )
 
@@ -91,8 +91,6 @@ class SongsViewModel
         var confirmExit = false
             private set
 
-        private val _showPlayBar = mutableStateOf(false)
-        val showPlayBar: State<Boolean> = _showPlayBar
         private var scrollValue = 0
 
         private var playBarDelayJob: Job? = null
@@ -248,7 +246,7 @@ class SongsViewModel
         }
 
         fun hidePlayBar() {
-            _showPlayBar.value = false
+            sideEffect = sideEffect.copy(showPlayBar = false)
         }
 
         fun onTogglePlaybackMode() {
@@ -423,7 +421,13 @@ class SongsViewModel
         }
 
         private fun showAndDelayHidePlayBar() {
-            switchOnDelayOffBoolState(_showPlayBar)
+            stopPlayBarDelayJob()
+            playBarDelayJob =
+                viewModelScope.launch {
+                    sideEffect = sideEffect.copy(showPlayBar = true)
+                    delay(10000)
+                    sideEffect = sideEffect.copy(showPlayBar = false)
+                }
         }
 
         private fun togglePlayBarByScrollDelta(delta: Int) {
@@ -432,7 +436,7 @@ class SongsViewModel
                 return
             }
             if (delta < 0) {
-                _showPlayBar.value = false
+                hidePlayBar()
             }
         }
 
@@ -445,18 +449,10 @@ class SongsViewModel
             toggle(delta)
         }
 
-        private fun switchOnDelayOffBoolState(boolState: MutableState<Boolean>) {
-            if (!boolState.value) {
-                if (playBarDelayJob != null) {
-                    playBarDelayJob?.cancel()
-                    playBarDelayJob = null
-                }
-                playBarDelayJob =
-                    viewModelScope.launch {
-                        boolState.value = true
-                        delay(10000)
-                        boolState.value = false
-                    }
+        private fun stopPlayBarDelayJob() {
+            if (playBarDelayJob != null) {
+                playBarDelayJob?.cancel()
+                playBarDelayJob = null
             }
         }
 

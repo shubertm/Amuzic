@@ -252,7 +252,7 @@ class MainActivity : ComponentActivity() {
 
                     Box(Modifier.fillMaxSize()) {
                         PlayBar(
-                            songsViewModel.showPlayBar,
+                            songsViewModel.sideEffect.showPlayBar,
                             songsViewModel.state,
                             onPlayClick = {
                                 songsViewModel.onPlayClicked()
