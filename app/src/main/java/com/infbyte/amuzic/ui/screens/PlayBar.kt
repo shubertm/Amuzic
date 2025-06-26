@@ -29,8 +29,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +48,7 @@ import com.infbyte.amuzic.ui.viewmodel.AmuzicState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoxScope.PlayBar(
-    isVisible: State<Boolean>,
+    isVisible: Boolean,
     state: AmuzicState,
     onPlayClick: () -> Unit,
     onNextClick: () -> Unit,
@@ -60,7 +58,7 @@ fun BoxScope.PlayBar(
     onShowPlayListClick: () -> Unit,
 ) {
     AnimatedVisibility(
-        visible = isVisible.value,
+        visible = isVisible,
         Modifier
             .align(Alignment.BottomCenter),
         enter = expandVertically(tween(1000), Alignment.Bottom),
@@ -211,10 +209,7 @@ fun PreviewPlayBar() {
     AmuzicTheme {
         Box {
             PlayBar(
-                isVisible =
-                    remember {
-                        mutableStateOf(true)
-                    },
+                isVisible = true,
                 state =
                     remember {
                         AmuzicState.INITIAL_STATE
