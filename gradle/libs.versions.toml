@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.1.21"
-agp = "8.9.2"
+agp = "8.11.1"
 ktlintGradle = "12.1.1"
 hilt = "2.55"
 
