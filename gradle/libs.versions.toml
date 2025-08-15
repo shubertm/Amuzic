@@ -2,7 +2,7 @@
 kotlin = "2.1.21"
 agp = "8.11.1"
 ktlintGradle = "12.1.1"
-hilt = "2.55"
+hilt = "2.57"
 
 coreKtx = "1.15.0"
 material3 = "1.3.1"
