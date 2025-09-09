@@ -31,16 +31,6 @@ fun <C> List<C>.tryGetFirst(default: () -> C): C {
     }
 }
 
-fun Context.openWebLink(
-    @StringRes linkRes: Int,
-) {
-    val link = getString(linkRes)
-    startActivity(
-        Intent(Intent.ACTION_VIEW)
-            .setData(link.toUri()),
-    )
-}
-
 fun Modifier.navigationBarsPadding(condition: Boolean): Modifier = if (condition) navigationBarsPadding() else this
 
 fun <T> LazyListScope.accommodateFullBannerAds(
