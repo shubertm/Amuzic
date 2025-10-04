@@ -1,8 +1,5 @@
 package com.infbyte.amuzic.utils
 
-import android.content.Context
-import android.content.Intent
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.core.net.toUri
 import com.infbyte.amuzic.ui.views.FullBannerAdView
 
 fun calcScroll(state: LazyListState): Int {
@@ -29,16 +25,6 @@ fun <C> List<C>.tryGetFirst(default: () -> C): C {
     } else {
         default()
     }
-}
-
-fun Context.openWebLink(
-    @StringRes linkRes: Int,
-) {
-    val link = getString(linkRes)
-    startActivity(
-        Intent(Intent.ACTION_VIEW)
-            .setData(link.toUri()),
-    )
 }
 
 fun Modifier.navigationBarsPadding(condition: Boolean): Modifier = if (condition) navigationBarsPadding() else this

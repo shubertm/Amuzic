@@ -189,15 +189,6 @@ class MainActivity : ComponentActivity() {
                                 songsViewModel,
                                 onNavigate = { route -> navController.navigate(route) },
                                 onExit = { onExit() },
-                                about = { navigateBack ->
-                                    AboutScreen(
-                                        stringResource(R.string.app_name),
-                                        BuildConfig.VERSION_NAME,
-                                        R.drawable.ic_amuzic_foreground,
-                                        R.string.amuzic_privacy_policy_link,
-                                        adsConsentManager = googleMobileAdsConsentManager,
-                                    )
-                                },
                             )
                         }
                         composable(Screens.SONGS) {

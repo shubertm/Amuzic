@@ -58,7 +58,6 @@ fun MainScreen(
     songsViewModel: SongsViewModel,
     onNavigate: (String) -> Unit,
     onExit: () -> Unit,
-    about: @Composable (() -> Unit) -> Unit,
 ) {
     val pagerState = rememberPagerState(0) { 3 }
     val scope = rememberCoroutineScope()

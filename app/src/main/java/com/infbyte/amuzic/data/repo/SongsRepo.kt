@@ -108,7 +108,10 @@ class SongsRepo
                                 .setMediaId(id.toString())
                                 .build()
                         val duration = it.getLong(durationColumn)
-                        _songs += Song(item, extractFolderName(path), thumbnail, duration)
+                        val secondsDuration = duration / 1000
+                        if (secondsDuration >= 60) {
+                            _songs += Song(item, extractFolderName(path), thumbnail, duration)
+                        }
                     }
 
                     query.close()
