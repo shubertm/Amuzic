@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,9 +39,11 @@ import com.infbyte.amuze.ui.screens.NoMediaPermissionScreen
 import com.infbyte.amuzic.BuildConfig
 import com.infbyte.amuzic.R
 import com.infbyte.amuzic.contracts.AppSettingsContract
+import com.infbyte.amuzic.data.LAST_PLAYED_SONG
 import com.infbyte.amuzic.data.TERMS_ACCEPTED_KEY
 import com.infbyte.amuzic.data.readBoolean
 import com.infbyte.amuzic.data.writeBoolean
+import com.infbyte.amuzic.data.writeString
 import com.infbyte.amuzic.playback.AmuzicPlayerService
 import com.infbyte.amuzic.ui.dialogs.AppSettingsRedirectDialog
 import com.infbyte.amuzic.ui.dialogs.PrivacyPolicyDialog
@@ -110,7 +113,9 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (!songsViewModel.state.isLoaded) {
-                        songsViewModel.setReadPermGranted(isReadPermissionGranted(this@MainActivity))
+                        songsViewModel.setReadPermGranted(
+                            isReadPermissionGranted(this@MainActivity),
+                        )
                         if (!songsViewModel.state.isReadPermGranted) {
                             readBoolean(TERMS_ACCEPTED_KEY) { accepted ->
                                 songsViewModel.setTermsAccepted(accepted)
@@ -336,6 +341,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private suspend fun persistLastPlayedSong() {
+        writeString(LAST_PLAYED_SONG, songsViewModel.state.currentSong.id)
+    }
+
     private fun onExit() {
         if (!songsViewModel.confirmExit) {
             Toast.makeText(
@@ -346,7 +355,10 @@ class MainActivity : ComponentActivity() {
                 .show()
             songsViewModel.confirmExit()
         } else {
-            finish()
+            lifecycleScope.launch {
+                persistLastPlayedSong()
+                finish()
+            }
         }
     }
 }
