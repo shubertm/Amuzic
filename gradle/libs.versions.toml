@@ -16,7 +16,7 @@ amuze = "0.2.7"
 datastore = "1.1.7"
 junit = "4.13.2"
 testExt = "1.1.5"
-espresso = "3.5.1"
+espresso = "3.7.0"
 mobileAds = "24.2.0"
 ksp = "2.1.21-2.0.1"
 
