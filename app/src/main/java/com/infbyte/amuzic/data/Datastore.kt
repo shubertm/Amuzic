@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.collectLatest
 
@@ -11,6 +12,7 @@ private const val NAME = "AmuzicDatastore"
 private val Context.Datastore by preferencesDataStore(NAME)
 
 val TERMS_ACCEPTED_KEY = booleanPreferencesKey("terms_accepted_key")
+val LAST_PLAYED_SONG = stringPreferencesKey("last_played_song")
 
 suspend fun Context.writeBoolean(
     key: Preferences.Key<Boolean>,

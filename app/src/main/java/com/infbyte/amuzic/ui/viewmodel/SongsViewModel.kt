@@ -8,13 +8,16 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.RepeatMode
+import com.infbyte.amuzic.data.LAST_PLAYED_SONG
 import com.infbyte.amuzic.data.model.Album
 import com.infbyte.amuzic.data.model.Artist
 import com.infbyte.amuzic.data.model.NotificationMessage
 import com.infbyte.amuzic.data.model.Playlist
 import com.infbyte.amuzic.data.model.Song
+import com.infbyte.amuzic.data.readString
 import com.infbyte.amuzic.data.repo.PlaylistsRepo
 import com.infbyte.amuzic.data.repo.SongsRepo
 import com.infbyte.amuzic.playback.AmuzicPlayer
@@ -111,10 +114,24 @@ class SongsViewModel
         }
 
         fun init(context: Context) {
-            viewModelScope.launch { playlistsRepo.init(Path(context.filesDir.path)) }
+            viewModelScope.launch {
+                playlistsRepo.init(Path(context.filesDir.path))
+                context.readString(LAST_PLAYED_SONG) { mediaId ->
+                    setCurrentSong(mediaId)
+                }
+            }
             refreshController(context)
             loadSongs()
             loadPlaylists()
+        }
+
+        fun setCurrentSong(mediaId: String?) {
+            viewModelScope.launch {
+                if (mediaId != null) {
+                    val song = Song(MediaItem.Builder().setMediaId(mediaId).build())
+                    state = state.copy(currentSong = song)
+                }
+            }
         }
 
         fun confirmExit() {
@@ -477,9 +494,13 @@ class SongsViewModel
                             if (state.isRefreshing && songs.isEmpty()) {
                                 delay(1000)
                             }
+                            val currentSong =
+                                songs.find { it.id == state.currentSong.id }
+                                    ?: songs.tryGetFirst { state.currentSong }
+                            val currentSongIndex = songs.indexOf(currentSong)
+
                             state =
                                 state.copy(
-                                    currentSong = songs.tryGetFirst { state.currentSong },
                                     songs = songs,
                                     currentSongs = songs,
                                     artists = songsRepo.artists,
@@ -494,6 +515,7 @@ class SongsViewModel
                             sideEffect = sideEffect.copy(showSplash = false)
                             launch(Dispatchers.Main) {
                                 amuzicPlayer.createPlayList(songs.map { it.item })
+                                amuzicPlayer.selectSong(currentSongIndex, 0)
                             }
                         }
                     },
