@@ -59,7 +59,7 @@ fun NewPlaylist(
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_close),
-                        "",
+                        null,
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -69,7 +69,7 @@ fun NewPlaylist(
                     onClick = { onSave(name) },
                     Modifier.padding(end = 8.dp),
                 ) {
-                    Icon(painterResource(R.drawable.ic_add), "")
+                    Icon(painterResource(R.drawable.ic_add), null)
                 }
             },
         )

@@ -113,7 +113,7 @@ fun SongsScreen(songsViewModel: SongsViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(painterResource(R.drawable.ic_check), "")
+                    Icon(painterResource(R.drawable.ic_check), null)
                     Text(stringResource(R.string.amuzic_done), Modifier.padding(start = 2.dp))
                 }
             }
@@ -128,7 +128,7 @@ fun SongsScreen(songsViewModel: SongsViewModel) {
                         end = 16.dp,
                     ),
             ) {
-                Icon(painterResource(R.drawable.ic_queue_music), "")
+                Icon(painterResource(R.drawable.ic_queue_music), null)
             }
         }
     }
@@ -240,7 +240,7 @@ fun Song(
                 } else {
                     painterResource(R.drawable.ic_pause)
                 },
-                "",
+                null,
                 Modifier.padding(8.dp),
                 tint = color.value,
             )
@@ -261,6 +261,6 @@ fun Song(
 @Composable
 fun PreviewSong() {
     AmuzicTheme {
-        Song(song = Song(), true, true, {}, {})
+        Song(song = Song(), isCurrent = true, isSelecting = true, onClick = {}, onLongClick = {})
     }
 }

@@ -119,7 +119,7 @@ fun Playlist(
         IconButton(
             onClick = { isDeleting = true },
         ) {
-            Icon(painterResource(R.drawable.ic_delete), "")
+            Icon(painterResource(R.drawable.ic_delete), null)
         }
     }
 }

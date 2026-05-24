@@ -89,7 +89,7 @@ fun ArtistOrAlbumSongsScreen(
                                 onNavigateBack()
                             },
                         ) {
-                            Icon(painterResource(R.drawable.ic_arrow_back), "")
+                            Icon(painterResource(R.drawable.ic_arrow_back), null)
                         }
                     },
                     trailingIcon = {
@@ -102,7 +102,7 @@ fun ArtistOrAlbumSongsScreen(
                                     }
                                 },
                             ) {
-                                Icon(painterResource(R.drawable.ic_search), "")
+                                Icon(painterResource(R.drawable.ic_search), null)
                             }
                             if (!songsViewModel.state.isSearching) {
                                 IconButton(onClick = {}) {
@@ -216,13 +216,13 @@ fun PreviewSearchBar() {
                                 IconButton(
                                     onClick = { /*TODO*/ },
                                 ) {
-                                    Icon(painterResource(R.drawable.ic_arrow_back), "")
+                                    Icon(painterResource(R.drawable.ic_arrow_back), null)
                                 }
                             },
                             trailingIcon = {
                                 Row {
                                     IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(painterResource(R.drawable.ic_search), "")
+                                        Icon(painterResource(R.drawable.ic_search), null)
                                     }
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Box(

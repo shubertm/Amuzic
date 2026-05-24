@@ -87,7 +87,7 @@ fun MainScreen(
                             pagerState.animateScrollToPage(0, animationSpec = tween(500, 300))
                         }
                     },
-                    icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
+                    icon = { Icon(painterResource(R.drawable.ic_library_music), null) },
                     label = { Text(stringResource(R.string.amuzic_songs)) },
                 )
                 NavigationBarItem(
@@ -100,7 +100,7 @@ fun MainScreen(
                             pagerState.animateScrollToPage(1, animationSpec = tween(500, 300))
                         }
                     },
-                    icon = { Icon(painterResource(R.drawable.ic_artist), "") },
+                    icon = { Icon(painterResource(R.drawable.ic_artist), null) },
                     label = { Text(stringResource(R.string.amuzic_artists)) },
                 )
                 NavigationBarItem(
@@ -113,7 +113,7 @@ fun MainScreen(
                             pagerState.animateScrollToPage(2, animationSpec = tween(500, 300))
                         }
                     },
-                    icon = { Icon(painterResource(R.drawable.ic_album), "") },
+                    icon = { Icon(painterResource(R.drawable.ic_album), null) },
                     label = { Text(stringResource(R.string.amuzic_albums)) },
                 )
             }
@@ -158,7 +158,7 @@ fun MainScreen(
                                             }
                                         },
                                     ) {
-                                        Icon(painterResource(R.drawable.ic_search), "")
+                                        Icon(painterResource(R.drawable.ic_search), null)
                                     }
                                     if (!songsViewModel.state.isSearching) {
                                         IconButton(
@@ -167,7 +167,7 @@ fun MainScreen(
                                                 onNavigate(Screens.ABOUT)
                                             },
                                         ) {
-                                            Icon(painterResource(R.drawable.ic_info), contentDescription = "")
+                                            Icon(painterResource(R.drawable.ic_info), null)
                                         }
                                     }
                                 }
@@ -335,13 +335,13 @@ fun NavBar() {
                                 IconButton(
                                     onClick = { /*TODO*/ },
                                 ) {
-                                    Icon(painterResource(R.drawable.ic_arrow_back), "")
+                                    Icon(painterResource(R.drawable.ic_arrow_back), null)
                                 }
                             },
                             trailingIcon = {
                                 Row {
                                     IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(painterResource(R.drawable.ic_search), "")
+                                        Icon(painterResource(R.drawable.ic_search), null)
                                     }
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Box(
@@ -372,17 +372,17 @@ fun NavBar() {
                 NavigationBarItem(
                     selected = true,
                     onClick = { /*TODO*/ },
-                    icon = { Icon(painterResource(R.drawable.ic_library_music), "") },
+                    icon = { Icon(painterResource(R.drawable.ic_library_music), null) },
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = { /*TODO*/ },
-                    icon = { Icon(painterResource(R.drawable.ic_artist), "") },
+                    icon = { Icon(painterResource(R.drawable.ic_artist), null) },
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = { /*TODO*/ },
-                    icon = { Icon(painterResource(R.drawable.ic_album), "") },
+                    icon = { Icon(painterResource(R.drawable.ic_album), null) },
                 )
             }
         }

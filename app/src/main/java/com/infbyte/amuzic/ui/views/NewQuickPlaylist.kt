@@ -58,7 +58,7 @@ fun NewQuickPlaylist(
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_close),
-                        "",
+                        null,
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -67,7 +67,7 @@ fun NewQuickPlaylist(
                 FilledTonalIconButton(
                     onClick = { onSave(name) },
                 ) {
-                    Icon(painterResource(R.drawable.ic_check), "")
+                    Icon(painterResource(R.drawable.ic_check), null)
                 }
             },
         )

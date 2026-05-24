@@ -106,7 +106,7 @@ fun PlaylistsBottomSheet(
                 FilledTonalIconButton(
                     onClick = { showNewPlaylist = true },
                 ) {
-                    Icon(painterResource(R.drawable.ic_add), "")
+                    Icon(painterResource(R.drawable.ic_add), null)
                 }
             }
         }

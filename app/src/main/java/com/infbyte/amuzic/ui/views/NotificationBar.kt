@@ -49,7 +49,7 @@ fun NotificationBar(message: NotificationMessage = NotificationMessage.Success()
 
                     is NotificationMessage.Error -> {}
                 }
-                Icon(icon, "", tint = color)
+                Icon(icon, null, tint = color)
                 Text(message.info)
             }
         }

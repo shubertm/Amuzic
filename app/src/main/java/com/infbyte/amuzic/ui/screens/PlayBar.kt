@@ -96,7 +96,7 @@ fun BoxScope.PlayBar(
                                 painterResource(R.drawable.ic_shuffle)
                             else -> painterResource(R.drawable.ic_repeat)
                         },
-                        "",
+                        null,
                         Modifier.size(32.dp),
                         tint =
                             if (!state.shuffle && state.mode == Player.REPEAT_MODE_OFF) {
@@ -112,7 +112,7 @@ fun BoxScope.PlayBar(
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_skip_previous),
-                        "",
+                        null,
                         Modifier.size(32.dp),
                     )
                 }
@@ -129,7 +129,7 @@ fun BoxScope.PlayBar(
                         } else {
                             painterResource(R.drawable.ic_play_arrow)
                         },
-                        "",
+                        null,
                         Modifier.size(52.dp),
                     )
                 }
@@ -139,7 +139,7 @@ fun BoxScope.PlayBar(
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_skip_next),
-                        "",
+                        null,
                         Modifier.size(32.dp),
                     )
                 }
@@ -151,7 +151,7 @@ fun BoxScope.PlayBar(
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_queue_music),
-                        "",
+                        null,
                         Modifier.size(32.dp),
                     )
                 }

@@ -26,7 +26,7 @@ fun SelectionCount(
         IconButton(
             onClick = onCancel,
         ) {
-            Icon(painterResource(R.drawable.ic_close), "")
+            Icon(painterResource(R.drawable.ic_close), null)
         }
         if (number > 0) {
             Text(number.toString())
