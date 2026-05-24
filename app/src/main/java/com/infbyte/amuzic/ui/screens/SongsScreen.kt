@@ -22,9 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
@@ -41,11 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -118,7 +113,7 @@ fun SongsScreen(songsViewModel: SongsViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Outlined.Check, "")
+                    Icon(painterResource(R.drawable.ic_check), null)
                     Text(stringResource(R.string.amuzic_done), Modifier.padding(start = 2.dp))
                 }
             }
@@ -133,7 +128,7 @@ fun SongsScreen(songsViewModel: SongsViewModel) {
                         end = 16.dp,
                     ),
             ) {
-                Icon(painterResource(R.drawable.ic_queue_music), "")
+                Icon(painterResource(R.drawable.ic_queue_music), null)
             }
         }
     }
@@ -241,11 +236,11 @@ fun Song(
         if (isCurrent) {
             Icon(
                 if (song.isPlaying) {
-                    Icons.Outlined.PlayArrow
+                    painterResource(R.drawable.ic_play_arrow)
                 } else {
-                    ImageVector.vectorResource(R.drawable.ic_pause)
+                    painterResource(R.drawable.ic_pause)
                 },
-                "",
+                null,
                 Modifier.padding(8.dp),
                 tint = color.value,
             )
@@ -266,6 +261,6 @@ fun Song(
 @Composable
 fun PreviewSong() {
     AmuzicTheme {
-        Song(song = Song(), true, true, {}, {})
+        Song(song = Song(), isCurrent = true, isSelecting = true, onClick = {}, onLongClick = {})
     }
 }

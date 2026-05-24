@@ -3,9 +3,6 @@ package com.infbyte.amuzic.ui.views
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.infbyte.amuzic.R
@@ -59,8 +57,8 @@ fun NewQuickPlaylist(
                     },
                 ) {
                     Icon(
-                        Icons.Outlined.Close,
-                        "",
+                        painterResource(R.drawable.ic_close),
+                        null,
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -69,7 +67,7 @@ fun NewQuickPlaylist(
                 FilledTonalIconButton(
                     onClick = { onSave(name) },
                 ) {
-                    Icon(Icons.Outlined.Check, "")
+                    Icon(painterResource(R.drawable.ic_check), null)
                 }
             },
         )
