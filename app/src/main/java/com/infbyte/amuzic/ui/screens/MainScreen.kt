@@ -12,10 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -162,7 +158,7 @@ fun MainScreen(
                                             }
                                         },
                                     ) {
-                                        Icon(Icons.Outlined.Search, "")
+                                        Icon(painterResource(R.drawable.ic_search), "")
                                     }
                                     if (!songsViewModel.state.isSearching) {
                                         IconButton(
@@ -171,7 +167,7 @@ fun MainScreen(
                                                 onNavigate(Screens.ABOUT)
                                             },
                                         ) {
-                                            Icon(Icons.Outlined.Info, contentDescription = "")
+                                            Icon(painterResource(R.drawable.ic_info), contentDescription = "")
                                         }
                                     }
                                 }
@@ -339,13 +335,13 @@ fun NavBar() {
                                 IconButton(
                                     onClick = { /*TODO*/ },
                                 ) {
-                                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                                    Icon(painterResource(R.drawable.ic_arrow_back), "")
                                 }
                             },
                             trailingIcon = {
                                 Row {
                                     IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(Icons.Outlined.Search, "")
+                                        Icon(painterResource(R.drawable.ic_search), "")
                                     }
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Box(
