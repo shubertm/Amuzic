@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -91,7 +89,7 @@ fun ArtistOrAlbumSongsScreen(
                                 onNavigateBack()
                             },
                         ) {
-                            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                            Icon(painterResource(R.drawable.ic_arrow_back), null)
                         }
                     },
                     trailingIcon = {
@@ -104,7 +102,7 @@ fun ArtistOrAlbumSongsScreen(
                                     }
                                 },
                             ) {
-                                Icon(Icons.Outlined.Search, "")
+                                Icon(painterResource(R.drawable.ic_search), null)
                             }
                             if (!songsViewModel.state.isSearching) {
                                 IconButton(onClick = {}) {
@@ -218,13 +216,13 @@ fun PreviewSearchBar() {
                                 IconButton(
                                     onClick = { /*TODO*/ },
                                 ) {
-                                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, "")
+                                    Icon(painterResource(R.drawable.ic_arrow_back), null)
                                 }
                             },
                             trailingIcon = {
                                 Row {
                                     IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(Icons.Outlined.Search, "")
+                                        Icon(painterResource(R.drawable.ic_search), null)
                                     }
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Box(
