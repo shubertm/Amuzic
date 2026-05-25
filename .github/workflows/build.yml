@@ -8,22 +8,21 @@ jobs:
         runs-on: ubuntu-latest
         environment: Development
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
-            - name: Set Up JDK 17
-              uses: actions/setup-java@v4
+            - name: Set Up JDK 21
+              uses: actions/setup-java@v5
               with:
-                  java-version: '17'
-                  distribution: 'adopt'
-                  cache: gradle
+                  java-version: '21'
+                  distribution: 'temurin'
+
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v5
 
             - name: Decode Keystore
               run: |
                   echo ${{ secrets.RELEASE_SIGNING_KEYSTORE }} > base64_keystore.txt
                   base64 -d base64_keystore.txt > ./app/amuzic_release_keystore.jks
-
-            - name: Validate Gradle Wrapper
-              uses: gradle/actions/wrapper-validation@v3
 
             - name: Build Debug APK
               env:
@@ -64,19 +63,19 @@ jobs:
                   ./gradlew bundleRelease
 
             - name: Upload Debug APK
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: amuzic-debug
                   path: ./app/build/outputs/apk/debug/*.apk
 
             - name: Upload Release APK
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: amuzic-release
                   path: ./app/build/outputs/apk/release/*.apk
 
             -   name: Upload AAB
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 with:
                     name: amuzic-bundle
                     path: ./app/build/outputs/bundle/release/*.aab
@@ -85,18 +84,18 @@ jobs:
         environment: Development
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
+            - name: Set up JDK 21
+              uses: actions/setup-java@v5
               with:
-                  java-version: '17'
-                  distribution: 'adopt'
+                  java-version: '21'
+                  distribution: 'temurin'
 
             - name: Run linter
               run: ./gradlew lint
 
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: lint-results
                   path: ./app/build/reports/*.html
@@ -105,13 +104,13 @@ jobs:
         environment: Development
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
+            - name: Set up JDK 21
+              uses: actions/setup-java@v5
               with:
-                  java-version: '17'
-                  distribution: 'adopt'
+                  java-version: '21'
+                  distribution: 'temurin'
 
             - name: Kotlin linter
               run: ./gradlew ktlintCheck
