@@ -22,8 +22,8 @@
     <string name="amuzic_btc">Bitcoin</string>
     <string name="amuzic_eth">Ethereum</string>
     <string name="amuzic_coffee">Buy me a coffee</string>
-    <string name="infbyte_website">https://infbyte.com</string>
-    <string name="amuzic_privacy_policy_link">https://www.infbyte.com/apps/privacy-policy/amuzic</string>
+    <string name="infbyte_website">https://infbytetechnologies.github.io</string>
+    <string name="amuzic_privacy_policy_link">https://infbytetechnologies.github.io/apps/privacy-policy/amuzic</string>
     <string name="amuzic_copy">Copy</string>
     <string name="btc_address">12ndrwkbsthfJNLHCgw49db7sZ3MHMkUPa</string>
     <string name="eth_address">0x4906e6C45D466b9678eBbFb70bfBE3021d26Da5D</string>
@@ -32,7 +32,7 @@
     <string name="amuzic_listen">Listen</string>
     <string name="amuzic_agree">Agree</string>
     <string name="amuzic_cancel">Cancel</string>
-    <string name="amuzic_agree_rationale">By clicking Agree, you accept the terms and conditions stated in our <a href="https://www.infbyte.com/apps/privacy-policy/amuzic">Privacy Policy</a></string>
+    <string name="amuzic_agree_rationale">By clicking Agree, you accept the terms and conditions stated in our Privacy Policy</string>
     <string name="amuzic_service_explain">To play audio, Amuzic requires Audio permisson.</string>
     <string name="amuzic_grant">Grant</string>
     <string name="amuzic_grant_in_settings">Grant in settings</string>
@@ -41,7 +41,7 @@
     <string name="amuzic_done">Done</string>
     <string name="amuzic_playlists">Your playlists</string>
     <string name="amuzic_new_playlist">New playlist</string>
-    <string name="amuzic_preparing">Preparing your songs...</string>
+    <string name="amuzic_preparing">Preparing your songs…</string>
     <string name="amuzic_delete">Delete?</string>
     <string name="amuzic_no">No</string>
     <string name="amuzic_name">Name</string>
