@@ -28,14 +28,14 @@ val amuzicVersionCode: Int =
         ?: System.getenv("RELEASES")?.toInt() ?: 0
 
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     namespace = "com.infbyte.amuzic"
 
     defaultConfig {
         applicationId = "com.infbyte.amuzic"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = amuzicVersionCode + 1
         versionName = System.getenv("VERSION_NAME") ?: localVersion
 
